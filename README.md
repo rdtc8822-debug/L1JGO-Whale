@@ -1,4 +1,4 @@
-# L1JGO-Whale
+# L1J-Whale
 
 天堂 (Lineage 1) 3.80C 遊戲伺服器 — 使用 Go 語言從零重寫。
 
