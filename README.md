@@ -164,7 +164,7 @@ L1JGO-Whale/
 │   ├── seed/                      # 開發測試資料
 │   ├── Makefile
 │   └── go.mod
-├── map/                           # 地圖檔案（.s32）
+├── map/                           # 地圖檔案（.txt）
 └── l1j_java/                      # Java 參考原始碼（僅供參考）
 ```
 
