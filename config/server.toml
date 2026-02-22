@@ -1,0 +1,58 @@
+# ============================================================
+#  L1JGO-Whale 伺服器設定檔
+#  修改後需重啟伺服器才會生效
+# ============================================================
+
+# ── 伺服器基本設定 ──────────────────────────────────────────
+[server]
+name = "L1JGO-Whale"         # 伺服器名稱（顯示於登入畫面）
+id = 1                        # 伺服器編號
+language = 3                  # 語系代碼：0=美國, 3=台灣, 4=日本, 5=中國
+
+# ── 資料庫連線設定 ──────────────────────────────────────────
+[database]
+dsn = "postgres://postgres:your_password@localhost:5432/l1jgo?sslmode=disable"
+max_open_conns = 20           # 最大連線數
+max_idle_conns = 5            # 閒置連線數
+conn_max_lifetime = "30m"     # 連線最大存活時間
+
+# ── 網路與遊戲迴圈設定 ────────────────────────────────────
+[network]
+bind_address = "0.0.0.0:7001" # 監聽位址與埠號
+tick_rate = "200ms"            # 遊戲迴圈間隔（每秒 5 tick）
+in_queue_size = 128            # 每個連線的輸入佇列大小
+out_queue_size = 256           # 每個連線的輸出佇列大小
+max_packets_per_tick = 32      # 每 tick 每連線最大處理封包數
+write_timeout = "10s"          # 寫入逾時
+read_timeout = "60s"           # 讀取逾時
+
+# ── 倍率設定 ────────────────────────────────────────────────
+[rates]
+exp_rate = 1                   # 經驗值倍率（1=正常）
+drop_rate = 1                  # 掉寶倍率
+gold_rate = 1                  # 金幣倍率
+lawful_rate = 1.0              # 正義值倍率
+
+# ── 衝裝設定 ────────────────────────────────────────────────
+[enchant]
+weapon_chance = 0.5            # 武器安定值以上衝裝成功率（50%）
+armor_chance = 0.333           # 防具安定值以上衝裝成功率（33%）
+
+# ── 角色設定 ────────────────────────────────────────────────
+[character]
+default_slots = 6              # 預設角色欄位數
+auto_create_accounts = true    # 自動建立帳號（輸入不存在的帳號時自動註冊）
+delete_7_days = true           # 啟用 7 天刪除等待期
+delete_7_days_min_level = 5    # 需等待 7 天才能刪除的最低等級
+client_language_code = "MS950" # 客戶端文字編碼（繁體中文 Big5）
+
+# ── 日誌設定 ────────────────────────────────────────────────
+[logging]
+level = "info"                 # 日誌等級：debug, info, warn, error
+format = "console"             # 輸出格式："json" 或 "console"
+
+# ── 流量限制設定 ────────────────────────────────────────────
+[rate_limit]
+enabled = true                 # 啟用流量限制
+login_attempts_per_minute = 10 # 每分鐘最大登入嘗試次數
+packets_per_second = 60        # 每秒最大封包數

@@ -1,0 +1,3824 @@
+# NPC dialog actions - converted from L1JTW npcaction.sql
+
+actions:
+    - npc_id: 782
+      normal_action: fivelviin3
+      caotic_action: fivelviin3
+    - npc_id: 1621
+      normal_action: fivelviin2
+      caotic_action: fivelviin2
+    - npc_id: 2255
+      normal_action: fivelviin1
+      caotic_action: fivelviin1
+    - npc_id: 2820
+      normal_action: fivelviin4
+      caotic_action: fivelviin4
+    - npc_id: 45015
+      normal_action: duck1
+      caotic_action: duck1
+    - npc_id: 45154
+      normal_action: mermaid
+      caotic_action: mermaid
+    - npc_id: 46069
+      normal_action: minicod1
+      caotic_action: minicod1
+    - npc_id: 46070
+      normal_action: minicod3
+      caotic_action: minicod3
+    - npc_id: 46072
+      normal_action: minicod2
+      caotic_action: minicod2
+    - npc_id: 46074
+      normal_action: minicod2
+      caotic_action: minicod2
+    - npc_id: 46075
+      normal_action: minicod3
+      caotic_action: minicod3
+    - npc_id: 46076
+      normal_action: minicod1
+      caotic_action: minicod1
+    - npc_id: 46077
+      normal_action: minicod2
+      caotic_action: minicod2
+    - npc_id: 46078
+      normal_action: minicod1
+      caotic_action: minicod1
+    - npc_id: 46079
+      normal_action: minicod2
+      caotic_action: minicod2
+    - npc_id: 46080
+      normal_action: minicod1
+      caotic_action: minicod1
+    - npc_id: 46081
+      normal_action: minicod2
+      caotic_action: minicod2
+    - npc_id: 46092
+      normal_action: minitos3
+      caotic_action: minitos3
+    - npc_id: 46093
+      normal_action: minitos3
+      caotic_action: minitos3
+    - npc_id: 46094
+      normal_action: minitos2
+      caotic_action: minitos2
+    - npc_id: 46095
+      normal_action: minitos2
+      caotic_action: minitos2
+    - npc_id: 46096
+      normal_action: minitos1
+      caotic_action: minitos1
+    - npc_id: 50001
+      normal_action: barnia1
+      caotic_action: barnia1
+      teleport_url: barnia4
+    - npc_id: 50002
+      normal_action: sky4
+      caotic_action: sky4
+      teleport_url: sky1
+    - npc_id: 50003
+      normal_action: illdrath
+      caotic_action: illdrath
+      teleport_url: illdrath1
+    - npc_id: 50004
+      normal_action: htel
+      caotic_action: htel
+      teleport_url: htel1
+    - npc_id: 50005
+      normal_action: karen3
+      caotic_action: karen3
+      teleport_url: karen1
+    - npc_id: 50006
+      normal_action: coco2
+      caotic_action: coco2
+      teleport_url: coco4
+    - npc_id: 50007
+      normal_action: esmereld2
+      caotic_action: esmereld2
+      teleport_url: esmereld
+    - npc_id: 50008
+      normal_action: aghvout
+      caotic_action: aghvout
+      teleport_url: agout
+    - npc_id: 50009
+      normal_action: ishtar1
+      caotic_action: ishtar1
+      teleport_url: ishtar
+    - npc_id: 50010
+      normal_action: stel
+      caotic_action: stel
+      teleport_url: stel1
+    - npc_id: 50011
+      normal_action: kun4
+      caotic_action: kun4
+      teleport_url: kun2
+    - npc_id: 50012
+      normal_action: kiyari4
+      caotic_action: kiyari4
+      teleport_url: kiyari2
+    - npc_id: 50013
+      normal_action: agsiout
+      caotic_action: agsiout
+      teleport_url: agout
+    - npc_id: 50014
+      normal_action: dilong2
+      caotic_action: dilong2
+      teleport_url: dilongs
+    - npc_id: 50015
+      normal_action: teleisland1
+      caotic_action: teleisland1
+      teleport_url: teleisland2
+    - npc_id: 50016
+      normal_action: zeno
+      caotic_action: zeno1
+      teleport_url: zeno2
+    - npc_id: 50017
+      normal_action: telefire1
+      caotic_action: telefire2
+      teleport_url: telefire3
+    - npc_id: 50018
+      normal_action: colos
+      caotic_action: colos
+      teleport_url: colos1
+    - npc_id: 50019
+      normal_action: colusher
+      caotic_action: colusher
+    - npc_id: 50020
+      normal_action: telekent1
+      caotic_action: telekent1
+      teleport_url: telekent2
+      teleport_urla: telekent3
+    - npc_id: 50021
+      normal_action: teleckent1
+      caotic_action: teleckent1
+      teleport_url: teleckent2
+    - npc_id: 50022
+      normal_action: telefire1
+      caotic_action: telefire2
+      teleport_url: telefire3
+    - npc_id: 50023
+      normal_action: kentober1
+      caotic_action: kentober1
+      teleport_url: kentober2
+    - npc_id: 50024
+      normal_action: telegludin1
+      caotic_action: telegludin1
+      teleport_url: telegludin2
+      teleport_urla: telegludin3
+    - npc_id: 50025
+      normal_action: gltzguard
+      caotic_action: gltzguard
+      teleport_url: gltzguard1
+    - npc_id: 50026
+      normal_action: telegltz1
+      caotic_action: telegltz1
+      teleport_url: telegltz2
+    - npc_id: 50027
+      normal_action: gltztele
+      caotic_action: gltztele
+      teleport_url: gltztele1
+    - npc_id: 50028
+      normal_action: colos
+      caotic_action: colos
+      teleport_url: colos1
+    - npc_id: 50029
+      normal_action: colusher
+      caotic_action: colusher
+    - npc_id: 50030
+      normal_action: telefire1
+      caotic_action: telefire2
+      teleport_url: telefire3
+    - npc_id: 50031
+      normal_action: sepia2
+      caotic_action: sepia2
+    - npc_id: 50032
+      normal_action: grtzguard
+      caotic_action: grtzguard
+      teleport_url: grtzguard1
+    - npc_id: 50033
+      normal_action: telegrtz1
+      caotic_action: telegrtz1
+      teleport_url: telegrtz2
+    - npc_id: 50034
+      normal_action: grtztele
+      caotic_action: grtztele
+      teleport_url: grtztele1
+    - npc_id: 50035
+      normal_action: telecgiran1
+      caotic_action: telecgiran1
+      teleport_url: telecgiran2
+    - npc_id: 50036
+      normal_action: telegiran1
+      caotic_action: telegiran1
+      teleport_url: telegiran2
+      teleport_urla: telegiran3
+    - npc_id: 50037
+      normal_action: colos
+      caotic_action: colos
+      teleport_url: colos1
+    - npc_id: 50038
+      normal_action: colusher
+      caotic_action: colusher
+    - npc_id: 50039
+      normal_action: televala1
+      caotic_action: televala1
+      teleport_url: televala2
+      teleport_urla: televala3
+    - npc_id: 50040
+      normal_action: telecdwarf1
+      caotic_action: telecdwarf1
+      teleport_url: telecdwarf2
+    - npc_id: 50041
+      normal_action: colos
+      caotic_action: colos
+      teleport_url: colos1
+    - npc_id: 50042
+      normal_action: colusher
+      caotic_action: colusher
+    - npc_id: 50043
+      normal_action: ramudap2
+      caotic_action: ramudap2
+      teleport_url: ramudap1
+    - npc_id: 50044
+      normal_action: sirius1
+      caotic_action: sirius1
+      teleport_url: sirius2
+      teleport_urla: sirius3
+    - npc_id: 50045
+      normal_action: telephantasm
+      caotic_action: telephantasm
+      teleport_url: phantasmisle
+    - npc_id: 50046
+      normal_action: elleris1
+      caotic_action: elleris1
+      teleport_url: elleris2
+      teleport_urla: elleris3
+    - npc_id: 50047
+      normal_action: telecaden1
+      caotic_action: telecaden1
+      teleport_url: telecaden2
+    - npc_id: 50048
+      normal_action: ortzguard
+      caotic_action: ortzguard
+      teleport_url: ortzguard1
+    - npc_id: 50049
+      normal_action: teleortz1
+      caotic_action: teleortz1
+      teleport_url: teleortz2
+    - npc_id: 50050
+      normal_action: ortztele
+      caotic_action: ortztele
+      teleport_url: ortztele1
+    - npc_id: 50051
+      normal_action: kirius1
+      caotic_action: kirius1
+      teleport_url: kirius2
+      teleport_urla: kirius3
+    - npc_id: 50052
+      normal_action: telecwoods1
+      caotic_action: telecwoods1
+      teleport_url: telecwoods2
+    - npc_id: 50053
+      normal_action: telefire1
+      caotic_action: telefire2
+      teleport_url: telefire3
+    - npc_id: 50054
+      normal_action: telewoods1
+      caotic_action: telewoods1
+      teleport_url: telewoods2
+      teleport_urla: telewoods3
+    - npc_id: 50055
+      normal_action: drist
+      caotic_action: drist1
+      teleport_url: drist2
+    - npc_id: 50056
+      normal_action: telesilver1
+      caotic_action: telesilver1
+      teleport_url: telesilver2
+      teleport_urla: telesilver3
+    - npc_id: 50057
+      normal_action: telefire1
+      caotic_action: telefire2
+      teleport_url: telefire3
+    - npc_id: 50058
+      normal_action: sktzguard
+      caotic_action: sktzguard
+      teleport_url: sktzguard1
+    - npc_id: 50059
+      normal_action: telesktz1
+      caotic_action: telesktz1
+      teleport_url: telesktz2
+    - npc_id: 50060
+      normal_action: sktztele
+      caotic_action: sktztele
+      teleport_url: sktztele1
+    - npc_id: 50061
+      normal_action: colos
+      caotic_action: colos
+      teleport_url: colos1
+    - npc_id: 50062
+      normal_action: colusher
+      caotic_action: colusher
+    - npc_id: 50063
+      normal_action: telecorc1
+      caotic_action: telecorc1
+      teleport_url: telecorc2
+    - npc_id: 50064
+      normal_action: duvall1
+      caotic_action: duvall1
+      teleport_url: duvall3
+    - npc_id: 50065
+      normal_action: ribian4
+      caotic_action: ribian4
+    - npc_id: 50066
+      normal_action: teleheine1
+      caotic_action: teleheine1
+      teleport_url: teleheine2
+      teleport_urla: teleheine3
+    - npc_id: 50067
+      normal_action: telecheine1
+      caotic_action: telecheine1
+      teleport_url: telecheine2
+    - npc_id: 50068
+      normal_action: telescave1
+      caotic_action: telescave1
+      teleport_url: telescave2
+    - npc_id: 50069
+      normal_action: enya3
+      caotic_action: enya3
+      teleport_url: enya1
+    - npc_id: 50070
+      normal_action: luck1
+      caotic_action: luck1
+      teleport_url: luck2
+    - npc_id: 50071
+      normal_action: escapefi1
+      caotic_action: escapefi1
+      teleport_url: escapefi2
+    - npc_id: 50072
+      normal_action: teleoum1
+      caotic_action: teleoum1
+      teleport_url: teleoum2
+    - npc_id: 50073
+      normal_action: telediad1
+      caotic_action: telediad1
+      teleport_url: telediad2
+    - npc_id: 50074
+      normal_action: telecavern1
+      caotic_action: telecavern1
+      teleport_url: telecavern2
+    - npc_id: 50075
+      normal_action: telecdiad1
+      caotic_action: telecdiad1
+      teleport_url: telecdiad2
+    - npc_id: 50076
+      normal_action: telgrave1
+      caotic_action: telgrave1
+      teleport_url: telgrave2
+    - npc_id: 50077
+      normal_action: telabyss1
+      caotic_action: telabyss1
+      teleport_url: telabyss2
+    - npc_id: 50078
+      normal_action: picrystal
+      caotic_action: picrystal
+      teleport_url: picrystal1
+    - npc_id: 50079
+      normal_action: telediad1
+      caotic_action: telediad1
+      teleport_url: telediad2
+      teleport_urla: telediad3
+    - npc_id: 50080
+      normal_action: paul1
+      caotic_action: paul1
+      teleport_url: teleorcbdg1
+    - npc_id: 50081
+      normal_action: subinvest1
+      caotic_action: subinvest1
+    - npc_id: 50082
+      normal_action: en0221
+      caotic_action: en0221
+    - npc_id: 50083
+      normal_action: en0231
+      caotic_action: en0231
+    - npc_id: 50084
+      normal_action: exitghost1
+      caotic_action: exitghost1
+    - npc_id: 50085
+      normal_action: daniel1
+      caotic_action: daniel1
+      teleport_url: teleorcbdg2
+    - npc_id: 50111
+      normal_action: orenc2
+      caotic_action: orenc2
+    - npc_id: 50112
+      normal_action: orenb1
+      caotic_action: orenb1
+    - npc_id: 50113
+      normal_action: orena1
+      caotic_action: orena1
+    - npc_id: 50114
+      normal_action: orenh2
+      caotic_action: orenh2
+    - npc_id: 50115
+      normal_action: oreno2
+      caotic_action: oreno2
+    - npc_id: 50116
+      normal_action: orend2
+      caotic_action: orend2
+    - npc_id: 50117
+      normal_action: orene2
+      caotic_action: orene2
+    - npc_id: 50118
+      normal_action: niki
+      caotic_action: niki
+    - npc_id: 50119
+      normal_action: orenf2
+      caotic_action: orenf2
+    - npc_id: 50120
+      normal_action: oreni2
+      caotic_action: oreni2
+    - npc_id: 50121
+      normal_action: oreng2
+      caotic_action: oreng2
+    - npc_id: 50122
+      normal_action: orenj2
+      caotic_action: orenj2
+    - npc_id: 50123
+      normal_action: orenk2
+      caotic_action: orenk2
+    - npc_id: 50124
+      normal_action: orenm2
+      caotic_action: orenm2
+    - npc_id: 50125
+      normal_action: orenl2
+      caotic_action: orenl2
+    - npc_id: 50126
+      normal_action: orenn2
+      caotic_action: orenn2
+    - npc_id: 50127
+      normal_action: consul2
+      caotic_action: consul2
+      teleport_url: consul1
+    - npc_id: 50501
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50502
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50503
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50504
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50505
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50506
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50507
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50508
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50509
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50510
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50511
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50512
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50513
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50514
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50515
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50516
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50517
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50518
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50519
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50520
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50521
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50522
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50523
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50524
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50525
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50526
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50527
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50528
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50529
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50530
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50531
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50532
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50533
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50534
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50535
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50536
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50537
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50538
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50539
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50540
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50541
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50542
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50543
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50544
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50545
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50546
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50547
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50548
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50549
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50550
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50551
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50552
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50553
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50554
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50555
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50556
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50557
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50558
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50559
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50560
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50561
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50562
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50563
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50564
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50565
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50566
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50567
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50568
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50569
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50570
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50571
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50572
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50573
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50574
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50575
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50576
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50577
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50578
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50579
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50580
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50581
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50582
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50583
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50584
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50585
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50586
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50587
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50588
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50589
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50590
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50591
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50592
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50593
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50594
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50595
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50596
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50597
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50598
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50599
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50600
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50601
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50602
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50603
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50604
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50605
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50606
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50607
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50608
+      normal_action: kinin1
+      caotic_action: kinin1
+      teleport_url: kinin2
+    - npc_id: 50609
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50610
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50611
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50612
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50613
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50614
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50615
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50616
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50617
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50618
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50619
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50620
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50621
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50622
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50623
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50624
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50625
+      normal_action: acient1
+      caotic_action: acient1
+    - npc_id: 50626
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50627
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50628
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50629
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50630
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 50631
+      normal_action: agit
+      caotic_action: agit
+      teleport_url: agtel0
+    - npc_id: 60001
+      normal_action: dorin
+      caotic_action: dorinl
+      teleport_url: pdorin
+    - npc_id: 60002
+      normal_action: bahof
+      caotic_action: bahof
+      teleport_url: pbahof
+    - npc_id: 60003
+      normal_action: thram
+      caotic_action: thraml
+      teleport_url: pthram
+    - npc_id: 60004
+      normal_action: denitz
+      caotic_action: denitzl
+      teleport_url: pdenitz
+    - npc_id: 60005
+      normal_action: luku
+      caotic_action: lukul
+      teleport_url: pluku
+    - npc_id: 60006
+      normal_action: jianku
+      caotic_action: jiankul
+      teleport_url: pjianku
+    - npc_id: 60007
+      normal_action: karim
+      caotic_action: kariml
+      teleport_url: pkarim
+    - npc_id: 60008
+      normal_action: nodim
+      caotic_action: nodiml
+      teleport_url: pnodim
+    - npc_id: 60009
+      normal_action: sauram
+      caotic_action: sauraml
+      teleport_url: psauram
+    - npc_id: 60010
+      normal_action: kasham
+      caotic_action: kashaml
+      teleport_url: pkasham
+    - npc_id: 60011
+      normal_action: kuron
+      caotic_action: kuronl
+      teleport_url: pkuron
+    - npc_id: 60012
+      normal_action: tofen
+      caotic_action: tofen
+      teleport_url: ptofen
+    - npc_id: 60013
+      normal_action: axellon
+      caotic_action: axellonl
+      teleport_url: paxellon
+    - npc_id: 60014
+      normal_action: kriom
+      caotic_action: kriom
+      teleport_url: pkriom
+    - npc_id: 60015
+      normal_action: ogi
+      caotic_action: ogi
+      teleport_url: pogi
+    - npc_id: 60016
+      normal_action: juke
+      caotic_action: jukel
+      teleport_url: pjuke
+    - npc_id: 60017
+      normal_action: karudim
+      caotic_action: karudiml
+      teleport_url: pkarudim
+    - npc_id: 60018
+      normal_action: kamu
+      caotic_action: kamul
+      teleport_url: pkamu
+    - npc_id: 60019
+      normal_action: timpukin
+      caotic_action: timpukinl
+      teleport_url: ptimpukin
+    - npc_id: 60020
+      normal_action: tulak
+      caotic_action: tulakl
+      teleport_url: ptulak
+    - npc_id: 60021
+      normal_action: hirim
+      caotic_action: hiriml
+      teleport_url: phirim
+    - npc_id: 60022
+      normal_action: borgin
+      caotic_action: borgin
+      teleport_url: pborgin
+    - npc_id: 60023
+      normal_action: tarkin
+      caotic_action: tarkinl
+      teleport_url: ptarkin
+    - npc_id: 60024
+      normal_action: gotham
+      caotic_action: gothaml
+      teleport_url: pgotham
+    - npc_id: 60025
+      normal_action: kusian
+      caotic_action: kusianl
+      teleport_url: pkusian
+    - npc_id: 60026
+      normal_action: orclon
+      caotic_action: orclon
+      teleport_url: porclon
+    - npc_id: 60027
+      normal_action: kuhatin
+      caotic_action: kuhatinl
+      teleport_url: pkuhatin
+    - npc_id: 60028
+      normal_action: elE1
+      caotic_action: elE1
+      teleport_url: elCE1
+    - npc_id: 60029
+      normal_action: haidrim
+      caotic_action: haidrim
+      teleport_url: phaidrim
+    - npc_id: 60030
+      normal_action: hakim
+      caotic_action: hakiml
+      teleport_url: phakim
+    - npc_id: 60031
+      normal_action: rayearth1
+      caotic_action: rayearth2
+      teleport_url: pgotham
+    - npc_id: 60032
+      normal_action: garin
+      caotic_action: garinl
+      teleport_url: pgarin
+    - npc_id: 60033
+      normal_action: gawl
+      caotic_action: gawll
+      teleport_url: pgawl
+    - npc_id: 60034
+      normal_action: kuud
+      caotic_action: kuudl
+      teleport_url: pkuud
+    - npc_id: 60035
+      normal_action: zidar
+      caotic_action: zadarl
+      teleport_url: pgawl
+    - npc_id: 60036
+      normal_action: tigus
+      caotic_action: tigusl
+      teleport_url: pgawl
+    - npc_id: 60037
+      normal_action: en1011
+      caotic_action: en1011
+    - npc_id: 60501
+      normal_action: patguard
+      caotic_action: patguard
+    - npc_id: 60502
+      normal_action: patguard
+      caotic_action: patguard
+    - npc_id: 60506
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60507
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60508
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60509
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60510
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60513
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60514
+      normal_action: ktguard6
+      caotic_action: ktguard6
+      teleport_url: ktguard6
+    - npc_id: 60515
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60516
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60517
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60522
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60523
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60524
+      normal_action: grguard6
+      caotic_action: grguard6
+      teleport_url: grguard6
+    - npc_id: 60525
+      normal_action: grguard6
+      caotic_action: grguard6
+      teleport_url: grguard6
+    - npc_id: 60526
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60527
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60528
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60529
+      normal_action: grguard6
+      caotic_action: grguard6
+      teleport_url: grguard6
+    - npc_id: 60530
+      normal_action: dcguard6
+      caotic_action: dcguard6
+      teleport_url: dcguard6
+    - npc_id: 60531
+      normal_action: dcguard6
+      caotic_action: dcguard6
+      teleport_url: dcguard6
+    - npc_id: 60533
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60534
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60537
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60538
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60539
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60540
+      normal_action: adguard6
+      caotic_action: adguard6
+      teleport_url: adguard6
+    - npc_id: 60551
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60552
+      normal_action: wdguard6
+      caotic_action: wdguard6
+      teleport_url: wdguard6
+    - npc_id: 60553
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60554
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 60558
+      normal_action: sdummy1
+      caotic_action: sdummy1
+    - npc_id: 60559
+      normal_action: sdummy1
+      caotic_action: sdummy1
+    - npc_id: 60560
+      normal_action: orcguard6
+      caotic_action: orcguard6
+      teleport_url: orcguard6
+    - npc_id: 60563
+      normal_action: heguard6
+      caotic_action: heguard6
+      teleport_url: heguard6
+    - npc_id: 60565
+      normal_action: wdguard4
+      caotic_action: wdguard4
+      teleport_url: wdguard5
+    - npc_id: 70001
+      normal_action: rose1
+      caotic_action: rose1
+      teleport_url: rose6
+    - npc_id: 70002
+      normal_action: sasha
+      caotic_action: sasha
+    - npc_id: 70003
+      normal_action: siriss
+      caotic_action: siriss
+      teleport_url: sirissmg
+    - npc_id: 70004
+      normal_action: johan
+      caotic_action: johan
+      teleport_url: johan1
+    - npc_id: 70005
+      normal_action: en0131
+      caotic_action: en0131
+    - npc_id: 70006
+      normal_action: kiris
+      caotic_action: kiris
+    - npc_id: 70007
+      normal_action: tina1
+      caotic_action: tina1
+      teleport_url: tina6
+    - npc_id: 70008
+      normal_action: fraoun
+      caotic_action: fraoun
+    - npc_id: 70009
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70010
+      normal_action: balsim
+      caotic_action: balsim
+    - npc_id: 70011
+      normal_action: shipEvI3
+      caotic_action: shipEvI1
+    - npc_id: 70012
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70013
+      normal_action: cold1
+      caotic_action: cold2
+    - npc_id: 70014
+      normal_action: pandora
+      caotic_action: pandora5
+    - npc_id: 70015
+      normal_action: arieh1
+      caotic_action: arieh1
+      teleport_url: arieh6
+    - npc_id: 70016
+      normal_action: andyn
+      caotic_action: andyn
+      teleport_url: andyn3
+    - npc_id: 70017
+      normal_action: orim1
+      caotic_action: orim1
+      teleport_url: orim2
+    - npc_id: 70018
+      normal_action: ysorya
+      caotic_action: ysorya
+      teleport_url: ysorya3
+    - npc_id: 70019
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70020
+      normal_action: rollko
+      caotic_action: rollko
+      teleport_url: rollko1
+    - npc_id: 70021
+      normal_action: luth
+      caotic_action: luth
+      teleport_url: luth3
+    - npc_id: 70022
+      normal_action: shipEvM1
+      caotic_action: shipEvM1
+      teleport_url: shipEvM2
+    - npc_id: 70023
+      normal_action: tzmerchant
+      caotic_action: tzmerchant
+    - npc_id: 70024
+      normal_action: catty
+      caotic_action: catty
+      teleport_url: catty3
+    - npc_id: 70025
+      normal_action: pasim
+      caotic_action: pasim
+      teleport_url: pasim2
+    - npc_id: 70026
+      normal_action: derek1
+      caotic_action: derek1
+      teleport_url: derek2
+    - npc_id: 70027
+      normal_action: dio1
+      caotic_action: dio1
+      teleport_url: dio2
+    - npc_id: 70028
+      normal_action: randal1
+      caotic_action: randal1
+      teleport_url: randal2
+    - npc_id: 70029
+      normal_action: margaret1
+      caotic_action: margaret1
+      teleport_url: margaret2
+    - npc_id: 70030
+      normal_action: mayer
+      caotic_action: mayer
+      teleport_url: mayer3
+    - npc_id: 70031
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70032
+      normal_action: vergil
+      caotic_action: vergil
+      teleport_url: vergil3
+    - npc_id: 70033
+      normal_action: verita
+      caotic_action: verita
+      teleport_url: verita3
+    - npc_id: 70034
+      normal_action: vincent1
+      caotic_action: vincent1
+      teleport_url: vincent2
+    - npc_id: 70035
+      normal_action: secil
+      caotic_action: secil
+    - npc_id: 70036
+      normal_action: stella1
+      caotic_action: stella1
+      teleport_url: stella6
+    - npc_id: 70037
+      normal_action: tzmerchant
+      caotic_action: tzmerchant
+    - npc_id: 70038
+      normal_action: evert1
+      caotic_action: evert1
+      teleport_url: evert2
+    - npc_id: 70039
+      normal_action: werner
+      caotic_action: werner
+      teleport_url: werner3
+    - npc_id: 70040
+      normal_action: jason1
+      caotic_action: jason1
+      teleport_url: jason2
+    - npc_id: 70041
+      normal_action: perkin
+      caotic_action: perkin
+    - npc_id: 70042
+      normal_action: polee
+      caotic_action: polee
+    - npc_id: 70043
+      normal_action: philip1
+      caotic_action: philip1
+      teleport_url: philip2
+    - npc_id: 70044
+      normal_action: ralf1
+      caotic_action: ralf1
+      teleport_url: ralf6
+    - npc_id: 70045
+      normal_action: berry1
+      caotic_action: berry1
+      teleport_url: berry6
+    - npc_id: 70046
+      normal_action: jin1
+      caotic_action: jin1
+      teleport_url: jin6
+    - npc_id: 70047
+      normal_action: defman
+      caotic_action: defman
+      teleport_url: defman3
+    - npc_id: 70048
+      normal_action: raon
+      caotic_action: raon
+      teleport_url: raon3
+    - npc_id: 70049
+      normal_action: rozen1
+      caotic_action: rozen1
+      teleport_url: rozen2
+    - npc_id: 70050
+      normal_action: ruky1
+      caotic_action: ruky1
+      teleport_url: ruky6
+    - npc_id: 70051
+      normal_action: magus
+      caotic_action: magus
+      teleport_url: magus2
+    - npc_id: 70052
+      normal_action: mellisa
+      caotic_action: mellisa
+      teleport_url: mellisa3
+    - npc_id: 70053
+      normal_action: sharu1
+      caotic_action: sharu1
+      teleport_url: sharu2
+    - npc_id: 70054
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70055
+      normal_action: ashinnue
+      caotic_action: ashinnue
+    - npc_id: 70056
+      normal_action: jode
+      caotic_action: jode
+      teleport_url: jode1
+    - npc_id: 70057
+      normal_action: catherine
+      caotic_action: catherine
+      teleport_url: catherine3
+    - npc_id: 70058
+      normal_action: fega
+      caotic_action: fega
+      teleport_url: fega3
+    - npc_id: 70059
+      normal_action: dico
+      caotic_action: dico
+      teleport_url: dico3
+    - npc_id: 70060
+      normal_action: rinda
+      caotic_action: rinda
+      teleport_url: rinda3
+    - npc_id: 70061
+      normal_action: mandra
+      caotic_action: mandra
+      teleport_url: mandra3
+    - npc_id: 70062
+      normal_action: varyeth
+      caotic_action: varyeth
+      teleport_url: varyeth3
+    - npc_id: 70063
+      normal_action: bius
+      caotic_action: bius
+      teleport_url: bius3
+    - npc_id: 70064
+      normal_action: tzmerchant
+      caotic_action: tzmerchant
+    - npc_id: 70065
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70066
+      normal_action: kreister
+      caotic_action: kreister
+      teleport_url: kreister3
+    - npc_id: 70067
+      normal_action: pagoru
+      caotic_action: pagoru
+      teleport_url: pagoru3
+    - npc_id: 70068
+      normal_action: franko
+      caotic_action: franko
+      teleport_url: franko1
+    - npc_id: 70069
+      normal_action: momo1
+      caotic_action: momo1
+      teleport_url: momo6
+    - npc_id: 70070
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70071
+      normal_action: ashur
+      caotic_action: ashur
+      teleport_url: ashur3
+    - npc_id: 70072
+      normal_action: elmina
+      caotic_action: elmina
+      teleport_url: elmina3
+    - npc_id: 70073
+      normal_action: glen
+      caotic_action: glen1
+    - npc_id: 70074
+      normal_action: mellin
+      caotic_action: mellin1
+    - npc_id: 70075
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70076
+      normal_action: tzmerchant
+      caotic_action: tzmerchant
+    - npc_id: 70077
+      normal_action: dogdealer
+      caotic_action: dogdealer
+      teleport_url: rodney
+    - npc_id: 70078
+      normal_action: orcm1
+      caotic_action: orcm1
+      teleport_url: orcm6
+    - npc_id: 70079
+      normal_action: jackson
+      caotic_action: jackson
+      teleport_url: jackson3
+    - npc_id: 70080
+      normal_action: horunev1
+      caotic_action: horunev1
+      teleport_url: horunev2
+    - npc_id: 70081
+      normal_action: buakheu1
+      caotic_action: buakheu1
+      teleport_url: buakheu2
+    - npc_id: 70082
+      normal_action: britt
+      caotic_action: britt
+      teleport_url: britt3
+    - npc_id: 70083
+      normal_action: shivan
+      caotic_action: shivan
+      teleport_url: shivan3
+    - npc_id: 70084
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70085
+      normal_action: old1
+      caotic_action: old1
+      teleport_url: old6
+    - npc_id: 70086
+      normal_action: isvall4
+      caotic_action: isvall4
+      teleport_url: isvall1
+    - npc_id: 70087
+      normal_action: sedia4
+      caotic_action: sedia4
+    - npc_id: 70088
+      normal_action: scwaty1
+      caotic_action: scwaty1
+      teleport_url: scwaty2
+    - npc_id: 70089
+      normal_action: oblivion1
+      caotic_action: oblivion1
+      teleport_url: oblivion2
+    - npc_id: 70090
+      normal_action: chiky1
+      caotic_action: chiky1
+      teleport_url: chiky3
+    - npc_id: 70091
+      normal_action: tilon1
+      caotic_action: tilon1
+      teleport_url: tilon13
+    - npc_id: 70092
+      normal_action: emart
+      caotic_action: emart
+    - npc_id: 70093
+      normal_action: karupu
+      caotic_action: karupu
+    - npc_id: 70094
+      normal_action: duran
+      caotic_action: duran
+      teleport_url: duran2
+    - npc_id: 70095
+      normal_action: duron1
+      caotic_action: duron1
+    - npc_id: 70096
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70097
+      normal_action: foni1
+      caotic_action: foni1
+    - npc_id: 70098
+      normal_action: bobo1
+      caotic_action: bobo1
+    - npc_id: 70099
+      normal_action: kuper2
+      caotic_action: kuper2
+    - npc_id: 70100
+      normal_action: lengo1
+      caotic_action: lengo1
+    - npc_id: 70101
+      normal_action: fiin1
+      caotic_action: fiin1
+    - npc_id: 70102
+      normal_action: judice1
+      caotic_action: judice1
+    - npc_id: 70503
+      normal_action: goodman
+      caotic_action: goodman
+    - npc_id: 70504
+      normal_action: neutralman
+      caotic_action: neutralman
+    - npc_id: 70506
+      normal_action: en0101
+      caotic_action: en0101
+    - npc_id: 70507
+      normal_action: rion1
+      caotic_action: rion1
+      teleport_url: rion2
+    - npc_id: 70508
+      normal_action: enchanterw1
+      caotic_action: enchanterw1
+      teleport_url: encw
+    - npc_id: 70509
+      normal_action: enchantera1
+      caotic_action: enchantera1
+      teleport_url: enca
+    - npc_id: 70510
+      normal_action: newgypsy
+      caotic_action: newgypsy
+      teleport_url: gypsy1
+    - npc_id: 70511
+      normal_action: evilman
+      caotic_action: evilman
+    - npc_id: 70512
+      normal_action: noved
+      caotic_action: noved
+    - npc_id: 70513
+      normal_action: peria1
+      caotic_action: peria1
+      teleport_url: peria2
+    - npc_id: 70514
+      normal_action: freehaste
+      caotic_action: freehaste
+    - npc_id: 70515
+      normal_action: mubo1
+      caotic_action: mubo1
+    - npc_id: 70517
+      normal_action: cuse1
+      caotic_action: cuse1
+      teleport_url: cuse3
+    - npc_id: 70518
+      normal_action: tio
+      caotic_action: tio
+    - npc_id: 70519
+      normal_action: peria1
+      caotic_action: peria1
+      teleport_url: peria2
+    - npc_id: 70520
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70522
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70523
+      normal_action: ladar1
+      caotic_action: ladarC1
+    - npc_id: 70524
+      normal_action: lavienue9
+      caotic_action: lavienue9
+      teleport_url: lavienue2
+    - npc_id: 70525
+      normal_action: lien1
+      caotic_action: lienC1
+    - npc_id: 70526
+      normal_action: raiders1
+      caotic_action: raiders1
+      teleport_url: raiders3
+    - npc_id: 70527
+      normal_action: lengo1
+      caotic_action: lengo1
+    - npc_id: 70528
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70529
+      normal_action: mona1
+      caotic_action: mona1
+    - npc_id: 70530
+      normal_action: restore1pk
+      caotic_action: restore1pk
+      teleport_url: helppk
+    - npc_id: 70531
+      normal_action: jem2
+      caotic_action: jem2
+    - npc_id: 70532
+      normal_action: johnson1
+      caotic_action: johnson1
+    - npc_id: 70533
+      normal_action: judice1
+      caotic_action: judice1
+    - npc_id: 70534
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70535
+      normal_action: kuper1
+      caotic_action: kuper1
+    - npc_id: 70536
+      normal_action: touma1
+      caotic_action: touma1
+      teleport_url: touma2
+    - npc_id: 70537
+      normal_action: farlin1
+      caotic_action: farlinC1
+    - npc_id: 70538
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70539
+      normal_action: fiin1
+      caotic_action: fiin1
+    - npc_id: 70540
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70544
+      normal_action: dick1
+      caotic_action: dick1
+      teleport_url: dick2
+    - npc_id: 70545
+      normal_action: richard3
+      caotic_action: richard3
+    - npc_id: 70546
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70547
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70549
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70550
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70553
+      normal_action: ishmael1
+      caotic_action: ishmael1
+      teleport_url: ishmael2
+    - npc_id: 70554
+      normal_action: zero2
+      caotic_action: zero2
+    - npc_id: 70555
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70556
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70560
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70562
+      normal_action: hunt1
+      caotic_action: hunt1
+      teleport_url: hunt2
+    - npc_id: 70563
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70567
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70568
+      normal_action: yuno
+      caotic_action: yuno
+    - npc_id: 70572
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70574
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70577
+      normal_action: auction1
+      caotic_action: auction1
+      teleport_url: auction3
+    - npc_id: 70594
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70598
+      normal_action: moria1
+      caotic_action: moria1
+      teleport_url: moria4
+    - npc_id: 70599
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70600
+      normal_action: orckeeperop
+      caotic_action: orckeeperop
+      teleport_url: orckeeperop
+    - npc_id: 70601
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70605
+      normal_action: blaise1
+      caotic_action: blaise1
+      teleport_url: blaise4
+    - npc_id: 70607
+      normal_action: sarsha1
+      caotic_action: sarsha1
+      teleport_url: sarsha2
+    - npc_id: 70611
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70614
+      normal_action: anton1
+      caotic_action: anton1
+    - npc_id: 70617
+      normal_action: almon1
+      caotic_action: almon1
+      teleport_url: almon2
+    - npc_id: 70623
+      normal_action: orville1
+      caotic_action: orville1
+      teleport_url: orville2
+    - npc_id: 70631
+      normal_action: secretary4
+      caotic_action: secretary4
+      teleport_url: secretary1
+    - npc_id: 70632
+      normal_action: kevin1
+      caotic_action: kevin1
+      teleport_url: kevin2
+    - npc_id: 70633
+      normal_action: colbert1
+      caotic_action: colbert1
+      teleport_url: colbert2
+    - npc_id: 70641
+      normal_action: herbert1
+      caotic_action: herbert1
+      teleport_url: herbert2
+    - npc_id: 70642
+      normal_action: hector1
+      caotic_action: hector1
+      teleport_url: hector2
+    - npc_id: 70644
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70645
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70649
+      normal_action: lary1
+      caotic_action: lary1
+    - npc_id: 70652
+      normal_action: laryaide1
+      caotic_action: laryaide1
+    - npc_id: 70653
+      normal_action: masha
+      caotic_action: masha
+    - npc_id: 70654
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70655
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70656
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70657
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70658
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70660
+      normal_action: gdummyc1
+      caotic_action: gdummyc1
+    - npc_id: 70661
+      normal_action: gdummy1
+      caotic_action: gdummy1
+    - npc_id: 70662
+      normal_action: ivelviin1
+      caotic_action: ivelviin1
+      teleport_url: ivelviin2
+    - npc_id: 70663
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70664
+      normal_action: cove1
+      caotic_action: cove1
+      teleport_url: cove2
+    - npc_id: 70665
+      normal_action: potempin1
+      caotic_action: potempin1
+      teleport_url: potempin2
+    - npc_id: 70666
+      normal_action: freckson1
+      caotic_action: freckson1
+      teleport_url: freckson2
+    - npc_id: 70667
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70668
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70670
+      normal_action: citizen8
+      caotic_action: citizen8
+    - npc_id: 70671
+      normal_action: nose
+      caotic_action: nose
+      teleport_url: nose1
+    - npc_id: 70674
+      normal_action: reona1
+      caotic_action: reona1
+      teleport_url: reona2
+    - npc_id: 70675
+      normal_action: citizen1
+      caotic_action: citizen1
+    - npc_id: 70676
+      normal_action: ryumiel1
+      caotic_action: ryumiel1
+    - npc_id: 70683
+      normal_action: montes2
+      caotic_action: montes2
+      teleport_url: montes4
+    - npc_id: 70686
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70687
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70688
+      normal_action: citizen10
+      caotic_action: citizen10
+    - npc_id: 70690
+      normal_action: bamute1
+      caotic_action: bamute1
+      teleport_url: bamute2
+    - npc_id: 70692
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70695
+      normal_action: biust1
+      caotic_action: biust1
+      teleport_url: biust2
+    - npc_id: 70701
+      normal_action: restore
+      caotic_action: restore
+    - npc_id: 70702
+      normal_action: ring1
+      caotic_action: ring1
+    - npc_id: 70707
+      normal_action: eno1
+      caotic_action: eno1
+      teleport_url: enoc1
+    - npc_id: 70711
+      normal_action: giantk1
+      caotic_action: giantk1
+      teleport_url: giantk2
+    - npc_id: 70715
+      normal_action: jimuk1
+      caotic_action: jimuk1
+      teleport_url: jimuk2
+    - npc_id: 70721
+      normal_action: timon1
+      caotic_action: timon1
+      teleport_url: timon2
+    - npc_id: 70722
+      normal_action: paruit01
+      caotic_action: paruit01
+      teleport_url: paruitC
+    - npc_id: 70723
+      normal_action: pau1
+      caotic_action: pau1
+      teleport_url: pau2
+    - npc_id: 70724
+      normal_action: heit4
+      caotic_action: heit4
+    - npc_id: 70725
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70734
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70739
+      normal_action: dicardinge1
+      caotic_action: dicardinge1
+      teleport_url: dicardinge2
+    - npc_id: 70740
+      normal_action: zero2
+      caotic_action: zero2
+    - npc_id: 70742
+      normal_action: detecter1
+      caotic_action: detecter1
+      teleport_url: detecter2
+    - npc_id: 70744
+      normal_action: roje16
+      caotic_action: roje16
+    - npc_id: 70748
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70749
+      normal_action: mild1
+      caotic_action: mild1
+      teleport_url: mild2
+    - npc_id: 70751
+      normal_action: brad1
+      caotic_action: brad1
+    - npc_id: 70757
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70758
+      normal_action: sabin
+      caotic_action: sabin
+    - npc_id: 70760
+      normal_action: ellyonne
+      caotic_action: ellyonne
+      teleport_url: ellyonne4
+    - npc_id: 70761
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70762
+      normal_action: karif1
+      caotic_action: karif1
+    - npc_id: 70763
+      normal_action: talass
+      caotic_action: talass
+    - npc_id: 70764
+      normal_action: taus
+      caotic_action: taus
+    - npc_id: 70768
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70771
+      normal_action: randith1
+      caotic_action: randith1
+      teleport_url: randith2
+    - npc_id: 70772
+      normal_action: ladar1
+      caotic_action: ladarC1
+    - npc_id: 70773
+      normal_action: marbin1
+      caotic_action: marbin1
+      teleport_url: marbin2
+    - npc_id: 70774
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70775
+      normal_action: mark1
+      caotic_action: mark1
+      teleport_url: mark2
+    - npc_id: 70776
+      normal_action: meg4
+      caotic_action: meg4
+    - npc_id: 70777
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70778
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70779
+      normal_action: ants2
+      caotic_action: ants2
+      teleport_url: antss
+    - npc_id: 70780
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70781
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70782
+      normal_action: ant2
+      caotic_action: ant2
+    - npc_id: 70783
+      normal_action: aria4
+      caotic_action: aria4
+    - npc_id: 70784
+      normal_action: othmond1
+      caotic_action: othmond1
+      teleport_url: othmond2
+    - npc_id: 70788
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70789
+      normal_action: halt1
+      caotic_action: halt1
+      teleport_url: halt2
+    - npc_id: 70790
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70792
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70794
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70796
+      normal_action: dunham2
+      caotic_action: dunham2
+    - npc_id: 70797
+      normal_action: drist
+      caotic_action: drist
+    - npc_id: 70798
+      normal_action: riky2
+      caotic_action: riky2
+    - npc_id: 70799
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70800
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70801
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70802
+      normal_action: aanon1
+      caotic_action: aanon1
+    - npc_id: 70804
+      normal_action: lien1
+      caotic_action: lienC1
+    - npc_id: 70805
+      normal_action: ladar1
+      caotic_action: ladarC1
+    - npc_id: 70806
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70807
+      normal_action: farlin1
+      caotic_action: farlinC1
+    - npc_id: 70808
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70809
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70811
+      normal_action: lyraEv1
+      caotic_action: lyraEv1
+      teleport_url: lyraEv3
+    - npc_id: 70815
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70816
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70817
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70820
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70822
+      normal_action: seghem1
+      caotic_action: seghem1
+      teleport_url: seghem2
+    - npc_id: 70823
+      normal_action: restore1pk
+      caotic_action: restore1pk
+    - npc_id: 70824
+      normal_action: assassin4
+      caotic_action: assassin4
+    - npc_id: 70826
+      normal_action: oth2
+      caotic_action: oth2
+    - npc_id: 70830
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70831
+      normal_action: kentu1
+      caotic_action: kentu1
+      teleport_url: kentu2
+    - npc_id: 70836
+      normal_action: hans1
+      caotic_action: hans1
+      teleport_url: hans2
+    - npc_id: 70837
+      normal_action: narhenE3
+      caotic_action: narhenE3
+      teleport_url: narhenE1
+    - npc_id: 70838
+      normal_action: nerupaE1
+      caotic_action: nerupaE1
+      teleport_url: nerupaCE1
+    - npc_id: 70840
+      normal_action: robinwood1
+      caotic_action: robinwood1
+      teleport_url: robinwood3
+    - npc_id: 70841
+      normal_action: luudiel1
+      caotic_action: luudiel1
+    - npc_id: 70844
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 70846
+      normal_action: arachnee1
+      caotic_action: arachnee1
+      teleport_url: arachnem1
+    - npc_id: 70847
+      normal_action: estE1
+      caotic_action: estE1
+      teleport_url: estCE1
+    - npc_id: 70848
+      normal_action: ente1
+      caotic_action: ente1
+      teleport_url: entm1
+    - npc_id: 70850
+      normal_action: pane1
+      caotic_action: pane1
+      teleport_url: panm1
+    - npc_id: 70851
+      normal_action: fairye1
+      caotic_action: fairye1
+      teleport_url: fairym1
+    - npc_id: 70852
+      normal_action: fairyqe1
+      caotic_action: fairyqe1
+      teleport_url: fairyqm1
+    - npc_id: 70853
+      normal_action: fairyp3
+      caotic_action: fairyp3
+    - npc_id: 70855
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70857
+      normal_action: heguard6
+      caotic_action: heguard6
+      teleport_url: heguard6
+    - npc_id: 70860
+      normal_action: othertown
+      caotic_action: othertown
+      teleport_url: othertownh
+    - npc_id: 70861
+      normal_action: encwc
+      caotic_action: encwc
+    - npc_id: 70862
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70863
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70865
+      normal_action: encac
+      caotic_action: encac
+    - npc_id: 70872
+      normal_action: eveurol1
+      caotic_action: eveurol1
+      teleport_url: eveurol5
+    - npc_id: 70873
+      normal_action: ellan1
+      caotic_action: ellan1
+      teleport_url: ellan2
+    - npc_id: 70876
+      normal_action: secretary1
+      caotic_action: secretary1
+      teleport_url: secretary4
+    - npc_id: 70880
+      normal_action: fisher1
+      caotic_action: fisher1
+      teleport_url: fisher2
+    - npc_id: 70881
+      normal_action: gdummy1
+      caotic_action: gdummy1
+    - npc_id: 70882
+      normal_action: vaiger1
+      caotic_action: vaiger1
+      teleport_url: vaiger2
+    - npc_id: 70884
+      normal_action: bpledge2
+      caotic_action: bpledge2
+      teleport_url: bpledge1
+    - npc_id: 70885
+      normal_action: kanguard4
+      caotic_action: kanguard4
+    - npc_id: 70889
+      normal_action: citizen6
+      caotic_action: citizen6
+    - npc_id: 70890
+      normal_action: rabor
+      caotic_action: rabor
+    - npc_id: 70892
+      normal_action: ronde6
+      caotic_action: ronde6
+    - npc_id: 70894
+      normal_action: rondedum
+      caotic_action: rondedum
+    - npc_id: 70895
+      normal_action: bluedikaq4
+      caotic_action: bluedikaq4
+    - npc_id: 70896
+      normal_action: bluedum
+      caotic_action: bluedum
+    - npc_id: 70898
+      normal_action: inn
+      caotic_action: Inn1
+    - npc_id: 70903
+      normal_action: kandum
+      caotic_action: kandum
+    - npc_id: 70904
+      normal_action: koup1
+      caotic_action: koup1
+      teleport_url: koupdwaf
+    - npc_id: 70906
+      normal_action: kima1
+      caotic_action: kima1
+    - npc_id: 70908
+      normal_action: pears1
+      caotic_action: pears1
+    - npc_id: 70909
+      normal_action: pierot1
+      caotic_action: pierot1
+    - npc_id: 70910
+      normal_action: hadesty1
+      caotic_action: hadesty1
+      teleport_url: hadesty2
+    - npc_id: 70912
+      normal_action: woumsix1
+      caotic_action: woumsix1
+    - npc_id: 70913
+      normal_action: woumfour1
+      caotic_action: woumfour1
+    - npc_id: 70916
+      normal_action: redin1
+      caotic_action: redin1
+    - npc_id: 70917
+      normal_action: burns1
+      caotic_action: burns1
+    - npc_id: 70919
+      normal_action: smiter1
+      caotic_action: smiter1
+    - npc_id: 70920
+      normal_action: dfguard1
+      caotic_action: dfguard1
+    - npc_id: 70922
+      normal_action: credonas1
+      caotic_action: credonas1
+    - npc_id: 70923
+      normal_action: olle1
+      caotic_action: olle1
+    - npc_id: 70924
+      normal_action: genes1
+      caotic_action: genes1
+    - npc_id: 70925
+      normal_action: elderoum1
+      caotic_action: elderoum1
+    - npc_id: 70927
+      normal_action: coderage1
+      caotic_action: coderage1
+    - npc_id: 70928
+      normal_action: tristan1
+      caotic_action: tristan1
+    - npc_id: 70934
+      normal_action: lesta
+      caotic_action: lesta
+    - npc_id: 70953
+      normal_action: alchemy1
+      caotic_action: alchemy1
+      teleport_url: alchemy4
+    - npc_id: 70964
+      normal_action: basch
+      caotic_action: basch
+    - npc_id: 70970
+      normal_action: clalchemist1
+      caotic_action: clalchemist1
+      teleport_url: clalchemist2
+    - npc_id: 70971
+      normal_action: sialchemist1
+      caotic_action: sialchemist1
+      teleport_url: sialchemist2
+    - npc_id: 70980
+      normal_action: orenc0
+      caotic_action: orenc0
+    - npc_id: 70981
+      normal_action: hen1
+      caotic_action: hen1
+    - npc_id: 70983
+      normal_action: pig1
+      caotic_action: pig1
+    - npc_id: 70984
+      normal_action: milkcow1
+      caotic_action: milkcow1
+      teleport_url: none
+    - npc_id: 70985
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70986
+      normal_action: orckeeperop
+      caotic_action: orckeeperop
+      teleport_url: orckeeperop
+    - npc_id: 70987
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70988
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70989
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70990
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70991
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70992
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70993
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70994
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70995
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70996
+      normal_action: gatekeeperop
+      caotic_action: gatekeeperop
+      teleport_url: gatekeeperop
+    - npc_id: 70997
+      normal_action: jpe0011
+      caotic_action: jpe0011
+    - npc_id: 70998
+      normal_action: en0307
+      caotic_action: en0307
+    - npc_id: 70999
+      normal_action: jpe0021
+      caotic_action: jpe0021
+    - npc_id: 71000
+      normal_action: jpe0031
+      caotic_action: jpe0031
+    - npc_id: 71001
+      normal_action: en0011
+      caotic_action: en0015
+    - npc_id: 71002
+      normal_action: jpe0161
+      caotic_action: jpe0161
+    - npc_id: 71003
+      normal_action: en0021
+      caotic_action: en0025
+    - npc_id: 71004
+      normal_action: en0051
+      caotic_action: en0051
+    - npc_id: 71005
+      normal_action: jpe0041
+      caotic_action: jpe0041
+    - npc_id: 71006
+      normal_action: jpe0051
+      caotic_action: jpe0051
+    - npc_id: 71007
+      normal_action: en0031
+      caotic_action: en0031
+    - npc_id: 71009
+      normal_action: jpe0076
+      caotic_action: jpe0076
+    - npc_id: 71010
+      normal_action: en0061
+      caotic_action: en0061
+    - npc_id: 71011
+      normal_action: jpe0067
+      caotic_action: jpe0067
+    - npc_id: 71012
+      normal_action: en0041
+      caotic_action: en0041
+    - npc_id: 71013
+      normal_action: karen2
+      caotic_action: karen2
+      teleport_url: karen3
+    - npc_id: 71014
+      normal_action: en0242
+      caotic_action: en0242
+    - npc_id: 71015
+      normal_action: en0263
+      caotic_action: en0263
+    - npc_id: 71016
+      normal_action: en0251
+      caotic_action: en0251
+    - npc_id: 71017
+      normal_action: en0251
+      caotic_action: en0251
+    - npc_id: 71018
+      normal_action: jpe0134
+      caotic_action: jpe0134
+    - npc_id: 71019
+      normal_action: jpe0115
+      caotic_action: jpe0115
+    - npc_id: 71020
+      normal_action: jpe0121
+      caotic_action: jpe0121
+    - npc_id: 71021
+      normal_action: en0197
+      caotic_action: en0197
+    - npc_id: 71022
+      normal_action: jpe0151
+      caotic_action: jpe0151
+    - npc_id: 71023
+      normal_action: jpe0141
+      caotic_action: jpe0141
+    - npc_id: 71024
+      normal_action: garret1
+      caotic_action: garret1
+    - npc_id: 71025
+      normal_action: jpe0086
+      caotic_action: jpe0086
+    - npc_id: 71026
+      normal_action: coco4
+      caotic_action: coco4
+      teleport_url: coco1
+    - npc_id: 71027
+      normal_action: en0282
+      caotic_action: en0282
+    - npc_id: 71028
+      normal_action: en0121
+      caotic_action: en0121
+    - npc_id: 71029
+      normal_action: en0291
+      caotic_action: en0291
+    - npc_id: 71030
+      normal_action: noved
+      caotic_action: noved
+    - npc_id: 71031
+      normal_action: en0085
+      caotic_action: en0085
+    - npc_id: 71032
+      normal_action: en0091e
+      caotic_action: en0091e
+    - npc_id: 71033
+      normal_action: en0214
+      caotic_action: en0214
+    - npc_id: 71034
+      normal_action: en0205
+      caotic_action: en0205
+    - npc_id: 71035
+      normal_action: en0231
+      caotic_action: en0231
+    - npc_id: 71036
+      normal_action: kamyla000
+      caotic_action: kamyla000
+    - npc_id: 71037
+      normal_action: jpe0101
+      caotic_action: jpe0101
+    - npc_id: 71038
+      normal_action: orcfnoname1
+      caotic_action: orcfnoname1
+    - npc_id: 71039
+      normal_action: orcfbuwoo1
+      caotic_action: orcfbuwoo1
+    - npc_id: 71040
+      normal_action: orcfnoa2
+      caotic_action: orcfnoa2
+    - npc_id: 71041
+      normal_action: orcfhuwoomo1
+      caotic_action: orcfhuwoomo1
+    - npc_id: 71042
+      normal_action: orcfbakumo1
+      caotic_action: orcfbakumo1
+    - npc_id: 71043
+      normal_action: orcfbuka1
+      caotic_action: orcfbuka1
+    - npc_id: 71044
+      normal_action: orcfkame1
+      caotic_action: orcfkame1
+    - npc_id: 71045
+      normal_action: orcfbawoo1
+      caotic_action: orcfbawoo1
+    - npc_id: 71046
+      normal_action: roberto
+      caotic_action: roberto
+    - npc_id: 71047
+      normal_action: lupus
+      caotic_action: lupus
+    - npc_id: 71048
+      normal_action: karu
+      caotic_action: karu
+    - npc_id: 71049
+      normal_action: rooney
+      caotic_action: rooney
+    - npc_id: 71050
+      normal_action: shian
+      caotic_action: shian
+    - npc_id: 71051
+      normal_action: monett
+      caotic_action: monett
+    - npc_id: 71052
+      normal_action: enishia
+      caotic_action: enishia
+    - npc_id: 71053
+      normal_action: berik1
+      caotic_action: berik1
+    - npc_id: 71054
+      normal_action: roxxan
+      caotic_action: roxxan
+    - npc_id: 71055
+      normal_action: lukein1
+      caotic_action: lukein1
+    - npc_id: 71056
+      normal_action: simizz1
+      caotic_action: simizz1
+    - npc_id: 71057
+      normal_action: doil1
+      caotic_action: doilc
+    - npc_id: 71058
+      normal_action: ratsyu1
+      caotic_action: ratsyu1
+    - npc_id: 71059
+      normal_action: rudian1a
+      caotic_action: rudian1a
+    - npc_id: 71060
+      normal_action: resta1
+      caotic_action: resta1
+    - npc_id: 71061
+      normal_action: cadmus1
+      caotic_action: cadmus1
+    - npc_id: 71062
+      normal_action: kamit1
+      caotic_action: kamit1
+    - npc_id: 71063
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71064
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71065
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71066
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71067
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71068
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71069
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71070
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71071
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71072
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71073
+      normal_action: maptbox0
+      caotic_action: maptbox0
+    - npc_id: 71074
+      normal_action: lelder0
+      caotic_action: lelder0
+    - npc_id: 71075
+      normal_action: llizard1a
+      caotic_action: llizard1a
+    - npc_id: 71076
+      normal_action: ylizardb
+      caotic_action: ylizardb
+    - npc_id: 71077
+      normal_action: invest1
+      caotic_action: invest1
+    - npc_id: 71078
+      normal_action: usender1
+      caotic_action: usender1
+    - npc_id: 71079
+      normal_action: ubuy
+      caotic_action: ubuy1
+    - npc_id: 71080
+      normal_action: amisoo1
+      caotic_action: amisoo1
+    - npc_id: 71081
+      normal_action: blackkey1
+      caotic_action: blackkey1
+    - npc_id: 71082
+      normal_action: blackkey2
+      caotic_action: blackkey2
+    - npc_id: 71083
+      normal_action: blackkey3
+      caotic_action: blackkey3
+    - npc_id: 71084
+      normal_action: blackkey4
+      caotic_action: blackkey4
+    - npc_id: 71085
+      normal_action: redkey1
+      caotic_action: redkey1
+    - npc_id: 71086
+      normal_action: redkey2
+      caotic_action: redkey2
+    - npc_id: 71087
+      normal_action: redkey3
+      caotic_action: redkey3
+    - npc_id: 71088
+      normal_action: redkey4
+      caotic_action: redkey4
+    - npc_id: 71089
+      normal_action: francu1
+      caotic_action: francu001
+    - npc_id: 71090
+      normal_action: jcrystal0
+      caotic_action: jcrystal0
+    - npc_id: 71091
+      normal_action: jcrystall0
+      caotic_action: jcrystall0
+    - npc_id: 71095
+      normal_action: csoulq2
+      caotic_action: csoulq2
+    - npc_id: 71108
+      normal_action: chaotictp1
+      caotic_action: chaotictp1
+    - npc_id: 71109
+      normal_action: lawfultp1
+      caotic_action: lawfultp1
+    - npc_id: 71110
+      normal_action: caexplorer1
+      caotic_action: caexplorer1
+    - npc_id: 71111
+      normal_action: cahunterone1
+      caotic_action: cahunterone1
+    - npc_id: 71112
+      normal_action: cahuntertwo1
+      caotic_action: cahuntertwo1
+    - npc_id: 71113
+      normal_action: clalchemist1
+      caotic_action: clalchemist1
+    - npc_id: 71114
+      normal_action: sialchemist1
+      caotic_action: sialchemist1
+    - npc_id: 71115
+      normal_action: inforaden1
+      caotic_action: inforaden1
+    - npc_id: 71116
+      normal_action: agelder1
+      caotic_action: agelder1
+    - npc_id: 71117
+      normal_action: aggeneral1
+      caotic_action: aggeneral1
+    - npc_id: 71118
+      normal_action: talkingoum1
+      caotic_action: talkingoum1
+    - npc_id: 71119
+      normal_action: ataroze
+      caotic_action: ataroze
+    - npc_id: 71120
+      normal_action: rian1
+      caotic_action: rian1
+    - npc_id: 71121
+      normal_action: leonard1
+      caotic_action: leonard1
+    - npc_id: 71122
+      normal_action: fesco1
+      caotic_action: fesco1
+    - npc_id: 71123
+      normal_action: rubo1
+      caotic_action: rubo1
+    - npc_id: 71124
+      normal_action: alri1
+      caotic_action: alri1
+    - npc_id: 71125
+      normal_action: adelio
+      caotic_action: adelio
+    - npc_id: 71126
+      normal_action: eris1
+      caotic_action: eris1
+    - npc_id: 71127
+      normal_action: scwaru1
+      caotic_action: scwaru1
+    - npc_id: 71128
+      normal_action: perita1
+      caotic_action: perita1
+    - npc_id: 71129
+      normal_action: rumtis1
+      caotic_action: rumtis1
+    - npc_id: 71130
+      normal_action: rabla
+      caotic_action: rabla
+    - npc_id: 71131
+      normal_action: rabor
+      caotic_action: rabor
+    - npc_id: 71132
+      normal_action: woumfive1
+      caotic_action: woumfive1
+    - npc_id: 71133
+      normal_action: woumone1
+      caotic_action: woumone1
+    - npc_id: 71134
+      normal_action: woumtwo1
+      caotic_action: woumtwo1
+    - npc_id: 71135
+      normal_action: woumthir1
+      caotic_action: woumthir1
+    - npc_id: 71136
+      normal_action: woumele1
+      caotic_action: woumele1
+    - npc_id: 71137
+      normal_action: woumseven1
+      caotic_action: woumseven1
+    - npc_id: 71138
+      normal_action: woumnine1
+      caotic_action: woumnine1
+    - npc_id: 71139
+      normal_action: woumeight1
+      caotic_action: woumeight1
+    - npc_id: 71140
+      normal_action: woumten1
+      caotic_action: woumten1
+    - npc_id: 71141
+      normal_action: moumthree2
+      caotic_action: moumthree2
+    - npc_id: 71142
+      normal_action: moumtwo2
+      caotic_action: moumtwo2
+    - npc_id: 71143
+      normal_action: woumthree1
+      caotic_action: woumthree1
+    - npc_id: 71144
+      normal_action: woumtwel1
+      caotic_action: woumtwel1
+    - npc_id: 71145
+      normal_action: moumone2
+      caotic_action: moumone2
+    - npc_id: 71146
+      normal_action: midoum1
+      caotic_action: midoum1
+    - npc_id: 71147
+      normal_action: cutoum
+      caotic_action: cutoum
+    - npc_id: 71148
+      normal_action: eoumone1
+      caotic_action: eoumone1
+    - npc_id: 71149
+      normal_action: soumthree1
+      caotic_action: soumthree1
+    - npc_id: 71150
+      normal_action: soumone1
+      caotic_action: soumone1
+    - npc_id: 71151
+      normal_action: soumtwo1
+      caotic_action: soumtwo1
+    - npc_id: 71152
+      normal_action: stoumone1
+      caotic_action: stoumone1
+    - npc_id: 71153
+      normal_action: stoumthree1
+      caotic_action: stoumthree1
+    - npc_id: 71154
+      normal_action: stoumtwo1
+      caotic_action: stoumtwo1
+    - npc_id: 71155
+      normal_action: eoumtwo1
+      caotic_action: eoumtwo1
+    - npc_id: 71156
+      normal_action: prisondef1
+      caotic_action: prisondef1
+    - npc_id: 71157
+      normal_action: prisondef4
+      caotic_action: prisondef4
+    - npc_id: 71158
+      normal_action: prisondef5
+      caotic_action: prisondef5
+    - npc_id: 71159
+      normal_action: prisondef9
+      caotic_action: prisondef9
+    - npc_id: 71160
+      normal_action: prisondef6
+      caotic_action: prisondef6
+    - npc_id: 71161
+      normal_action: prisondef7
+      caotic_action: prisondef7
+    - npc_id: 71162
+      normal_action: prisondef8
+      caotic_action: prisondef8
+    - npc_id: 71163
+      normal_action: yastin1
+      caotic_action: yastin1
+    - npc_id: 71164
+      normal_action: lance1
+      caotic_action: lance1
+    - npc_id: 71165
+      normal_action: xestin1
+      caotic_action: xestin1
+    - npc_id: 71166
+      normal_action: guardin1
+      caotic_action: guardin1
+    - npc_id: 71167
+      normal_action: frim2
+      caotic_action: frim2
+    - npc_id: 71168
+      normal_action: dantes
+      caotic_action: dantes
+    - npc_id: 71169
+      normal_action: marbes1
+      caotic_action: marbes1
+    - npc_id: 71170
+      normal_action: clorence
+      caotic_action: clorence
+    - npc_id: 71171
+      normal_action: debow1
+      caotic_action: debow1
+    - npc_id: 71172
+      normal_action: dethief1
+      caotic_action: dethief1
+    - npc_id: 71173
+      normal_action: degeneral1
+      caotic_action: degeneral1
+    - npc_id: 71174
+      normal_action: desword1
+      caotic_action: desword1
+    - npc_id: 71175
+      normal_action: Ep5event16
+      caotic_action: Ep5event16
+    - npc_id: 71176
+      normal_action: adummy1
+      caotic_action: adummy1
+    - npc_id: 71177
+      normal_action: adummy1
+      caotic_action: adummy1
+    - npc_id: 71178
+      normal_action: ru1
+      caotic_action: ru1
+    - npc_id: 71179
+      normal_action: dh1
+      caotic_action: dh1
+    - npc_id: 71180
+      normal_action: jp1
+      caotic_action: jp1
+    - npc_id: 71181
+      normal_action: my1
+      caotic_action: my1
+    - npc_id: 71182
+      normal_action: sm1
+      caotic_action: sm1
+    - npc_id: 71184
+      normal_action: gdummy1
+      caotic_action: gdummy1
+    - npc_id: 71187
+      normal_action: diadummy1
+      caotic_action: diadummy1
+    - npc_id: 71188
+      normal_action: diadummy1
+      caotic_action: diadummy1
+    - npc_id: 71189
+      normal_action: diaguard1
+      caotic_action: diaguard1
+    - npc_id: 71190
+      normal_action: jericho1
+      caotic_action: jericho1
+    - npc_id: 71191
+      normal_action: becky1
+      caotic_action: becky1
+    - npc_id: 71192
+      normal_action: carmel1
+      caotic_action: carmel1
+    - npc_id: 71193
+      normal_action: chase1
+      caotic_action: chase1
+    - npc_id: 71194
+      normal_action: aurora1
+      caotic_action: aurora1
+    - npc_id: 71195
+      normal_action: winston1
+      caotic_action: winston1
+    - npc_id: 71196
+      normal_action: alfred
+      caotic_action: alfred1
+    - npc_id: 71197
+      normal_action: endel1
+      caotic_action: endel1
+    - npc_id: 71198
+      normal_action: tion1
+      caotic_action: tion1
+    - npc_id: 71199
+      normal_action: jeron1
+      caotic_action: jeron1
+    - npc_id: 71200
+      normal_action: pieta1
+      caotic_action: pieta1
+    - npc_id: 71251
+      normal_action: baseReset
+      caotic_action: baseReset
+    - npc_id: 71252
+      normal_action: joegolem
+      caotic_action: joegolem
+    - npc_id: 71253
+      normal_action: joegolem17
+      caotic_action: joegolem17
+    - npc_id: 71255
+      normal_action: tebegate1
+      caotic_action: tebegate1
+    - npc_id: 71256
+      normal_action: robinhood1
+      caotic_action: robinhood1
+    - npc_id: 71257
+      normal_action: zybril1
+      caotic_action: zybril1
+    - npc_id: 71258
+      normal_action: marba3
+      caotic_action: marba1
+    - npc_id: 71259
+      normal_action: aras1
+      caotic_action: aras11
+    - npc_id: 71264
+      normal_action: sciairen1
+      caotic_action: sciairen2
+    - npc_id: 71265
+      normal_action: sinwarrior
+      caotic_action: sinwarrior
+    - npc_id: 71266
+      normal_action: gdummy1
+      caotic_action: gdummy1
+    - npc_id: 71270
+      normal_action: dunsign1
+      caotic_action: dunsign1
+    - npc_id: 71271
+      normal_action: dunboard2
+      caotic_action: dunboard2
+    - npc_id: 71272
+      normal_action: dunsign2
+      caotic_action: dunsign2
+    - npc_id: 80010
+      normal_action: aprincess1
+      caotic_action: aprincess1
+      teleport_url: aprincess2
+    - npc_id: 80019
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80020
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80021
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80022
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80023
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80024
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80025
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80026
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80027
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80028
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80029
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80030
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80031
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80032
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80033
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80034
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80035
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80036
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80037
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80038
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80039
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80040
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80041
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80042
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80043
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80044
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80045
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 80047
+      normal_action: uhelp1
+      caotic_action: uhelp1
+    - npc_id: 80048
+      normal_action: entgate
+      caotic_action: entgate
+    - npc_id: 80049
+      normal_action: betray12
+      caotic_action: betray12
+    - npc_id: 80050
+      normal_action: meet101
+      caotic_action: meet101
+    - npc_id: 80051
+      normal_action: qyahee
+      caotic_action: qyahee
+    - npc_id: 80052
+      normal_action: u_hunt
+      caotic_action: u_hunt
+    - npc_id: 80053
+      normal_action: alice_no
+      caotic_action: alice_no
+    - npc_id: 80054
+      normal_action: lapyahee
+      caotic_action: lapyahee
+    - npc_id: 80055
+      normal_action: uamulet0
+      caotic_action: uamulet0
+    - npc_id: 80056
+      normal_action: infamous12
+      caotic_action: infamous12
+    - npc_id: 80057
+      normal_action: alfons1
+      caotic_action: alfons1
+    - npc_id: 80058
+      normal_action: cpass01
+      caotic_action: cpass01
+      teleport_url: cpass01
+    - npc_id: 80059
+      normal_action: wpass05
+      caotic_action: wpass05
+      teleport_url: wpass05
+    - npc_id: 80060
+      normal_action: wpass05
+      caotic_action: wpass05
+      teleport_url: wpass05
+    - npc_id: 80061
+      normal_action: wpass05
+      caotic_action: wpass05
+      teleport_url: wpass05
+    - npc_id: 80062
+      normal_action: wpass05
+      caotic_action: wpass05
+      teleport_url: wpass05
+    - npc_id: 80063
+      normal_action: gpass01
+      caotic_action: gpass01
+      teleport_url: gpass01
+    - npc_id: 80064
+      normal_action: meet001
+      caotic_action: meet001
+    - npc_id: 80065
+      normal_action: uturn0
+      caotic_action: uturn0
+    - npc_id: 80066
+      normal_action: betray01
+      caotic_action: betray01
+    - npc_id: 80067
+      normal_action: minicod08
+      caotic_action: minicod08
+    - npc_id: 80068
+      normal_action: fakebarlog1
+      caotic_action: fakebarlog1
+    - npc_id: 80069
+      normal_action: ldemon1
+      caotic_action: ldemon1
+    - npc_id: 80070
+      normal_action: tldemon1
+      caotic_action: tldemon1
+    - npc_id: 80071
+      normal_action: lring0
+      caotic_action: lring0
+    - npc_id: 80072
+      normal_action: lsmith0
+      caotic_action: lsmith0
+    - npc_id: 80073
+      normal_action: l_hunt
+      caotic_action: l_hunt
+    - npc_id: 80074
+      normal_action: infamous02
+      caotic_action: infamous02
+    - npc_id: 80075
+      normal_action: vehikeu1
+      caotic_action: vehikeu1
+    - npc_id: 80076
+      normal_action: voyager1
+      caotic_action: voyager1
+    - npc_id: 80077
+      normal_action: aldran1
+      caotic_action: aldran1
+    - npc_id: 80078
+      normal_action: arka1
+      caotic_action: arka1
+    - npc_id: 80079
+      normal_action: keplisha1
+      caotic_action: keplisha4
+      teleport_url: keplisha2
+    - npc_id: 80080
+      normal_action: f_elder
+      caotic_action: f_elder
+    - npc_id: 80081
+      normal_action: f_grandma1
+      caotic_action: f_grandma1
+    - npc_id: 80082
+      normal_action: fk_in_1
+      caotic_action: fk_in_1
+    - npc_id: 80083
+      normal_action: fk_out_1
+      caotic_action: fk_out_1
+      teleport_url: fk_out_1
+    - npc_id: 80084
+      normal_action: rparum
+      caotic_action: rparum
+    - npc_id: 80085
+      normal_action: duo
+      caotic_action: duo
+    - npc_id: 80086
+      normal_action: kusan
+      caotic_action: kusan
+    - npc_id: 80087
+      normal_action: datu
+      caotic_action: datu
+    - npc_id: 80088
+      normal_action: petmatcher
+      caotic_action: petmatcher
+    - npc_id: 80089
+      normal_action: medalbuyer
+      caotic_action: medalbuyer
+    - npc_id: 80090
+      normal_action: rakuki1
+      caotic_action: rakuki1
+    - npc_id: 80091
+      normal_action: rrafons
+      caotic_action: rrafons
+    - npc_id: 80092
+      normal_action: rjaint1
+      caotic_action: rjaint1
+    - npc_id: 80093
+      normal_action: rjyta1
+      caotic_action: rjyta1
+    - npc_id: 80094
+      normal_action: altar1
+      caotic_action: altar1
+    - npc_id: 80095
+      normal_action: rostin1
+      caotic_action: rostin1
+    - npc_id: 80096
+      normal_action: sharon1
+      caotic_action: sharon1
+    - npc_id: 80097
+      normal_action: rryman
+      caotic_action: rryman
+    - npc_id: 80098
+      normal_action: rfarbo1
+      caotic_action: rfarbo1
+    - npc_id: 80099
+      normal_action: rarson1
+      caotic_action: rarson8
+      teleport_url: rarson11
+    - npc_id: 80100
+      normal_action: maijin1
+      caotic_action: maijin1
+    - npc_id: 80101
+      normal_action: kuen1
+      caotic_action: kuen1
+    - npc_id: 80102
+      normal_action: fillis1
+      caotic_action: fillis3
+    - npc_id: 80103
+      normal_action: auction1
+      caotic_action: auction1
+    - npc_id: 80104
+      normal_action: horseseller1
+      caotic_action: horseseller0
+    - npc_id: 80105
+      normal_action: horserestore
+      caotic_action: horserestore
+    - npc_id: 80127
+      normal_action: cook1
+      caotic_action: cook1
+    - npc_id: 80128
+      normal_action: cointrader
+      caotic_action: cointrader
+    - npc_id: 80132
+      normal_action: dekabia1
+      caotic_action: dekabia1
+      teleport_url: dekabia2
+      teleport_urla: dekabia3
+    - npc_id: 80133
+      normal_action: pual1
+      caotic_action: pual1
+    - npc_id: 80134
+      normal_action: talrion4
+      caotic_action: talrion4
+    - npc_id: 80135
+      normal_action: elas3
+      caotic_action: elas3
+    - npc_id: 80136
+      normal_action: prokel1
+      caotic_action: prokel1
+    - npc_id: 80137
+      normal_action: jepar1
+      caotic_action: jepar1
+    - npc_id: 80141
+      normal_action: sbial1
+      caotic_action: sbial1
+    - npc_id: 80142
+      normal_action: batr1
+      caotic_action: batr1
+    - npc_id: 80143
+      normal_action: azel1
+      caotic_action: azel1
+    - npc_id: 80144
+      normal_action: rark1
+      caotic_action: rark1
+    - npc_id: 80145
+      normal_action: silrein1
+      caotic_action: silrein1
+    - npc_id: 80146
+      normal_action: sharial1
+      caotic_action: sharial1
+      teleport_url: sharial2
+      teleport_urla: sharial3
+    - npc_id: 81002
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81003
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81004
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81005
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81006
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81007
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81008
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81009
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81010
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81011
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81012
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81013
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81014
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81015
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81016
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81017
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81018
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81019
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81020
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81021
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81022
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81023
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81024
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81025
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81026
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81027
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81028
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81029
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81105
+      normal_action: stoenm4
+      caotic_action: stoenm4
+    - npc_id: 81110
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81112
+      normal_action: rader1
+      caotic_action: rader1
+    - npc_id: 81113
+      normal_action: hagutin1
+      caotic_action: hagutin1
+    - npc_id: 81114
+      normal_action: fsflame1
+      caotic_action: fsflame1
+    - npc_id: 81115
+      normal_action: adjutant1
+      caotic_action: adjutant1
+    - npc_id: 81118
+      normal_action: bsoul1
+      caotic_action: bsoul1
+    - npc_id: 81119
+      normal_action: laryaide1
+      caotic_action: laryaide1
+    - npc_id: 81120
+      normal_action: kalbass1
+      caotic_action: kalbass1
+    - npc_id: 81121
+      normal_action: pielemental
+      caotic_action: pielemental
+    - npc_id: 81123
+      normal_action: en2551-0
+      caotic_action: en2551-0
+    - npc_id: 81124
+      normal_action: en2556
+      caotic_action: en2556
+    - npc_id: 81155
+      normal_action: olle1
+      caotic_action: olle1
+      teleport_url: olle1
+    - npc_id: 81156
+      normal_action: dfguard1
+      caotic_action: dfguard1
+      teleport_url: dfguard1
+    - npc_id: 81200
+      normal_action: nobelt
+      caotic_action: nobelt
+    - npc_id: 81202
+      normal_action: minitos08
+      caotic_action: minitos08
+    - npc_id: 81203
+      normal_action: minitos3
+      caotic_action: minitos3
+    - npc_id: 81204
+      normal_action: minitos3
+      caotic_action: minitos3
+    - npc_id: 81205
+      normal_action: minitos2
+      caotic_action: minitos2
+    - npc_id: 81206
+      normal_action: minitos2
+      caotic_action: minitos2
+    - npc_id: 81207
+      normal_action: minitos1
+      caotic_action: minitos1
+    - npc_id: 81208
+      normal_action: minibrob01
+      caotic_action: minibrob01
+    - npc_id: 81241
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81242
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81243
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81244
+      normal_action: pandora
+      caotic_action: pandora
+    - npc_id: 81245
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81246
+      normal_action: sharna1
+      caotic_action: sharna2
+    - npc_id: 81247
+      normal_action: wcorpse1
+      caotic_action: wcorpse1
+    - npc_id: 81248
+      normal_action: wcorpse4
+      caotic_action: wcorpse4
+    - npc_id: 81249
+      normal_action: wcorpse7
+      caotic_action: wcorpse7
+    - npc_id: 81250
+      normal_action: wa_earth1
+      caotic_action: wa_earth1
+    - npc_id: 81251
+      normal_action: wa_acidw1
+      caotic_action: wa_acidw1
+    - npc_id: 81252
+      normal_action: wa_egg1
+      caotic_action: wa_egg1
+    - npc_id: 81255
+      normal_action: tutor
+      caotic_action: tutor
+    - npc_id: 81256
+      normal_action: admin1
+      caotic_action: admin1
+    - npc_id: 81257
+      normal_action: lowlv1
+      caotic_action: lowlv1
+    - npc_id: 81258
+      normal_action: asha2
+      caotic_action: asha2
+      teleport_url: asha3
+    - npc_id: 81259
+      normal_action: feaena2
+      caotic_action: feaena2
+      teleport_url: feaena3
+    - npc_id: 81260
+      normal_action: artisan2
+      caotic_action: artisan2
+    - npc_id: 81261
+      normal_action: 8event3
+      caotic_action: 8event3
+    - npc_id: 81262
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81263
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81264
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81265
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81266
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81267
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81268
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81269
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81270
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81271
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81272
+      normal_action: warechar1
+      caotic_action: warechar1
+    - npc_id: 81277
+      normal_action: dsecret3
+      caotic_action: dsecret3
+    - npc_id: 81278
+      normal_action: veil1
+      caotic_action: veil1
+    - npc_id: 81279
+      normal_action: grayknight1
+      caotic_action: grayknight1
+    - npc_id: 81280
+      normal_action: familyed
+      caotic_action: familyed
+    - npc_id: 81281
+      normal_action: ilbakiel
+      caotic_action: ilbakiel
+    - npc_id: 81282
+      normal_action: fivelviin1
+      caotic_action: fivelviin1
+    - npc_id: 81283
+      normal_action: fivelviin2
+      caotic_action: fivelviin2
+    - npc_id: 81284
+      normal_action: fivelviin3
+      caotic_action: fivelviin3
+    - npc_id: 81285
+      normal_action: fivelviin4
+      caotic_action: fivelviin4
+    - npc_id: 81286
+      normal_action: sherme2
+      caotic_action: sherme2
+    - npc_id: 81287
+      normal_action: merlin1
+      caotic_action: merlin1
+      teleport_url: merlin2
+    - npc_id: 81288
+      normal_action: hankoo1
+      caotic_action: hankoo1
+    - npc_id: 81289
+      normal_action: dwfmerchant
+      caotic_action: dwfmerchant
+    - npc_id: 81290
+      normal_action: bankoo1
+      caotic_action: bankoo1
+    - npc_id: 81291
+      normal_action: ddummy2
+      caotic_action: ddummy2
+    - npc_id: 81292
+      normal_action: shamansael1
+      caotic_action: shamansael1
+    - npc_id: 81293
+      normal_action: beasamoo
+      caotic_action: beasamool
+    - npc_id: 81294
+      normal_action: kymsamoo
+      caotic_action: kymsamoo
+    - npc_id: 81297
+      normal_action: adenshadow1
+      caotic_action: adenshadow1
+    - npc_id: 81298
+      normal_action: adenflora1
+      caotic_action: adenflora1
+      teleport_url: adenflora2
+    - npc_id: 81299
+      normal_action: amelia
+      caotic_action: amelia1
+    - npc_id: 81300
+      normal_action: gr_mammon1
+      caotic_action: gr_mammon1
+      teleport_url: gr_mammon3
+    - npc_id: 81307
+      normal_action: newsboy
+      caotic_action: newsboy
+    - npc_id: 81310
+      normal_action: redsoul_f4
+      caotic_action: redsoul_f4
+    - npc_id: 81311
+      normal_action: bluesoul_f4
+      caotic_action: bluesoul_f4
+    - npc_id: 81322
+      normal_action: adjutant9
+      caotic_action: adjutant9
+    - npc_id: 81334
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81335
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81345
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81346
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81347
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81348
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81349
+      normal_action: kiholl1
+      caotic_action: kiholl1
+    - npc_id: 81350
+      normal_action: dspy1
+      caotic_action: dspy1
+    - npc_id: 81352
+      normal_action: ""
+      caotic_action: ""
+    - npc_id: 81353
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81354
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81355
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81356
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81357
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81358
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81359
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81360
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81361
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81362
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81363
+      normal_action: bs_01
+      caotic_action: ""
+    - npc_id: 81364
+      normal_action: killton1
+      caotic_action: ""
+    - npc_id: 81365
+      normal_action: merin1
+      caotic_action: ""
+    - npc_id: 81366
+      normal_action: harin1
+      caotic_action: ""
+    - npc_id: 81367
+      normal_action: birthday1
+      caotic_action: ""
+    - npc_id: 81369
+      normal_action: mopo1
+      caotic_action: ""
+    - npc_id: 81370
+      normal_action: cofeonba
+      caotic_action: ""
+    - npc_id: 81371
+      normal_action: j_html00
+      caotic_action: j_html01
+    - npc_id: 81372
+      normal_action: id0
+      caotic_action: ""
+    - npc_id: 81373
+      normal_action: j_paper
+      caotic_action: ""
+    - npc_id: 81374
+      normal_action: j_l_out00
+      caotic_action: ""
+    - npc_id: 81375
+      normal_action: hugrint1
+      caotic_action: ""
+      teleport_urla: );INSERT INTO `npcaction` VALUES (91002

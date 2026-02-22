@@ -1,0 +1,40 @@
+# 編譯產物
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 測試產物
+*.test
+*.out
+coverage.html
+
+# Go 工具
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 地圖檔案（二進制，太大不上傳）
+map/
+
+# 種子/測試資料（視需求決定）
+# seed/
+
+# 開發筆記
+PLAN.md
+
+# 轉換工具執行檔
+portalconv.exe
+teleconv.exe
+sqlconv.exe

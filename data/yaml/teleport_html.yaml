@@ -1,0 +1,1924 @@
+# Teleport HTML data values (prices for dialog pages) - from Teleporter.xml
+
+html_data:
+    - action_name: teleportURL
+      html_id: teleisland2
+      npc_id: 50015
+      data:
+        - "1500"
+    - action_name: teleportURL
+      html_id: telefire3
+      npc_id: 50017
+      data:
+        - "168"
+    - action_name: teleportURL
+      html_id: telekent2
+      npc_id: 50020
+      data:
+        - "50"
+        - "50"
+        - "50"
+        - "120"
+        - "120"
+        - "120"
+        - "120"
+        - "180"
+        - "180"
+        - "200"
+        - "200"
+        - "300"
+        - "600"
+        - "7100"
+    - action_name: teleportURLA
+      html_id: telekent3
+      npc_id: 50020
+      data:
+        - "100"
+        - "220"
+        - "220"
+        - "220"
+        - "220"
+        - "220"
+        - "230"
+        - "330"
+        - "330"
+        - "440"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50020
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50020
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50020
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50020
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50020
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50020
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50020
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50020
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50020
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50020
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: teleckent2
+      npc_id: 50021
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: telefire3
+      npc_id: 50022
+      data:
+        - "168"
+    - action_name: teleportURL
+      html_id: kentober2
+      npc_id: 50023
+      data:
+        - "10000"
+    - action_name: teleportURL
+      html_id: telegludin2
+      npc_id: 50024
+      data:
+        - "50"
+        - "50"
+        - "50"
+        - "120"
+        - "120"
+        - "180"
+        - "180"
+        - "180"
+        - "240"
+        - "240"
+        - "240"
+        - "200"
+        - "200"
+        - "300"
+        - "500"
+        - "6800"
+    - action_name: teleportURLA
+      html_id: telegludin3
+      npc_id: 50024
+      data:
+        - "110"
+        - "242"
+        - "242"
+        - "242"
+        - "363"
+        - "363"
+        - "484"
+        - "363"
+        - "484"
+        - "605"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50024
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50024
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50024
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50024
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50024
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50024
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50024
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50024
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50024
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50024
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telegltz2
+      npc_id: 50026
+      data:
+        - "550"
+        - "700"
+        - "810"
+    - action_name: teleportURL
+      html_id: telefire3
+      npc_id: 50030
+      data:
+        - "168"
+    - action_name: teleportURL
+      html_id: telegrtz2
+      npc_id: 50033
+      data:
+        - "560"
+        - "720"
+        - "560"
+    - action_name: teleportURL
+      html_id: telecgiran2
+      npc_id: 50035
+      data:
+        - "0"
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: telegiran2
+      npc_id: 50036
+      data:
+        - "52"
+        - "52"
+        - "52"
+        - "126"
+        - "126"
+        - "126"
+        - "126"
+        - "189"
+        - "189"
+        - "315"
+        - "315"
+        - "315"
+        - "735"
+        - "7770"
+    - action_name: teleportURLA
+      html_id: telegiran3
+      npc_id: 50036
+      data:
+        - "105"
+        - "105"
+        - "105"
+        - "231"
+        - "231"
+        - "231"
+        - "346"
+        - "346"
+        - "346"
+        - "462"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50036
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50036
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50036
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50036
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50036
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50036
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50036
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50036
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50036
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50036
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: televala2
+      npc_id: 50039
+      data:
+        - "51"
+        - "51"
+        - "123"
+        - "123"
+        - "185"
+        - "185"
+        - "185"
+        - "247"
+        - "247"
+        - "306"
+        - "412"
+        - "412"
+        - "824"
+        - "7931"
+    - action_name: teleportURLA
+      html_id: televala3
+      npc_id: 50039
+      data:
+        - "103"
+        - "226"
+        - "226"
+        - "339"
+        - "339"
+        - "339"
+        - "339"
+        - "339"
+        - "453"
+        - "453"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50039
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50039
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50039
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50039
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50039
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50039
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50039
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50039
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50039
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50039
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telecdwarf2
+      npc_id: 50040
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: sirius2
+      npc_id: 50044
+      data:
+        - "50"
+        - "120"
+        - "120"
+        - "150"
+        - "150"
+        - "150"
+        - "240"
+        - "240"
+        - "300"
+        - "300"
+        - "500"
+        - "500"
+        - "900"
+        - "7400"
+    - action_name: teleportURLA
+      html_id: sirius3
+      npc_id: 50044
+      data:
+        - "108"
+        - "237"
+        - "237"
+        - "356"
+        - "356"
+        - "475"
+        - "475"
+        - "594"
+        - "594"
+        - "594"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50044
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50044
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50044
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50044
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50044
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50044
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50044
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50044
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50044
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50044
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: phantasmisle
+      npc_id: 50045
+      data:
+        - "1000"
+    - action_name: teleportURL
+      html_id: elleris2
+      npc_id: 50046
+      data:
+        - "50"
+        - "120"
+        - "120"
+        - "180"
+        - "180"
+        - "180"
+        - "240"
+        - "240"
+        - "300"
+        - "300"
+        - "500"
+        - "500"
+        - "900"
+        - "7400"
+    - action_name: teleportURLA
+      html_id: elleris3
+      npc_id: 50046
+      data:
+        - "108"
+        - "237"
+        - "237"
+        - "356"
+        - "356"
+        - "475"
+        - "475"
+        - "594"
+        - "594"
+        - "594"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50046
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50046
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50046
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50046
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50046
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50046
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50046
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50046
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50046
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50046
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telecaden2
+      npc_id: 50047
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: teleortz2
+      npc_id: 50049
+      data:
+        - "1150"
+        - "980"
+        - "590"
+    - action_name: teleportURL
+      html_id: kirius2
+      npc_id: 50051
+      data:
+        - "50"
+        - "120"
+        - "180"
+        - "180"
+        - "240"
+        - "240"
+        - "240"
+        - "300"
+        - "300"
+        - "1000"
+        - "500"
+        - "500"
+        - "900"
+        - "8000"
+    - action_name: teleportURLA
+      html_id: kirius3
+      npc_id: 50051
+      data:
+        - "220"
+        - "330"
+        - "330"
+        - "330"
+        - "440"
+        - "440"
+        - "550"
+        - "550"
+        - "550"
+        - "550"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50051
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50051
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50051
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50051
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50051
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50051
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50051
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50051
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50051
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50051
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telecwoods2
+      npc_id: 50052
+      data:
+        - "0"
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: telefire3
+      npc_id: 50053
+      data:
+        - "168"
+    - action_name: teleportURL
+      html_id: telewoods2
+      npc_id: 50054
+      data:
+        - "50"
+        - "50"
+        - "120"
+        - "240"
+        - "120"
+        - "180"
+        - "180"
+        - "240"
+        - "300"
+        - "200"
+        - "200"
+        - "300"
+        - "500"
+        - "6500"
+    - action_name: teleportURLA
+      html_id: telewoods3
+      npc_id: 50054
+      data:
+        - "100"
+        - "100"
+        - "220"
+        - "220"
+        - "242"
+        - "330"
+        - "330"
+        - "330"
+        - "440"
+        - "550"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50054
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50054
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50054
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50054
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50054
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50054
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50054
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50054
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50054
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50054
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telesilver2
+      npc_id: 50056
+      data:
+        - "55"
+        - "55"
+        - "55"
+        - "132"
+        - "132"
+        - "132"
+        - "198"
+        - "198"
+        - "198"
+        - "246"
+        - "246"
+        - "330"
+        - "330"
+        - "330"
+        - "770"
+        - "7480"
+    - action_name: teleportURLA
+      html_id: telesilver3
+      npc_id: 50056
+      data:
+        - "110"
+        - "110"
+        - "242"
+        - "242"
+        - "242"
+        - "242"
+        - "363"
+        - "363"
+        - "363"
+        - "363"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50056
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50056
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50056
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50056
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50056
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50056
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50056
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50056
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50056
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50056
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telefire3
+      npc_id: 50057
+      data:
+        - "168"
+    - action_name: teleportURL
+      html_id: telesktz2
+      npc_id: 50059
+      data:
+        - "580"
+        - "680"
+        - "680"
+    - action_name: teleportURL
+      html_id: telecorc2
+      npc_id: 50063
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: duvall3
+      npc_id: 50064
+      data:
+        - "100"
+    - action_name: teleportURL
+      html_id: teleheine2
+      npc_id: 50066
+      data:
+        - "50"
+        - "50"
+        - "50"
+        - "120"
+        - "120"
+        - "120"
+        - "180"
+        - "180"
+        - "240"
+        - "300"
+        - "400"
+        - "400"
+        - "800"
+        - "7100"
+    - action_name: teleportURLA
+      html_id: teleheine3
+      npc_id: 50066
+      data:
+        - "100"
+        - "100"
+        - "220"
+        - "220"
+        - "220"
+        - "220"
+        - "330"
+        - "330"
+        - "440"
+        - "550"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50066
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50066
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50066
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50066
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50066
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50066
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50066
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50066
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50066
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50066
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telecheine2
+      npc_id: 50067
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: telescave2
+      npc_id: 50068
+      data:
+        - "1500"
+        - "800"
+        - "600"
+        - "1800"
+        - "1800"
+        - "1000"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50068
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50068
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50068
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50068
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50068
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50068
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50068
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50068
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50068
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50068
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: teleoum2
+      npc_id: 50072
+      data:
+        - "2200"
+        - "1800"
+        - "1000"
+        - "1600"
+        - "2200"
+        - "1200"
+        - "1300"
+        - "2000"
+        - "2000"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50072
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50072
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50072
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50072
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50072
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50072
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50072
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50072
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50072
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50072
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telediad2
+      npc_id: 50073
+      data:
+        - "0"
+        - "2200"
+        - "0"
+        - "1800"
+        - "0"
+        - "2200"
+        - "1000"
+        - "0"
+        - "1200"
+        - "1600"
+        - "2000"
+        - "2000"
+        - "0"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50073
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50073
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50073
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50073
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50073
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50073
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50073
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50073
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50073
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50073
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: telecdiad2
+      npc_id: 50075
+      data:
+        - "0"
+        - "0"
+        - "0"
+    - action_name: teleportURL
+      html_id: telediad2
+      npc_id: 50079
+      data:
+        - "550"
+        - "550"
+        - "550"
+        - "600"
+        - "600"
+        - "600"
+        - "650"
+        - "700"
+        - "750"
+        - "750"
+        - "500"
+        - "500"
+        - "700"
+    - action_name: teleportURLA
+      html_id: telediad3
+      npc_id: 50079
+      data:
+        - "700"
+        - "800"
+        - "800"
+        - "1000"
+        - "10000"
+    - action_name: teleportURLB
+      html_id: guide_1_1
+      npc_id: 50079
+      data:
+        - "390"
+        - "390"
+        - "390"
+        - "390"
+    - action_name: teleportURLC
+      html_id: guide_1_2
+      npc_id: 50079
+      data:
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+        - "403"
+    - action_name: teleportURLD
+      html_id: guide_1_3
+      npc_id: 50079
+      data:
+        - "480"
+        - "480"
+        - "480"
+        - "480"
+        - "630"
+        - "1080"
+        - "630"
+    - action_name: teleportURLE
+      html_id: guide_2_1
+      npc_id: 50079
+      data:
+        - "600"
+        - "600"
+        - "750"
+        - "750"
+    - action_name: teleportURLF
+      html_id: guide_2_2
+      npc_id: 50079
+      data:
+        - "533"
+        - "533"
+        - "793"
+        - "663"
+    - action_name: teleportURLG
+      html_id: guide_2_3
+      npc_id: 50079
+      data:
+        - "630"
+        - "780"
+        - "1080"
+        - "930"
+    - action_name: teleportURLH
+      html_id: guide_3_1
+      npc_id: 50079
+      data:
+        - "750"
+        - "750"
+        - "750"
+        - "1200"
+    - action_name: teleportURLI
+      html_id: guide_3_2
+      npc_id: 50079
+      data:
+        - "663"
+        - "663"
+        - "663"
+        - "663"
+        - "1313"
+        - "1053"
+        - "793"
+    - action_name: teleportURLJ
+      html_id: guide_3_3
+      npc_id: 50079
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "780"
+        - "1080"
+    - action_name: teleportURLK
+      html_id: guide_4
+      npc_id: 50079
+      data:
+        - "780"
+        - "780"
+        - "780"
+        - "676"
+        - "676"
+        - "936"
+    - action_name: teleportURL
+      html_id: teleorcbdg1
+      npc_id: 50080
+      data:
+        - "15"
+    - action_name: teleportURL
+      html_id: teleorcbdg2
+      npc_id: 50085
+      data:
+        - "15"
+    - action_name: teleportURL
+      html_id: kinin2
+      npc_id: 50608
+      data:
+        - "300"
+        - "500"
+        - "500"
+        - "900"
+    - action_name: teleportURL
+      html_id: orcfbuwoo2
+      npc_id: 71039
+      data:
+        - "10000"
+    - action_name: teleportURL
+      html_id: usender2
+      npc_id: 71078
+      data:
+        - "10000"
+    - action_name: teleportURL
+      html_id: amisoo2
+      npc_id: 71080
+      data:
+        - "10000"
+    - action_name: teleportURL
+      html_id: fk_out_0
+      npc_id: 80083
+      data:
+        - "0"
+    - action_name: teleportURL
+      html_id: dekabia2
+      npc_id: 80132
+      data:
+        - "50"
+        - "50"
+        - "50"
+        - "50"
+        - "120"
+        - "120"
+        - "180"
+        - "180"
+        - "180"
+        - "240"
+        - "240"
+        - "400"
+        - "400"
+        - "800"
+        - "7700"
+    - action_name: teleportURLA
+      html_id: dekabia3
+      npc_id: 80132
+      data:
+        - "100"
+        - "220"
+        - "220"
+        - "330"
+        - "330"
+        - "330"
+        - "330"
+        - "440"
+        - "440"
+    - action_name: teleportURL
+      html_id: sharial2
+      npc_id: 80146
+      data:
+        - "50"
+        - "50"
+        - "50"
+        - "120"
+        - "180"
+        - "180"
+        - "240"
+        - "240"
+        - "240"
+        - "300"
+        - "300"
+        - "500"
+        - "500"
+        - "900"
+        - "8000"
+    - action_name: teleportURLA
+      html_id: sharial3
+      npc_id: 80146
+      data:
+        - "220"
+        - "330"
+        - "330"
+        - "440"
+        - "440"
+        - "550"
+        - "550"
+        - "550"
+        - "550"
+    - action_name: teleportURL
+      html_id: adenflora2
+      npc_id: 81298
+      data:
+        - "10000"
+    - action_name: teleportURL
+      html_id: gr_mammon3
+      npc_id: 81300
+      data:
+        - "10000"

@@ -1,0 +1,7948 @@
+# Teleport destinations - converted from L1JTW Teleporter.xml
+
+teleports:
+    - action: teleport elvenforest-in
+      npc_id: 50001
+      x: 33059
+      "y": 32343
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport dungeon-out
+      npc_id: 50002
+      x: 32682
+      "y": 32874
+      map_id: 2005
+      heading: 5
+      price: 0
+    - action: teleport talking island-in
+      npc_id: 50003
+      x: 32593
+      "y": 32922
+      map_id: 0
+      heading: 5
+      price: 0
+    - action: teleport hidden-velley-for-newbie
+      npc_id: 50004
+      x: 33083
+      "y": 33387
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport dungeon-in
+      npc_id: 50006
+      x: 32871
+      "y": 32866
+      map_id: 86
+      heading: 5
+      price: 0
+    - action: teleport talking-island-for-newbie
+      npc_id: 50010
+      x: 32593
+      "y": 32922
+      map_id: 0
+      heading: 5
+      price: 0
+    - action: teleport island-gludin
+      npc_id: 50015
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 1500
+    - action: teleport firefieldtown
+      npc_id: 50017
+      x: 32745
+      "y": 32445
+      map_id: 4
+      heading: 5
+      price: 168
+    - action: teleport guide1_1_1
+      npc_id: 50020
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50020
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50020
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50020
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50020
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50020
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50020
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50020
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50020
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50020
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50020
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50020
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50020
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50020
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50020
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50020
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50020
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50020
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50020
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50020
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50020
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50020
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50020
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50020
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50020
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50020
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50020
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50020
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50020
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50020
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50020
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50020
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50020
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50020
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50020
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50020
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50020
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50020
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50020
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50020
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50020
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50020
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50020
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50020
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50020
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50020
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50020
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50020
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50020
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport kent-aden
+      npc_id: 50020
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport kent-chaos
+      npc_id: 50020
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport kent-diad
+      npc_id: 50020
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7100
+    - action: teleport kent-dragon
+      npc_id: 50020
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport kent-eva
+      npc_id: 50020
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport kent-giran
+      npc_id: 50020
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport kent-girdun
+      npc_id: 50020
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport kent-gludin
+      npc_id: 50020
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport kent-gludun
+      npc_id: 50020
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport kent-grape
+      npc_id: 50020
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport kent-gypsy
+      npc_id: 50020
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport kent-heine
+      npc_id: 50020
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport kent-ice
+      npc_id: 50020
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport kent-island
+      npc_id: 50020
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 600
+    - action: teleport kent-lowful
+      npc_id: 50020
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport kent-mirr
+      npc_id: 50020
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport kent-oasis
+      npc_id: 50020
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 230
+    - action: teleport kent-oren
+      npc_id: 50020
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport kent-reed
+      npc_id: 50020
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport kent-silver
+      npc_id: 50020
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport kent-train
+      npc_id: 50020
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport kent-under
+      npc_id: 50020
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport kent-werldern
+      npc_id: 50020
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport kent-willow
+      npc_id: 50020
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport kent-woods
+      npc_id: 50020
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport kentc-girdun
+      npc_id: 50021
+      x: 32809
+      "y": 32793
+      map_id: 54
+      heading: 5
+      price: 0
+    - action: teleport kentc-gludun
+      npc_id: 50021
+      x: 32764
+      "y": 32774
+      map_id: 10
+      heading: 5
+      price: 0
+    - action: teleport kentc-village
+      npc_id: 50021
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport firefieldtown
+      npc_id: 50022
+      x: 32745
+      "y": 32445
+      map_id: 4
+      heading: 5
+      price: 168
+    - action: teleport kentcd
+      npc_id: 50023
+      x: 32721
+      "y": 33087
+      map_id: 240
+      heading: 5
+      price: 10000
+    - action: teleport gludin-aden
+      npc_id: 50024
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport gludin-behemoth
+      npc_id: 50024
+      x: 32779
+      "y": 32887
+      map_id: 1001
+      heading: 5
+      price: 180
+    - action: teleport gludin-chaos
+      npc_id: 50024
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport gludin-diad
+      npc_id: 50024
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 6800
+    - action: teleport gludin-dragon
+      npc_id: 50024
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport gludin-eva
+      npc_id: 50024
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 484
+    - action: teleport gludin-giran
+      npc_id: 50024
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport gludin-girdun
+      npc_id: 50024
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport gludin-gludun
+      npc_id: 50024
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 110
+    - action: teleport gludin-grape
+      npc_id: 50024
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport gludin-gypsy
+      npc_id: 50024
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 605
+    - action: teleport gludin-heine
+      npc_id: 50024
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport gludin-ice
+      npc_id: 50024
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 605
+    - action: teleport gludin-island
+      npc_id: 50024
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 500
+    - action: teleport gludin-kent
+      npc_id: 50024
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport gludin-lowful
+      npc_id: 50024
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport gludin-mirr
+      npc_id: 50024
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 484
+    - action: teleport gludin-oasis
+      npc_id: 50024
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport gludin-oren
+      npc_id: 50024
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport gludin-reed
+      npc_id: 50024
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport gludin-silver
+      npc_id: 50024
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport gludin-silveria
+      npc_id: 50024
+      x: 32841
+      "y": 32856
+      map_id: 1000
+      heading: 2
+      price: 240
+    - action: teleport gludin-train
+      npc_id: 50024
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport gludin-under
+      npc_id: 50024
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport gludin-werldern
+      npc_id: 50024
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport gludin-willow
+      npc_id: 50024
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport gludin-woods
+      npc_id: 50024
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport guide1_1_1
+      npc_id: 50024
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50024
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50024
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50024
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50024
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50024
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50024
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50024
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50024
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50024
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50024
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50024
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50024
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50024
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50024
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50024
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50024
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50024
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50024
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50024
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50024
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50024
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50024
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50024
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50024
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50024
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50024
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50024
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50024
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50024
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50024
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50024
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50024
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50024
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50024
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50024
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50024
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50024
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50024
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50024
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50024
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50024
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50024
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50024
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50024
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50024
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50024
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50024
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50024
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport gludin-trade-zone-gludio
+      npc_id: 50025
+      x: 32619
+      "y": 32795
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport gludintz-girantz
+      npc_id: 50026
+      x: 32702
+      "y": 32842
+      map_id: 350
+      heading: 5
+      price: 550
+    - action: teleport gludintz-orentz
+      npc_id: 50026
+      x: 32733
+      "y": 32792
+      map_id: 360
+      heading: 5
+      price: 700
+    - action: teleport gludintz-silvertz
+      npc_id: 50026
+      x: 32733
+      "y": 32792
+      map_id: 370
+      heading: 5
+      price: 810
+    - action: teleport gludio-gludin-trade-zone
+      npc_id: 50027
+      x: 32779
+      "y": 32848
+      map_id: 340
+      heading: 5
+      price: 0
+    - action: teleport firefieldtown
+      npc_id: 50030
+      x: 32745
+      "y": 32445
+      map_id: 4
+      heading: 5
+      price: 168
+    - action: teleport sepia-dungen
+      npc_id: 50031
+      x: 32740
+      "y": 32860
+      map_id: 302
+      heading: 5
+      price: 0
+    - action: teleport giran-trade-zone-giran
+      npc_id: 50032
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport girantz-gludintz
+      npc_id: 50033
+      x: 32779
+      "y": 32848
+      map_id: 340
+      heading: 5
+      price: 560
+    - action: teleport girantz-orentz
+      npc_id: 50033
+      x: 32733
+      "y": 32792
+      map_id: 360
+      heading: 5
+      price: 720
+    - action: teleport girantz-silvertz
+      npc_id: 50033
+      x: 32733
+      "y": 32792
+      map_id: 370
+      heading: 5
+      price: 560
+    - action: teleport giran-giran-trade-zone
+      npc_id: 50034
+      x: 32702
+      "y": 32842
+      map_id: 350
+      heading: 5
+      price: 0
+    - action: teleport giranc-dragonvalley
+      npc_id: 50035
+      x: 33432
+      "y": 32546
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport giranc-girandun
+      npc_id: 50035
+      x: 32731
+      "y": 32728
+      map_id: 55
+      heading: 5
+      price: 0
+    - action: teleport giranc-littlebb
+      npc_id: 50035
+      x: 33517
+      "y": 32851
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport giranc-village
+      npc_id: 50035
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport giran-aden
+      npc_id: 50036
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 126
+    - action: teleport giran-chaos
+      npc_id: 50036
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 315
+    - action: teleport giran-diad
+      npc_id: 50036
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7770
+    - action: teleport giran-dragon
+      npc_id: 50036
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 105
+    - action: teleport giran-eva
+      npc_id: 50036
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 231
+    - action: teleport giran-girdun
+      npc_id: 50036
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 105
+    - action: teleport giran-gludin
+      npc_id: 50036
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 126
+    - action: teleport giran-gludun
+      npc_id: 50036
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 231
+    - action: teleport giran-grape
+      npc_id: 50036
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 315
+    - action: teleport giran-gypsy
+      npc_id: 50036
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 346
+    - action: teleport giran-heine
+      npc_id: 50036
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 52
+    - action: teleport giran-ice
+      npc_id: 50036
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 346
+    - action: teleport giran-island
+      npc_id: 50036
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 735
+    - action: teleport giran-kent
+      npc_id: 50036
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 52
+    - action: teleport giran-lowful
+      npc_id: 50036
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 315
+    - action: teleport giran-mirr
+      npc_id: 50036
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 105
+    - action: teleport giran-oasis
+      npc_id: 50036
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 346
+    - action: teleport giran-oren
+      npc_id: 50036
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 126
+    - action: teleport giran-reed
+      npc_id: 50036
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 462
+    - action: teleport giran-silver
+      npc_id: 50036
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 126
+    - action: teleport giran-train
+      npc_id: 50036
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 231
+    - action: teleport giran-under
+      npc_id: 50036
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 346
+    - action: teleport giran-werldern
+      npc_id: 50036
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 52
+    - action: teleport giran-willow
+      npc_id: 50036
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 189
+    - action: teleport giran-woods
+      npc_id: 50036
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 189
+    - action: teleport guide1_1_1
+      npc_id: 50036
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50036
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50036
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50036
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50036
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50036
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50036
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50036
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50036
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50036
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50036
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50036
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50036
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50036
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50036
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50036
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50036
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50036
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50036
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50036
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50036
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50036
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50036
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50036
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50036
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50036
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50036
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50036
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50036
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50036
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50036
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50036
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50036
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50036
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50036
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50036
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50036
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50036
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50036
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50036
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50036
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50036
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50036
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50036
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50036
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50036
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50036
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50036
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50036
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport dwarf-aden
+      npc_id: 50039
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 185
+    - action: teleport dwarf-chaos
+      npc_id: 50039
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 412
+    - action: teleport dwarf-diad
+      npc_id: 50039
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7931
+    - action: teleport dwarf-dragon
+      npc_id: 50039
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 103
+    - action: teleport dwarf-eva
+      npc_id: 50039
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-giran
+      npc_id: 50039
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 51
+    - action: teleport dwarf-girdun
+      npc_id: 50039
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 226
+    - action: teleport dwarf-gludin
+      npc_id: 50039
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 185
+    - action: teleport dwarf-gludun
+      npc_id: 50039
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-grape
+      npc_id: 50039
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 306
+    - action: teleport dwarf-gypsy
+      npc_id: 50039
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-heine
+      npc_id: 50039
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 123
+    - action: teleport dwarf-ice
+      npc_id: 50039
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-island
+      npc_id: 50039
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 824
+    - action: teleport dwarf-kent
+      npc_id: 50039
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 123
+    - action: teleport dwarf-lowful
+      npc_id: 50039
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 412
+    - action: teleport dwarf-mirr
+      npc_id: 50039
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 226
+    - action: teleport dwarf-oasis
+      npc_id: 50039
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-oren
+      npc_id: 50039
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 51
+    - action: teleport dwarf-reed
+      npc_id: 50039
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 453
+    - action: teleport dwarf-silver
+      npc_id: 50039
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 185
+    - action: teleport dwarf-train
+      npc_id: 50039
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 339
+    - action: teleport dwarf-under
+      npc_id: 50039
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 453
+    - action: teleport dwarf-willow
+      npc_id: 50039
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 247
+    - action: teleport dwarf-woods
+      npc_id: 50039
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 247
+    - action: teleport guide1_1_1
+      npc_id: 50039
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50039
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50039
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50039
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50039
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50039
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50039
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50039
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50039
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50039
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50039
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50039
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50039
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50039
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50039
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50039
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50039
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50039
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50039
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50039
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50039
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50039
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50039
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50039
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50039
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50039
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50039
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50039
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50039
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50039
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50039
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50039
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50039
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50039
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50039
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50039
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50039
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50039
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50039
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50039
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50039
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50039
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50039
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50039
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50039
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50039
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50039
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50039
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50039
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport dwarfc-crystal
+      npc_id: 50040
+      x: 34174
+      "y": 32184
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport dwarfc-ivorytower
+      npc_id: 50040
+      x: 32773
+      "y": 32806
+      map_id: 79
+      heading: 5
+      price: 0
+    - action: teleport dwarfc-village
+      npc_id: 50040
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport aden-chaos
+      npc_id: 50044
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-diad
+      npc_id: 50044
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7400
+    - action: teleport aden-dragon
+      npc_id: 50044
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 356
+    - action: teleport aden-eva
+      npc_id: 50044
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-giran
+      npc_id: 50044
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport aden-girdun
+      npc_id: 50044
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 356
+    - action: teleport aden-gludin
+      npc_id: 50044
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport aden-gludun
+      npc_id: 50044
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-grape
+      npc_id: 50044
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport aden-gypsy
+      npc_id: 50044
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 108
+    - action: teleport aden-heine
+      npc_id: 50044
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport aden-ice
+      npc_id: 50044
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-island
+      npc_id: 50044
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 900
+    - action: teleport aden-kent
+      npc_id: 50044
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport aden-lowful
+      npc_id: 50044
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-mirr
+      npc_id: 50044
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-oasis
+      npc_id: 50044
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 475
+    - action: teleport aden-oren
+      npc_id: 50044
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport aden-reed
+      npc_id: 50044
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-silver
+      npc_id: 50044
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport aden-train
+      npc_id: 50044
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 475
+    - action: teleport aden-under
+      npc_id: 50044
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-werldern
+      npc_id: 50044
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport aden-willow
+      npc_id: 50044
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport aden-woods
+      npc_id: 50044
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport guide1_1_1
+      npc_id: 50044
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50044
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50044
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50044
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50044
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50044
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50044
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50044
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50044
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50044
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50044
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50044
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50044
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50044
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50044
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50044
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50044
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50044
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50044
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50044
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50044
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50044
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50044
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50044
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50044
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50044
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50044
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50044
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50044
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50044
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50044
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50044
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50044
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50044
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50044
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50044
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50044
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50044
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50044
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50044
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50044
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50044
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50044
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50044
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50044
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50044
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50044
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50044
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50044
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport phantasm-island
+      npc_id: 50045
+      x: 32635
+      "y": 32817
+      map_id: 303
+      heading: 5
+      price: 1000
+    - action: teleport aden-chaos
+      npc_id: 50046
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-diad
+      npc_id: 50046
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7400
+    - action: teleport aden-dragon
+      npc_id: 50046
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 356
+    - action: teleport aden-eva
+      npc_id: 50046
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-giran
+      npc_id: 50046
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport aden-girdun
+      npc_id: 50046
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 356
+    - action: teleport aden-gludin
+      npc_id: 50046
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport aden-gludun
+      npc_id: 50046
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-grape
+      npc_id: 50046
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport aden-gypsy
+      npc_id: 50046
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 108
+    - action: teleport aden-heine
+      npc_id: 50046
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport aden-ice
+      npc_id: 50046
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-island
+      npc_id: 50046
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 900
+    - action: teleport aden-kent
+      npc_id: 50046
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport aden-lowful
+      npc_id: 50046
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-mirr
+      npc_id: 50046
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 237
+    - action: teleport aden-oasis
+      npc_id: 50046
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 475
+    - action: teleport aden-oren
+      npc_id: 50046
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport aden-reed
+      npc_id: 50046
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-silver
+      npc_id: 50046
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport aden-train
+      npc_id: 50046
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 475
+    - action: teleport aden-under
+      npc_id: 50046
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 594
+    - action: teleport aden-werldern
+      npc_id: 50046
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport aden-willow
+      npc_id: 50046
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport aden-woods
+      npc_id: 50046
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport guide1_1_1
+      npc_id: 50046
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50046
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50046
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50046
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50046
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50046
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50046
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50046
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50046
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50046
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50046
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50046
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50046
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50046
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50046
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50046
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50046
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50046
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50046
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50046
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50046
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50046
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50046
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50046
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50046
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50046
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50046
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50046
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50046
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50046
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50046
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50046
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50046
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50046
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50046
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50046
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50046
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50046
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50046
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50046
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50046
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50046
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50046
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50046
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50046
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50046
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50046
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50046
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50046
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport adenc-gypsy
+      npc_id: 50047
+      x: 33979
+      "y": 32926
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport adenc-omantower
+      npc_id: 50047
+      x: 32795
+      "y": 32798
+      map_id: 101
+      heading: 5
+      price: 0
+    - action: teleport adenc-village
+      npc_id: 50047
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport oren-trade-zone-oren
+      npc_id: 50048
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport orentz-girantz
+      npc_id: 50049
+      x: 32702
+      "y": 32842
+      map_id: 350
+      heading: 5
+      price: 980
+    - action: teleport orentz-gludintz
+      npc_id: 50049
+      x: 32779
+      "y": 32848
+      map_id: 340
+      heading: 5
+      price: 1150
+    - action: teleport orentz-silvertz
+      npc_id: 50049
+      x: 32733
+      "y": 32792
+      map_id: 370
+      heading: 5
+      price: 590
+    - action: teleport oren-oren-trade-zone
+      npc_id: 50050
+      x: 32733
+      "y": 32792
+      map_id: 360
+      heading: 5
+      price: 0
+    - action: teleport guide1_1_1
+      npc_id: 50051
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50051
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50051
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50051
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50051
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50051
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50051
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50051
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50051
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50051
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50051
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50051
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50051
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50051
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50051
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50051
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50051
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50051
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50051
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50051
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50051
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50051
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50051
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50051
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50051
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50051
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50051
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50051
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50051
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50051
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50051
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50051
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50051
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50051
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50051
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50051
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50051
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50051
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50051
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50051
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50051
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50051
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50051
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50051
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50051
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50051
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50051
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50051
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50051
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport oren-aden
+      npc_id: 50051
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport oren-chaos
+      npc_id: 50051
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport oren-diad
+      npc_id: 50051
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 8000
+    - action: teleport oren-dragon
+      npc_id: 50051
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport oren-eva
+      npc_id: 50051
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport oren-giran
+      npc_id: 50051
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport oren-girdun
+      npc_id: 50051
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport oren-gludin
+      npc_id: 50051
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport oren-gludun
+      npc_id: 50051
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport oren-grape
+      npc_id: 50051
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport oren-gypsy
+      npc_id: 50051
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport oren-heine
+      npc_id: 50051
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport oren-ice
+      npc_id: 50051
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport oren-island
+      npc_id: 50051
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 900
+    - action: teleport oren-kent
+      npc_id: 50051
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport oren-lowful
+      npc_id: 50051
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport oren-mirr
+      npc_id: 50051
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport oren-oasis
+      npc_id: 50051
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport oren-reed
+      npc_id: 50051
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport oren-silver
+      npc_id: 50051
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport oren-train
+      npc_id: 50051
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport oren-under
+      npc_id: 50051
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport oren-werldern
+      npc_id: 50051
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport oren-willow
+      npc_id: 50051
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport oren-woods
+      npc_id: 50051
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport woodsc-oasis
+      npc_id: 50052
+      x: 32863
+      "y": 33252
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport woodsc-sknight
+      npc_id: 50052
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport woodsc-village
+      npc_id: 50052
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport woodsc-windun
+      npc_id: 50052
+      x: 32805
+      "y": 32811
+      map_id: 27
+      heading: 5
+      price: 0
+    - action: teleport firefieldtown
+      npc_id: 50053
+      x: 32745
+      "y": 32445
+      map_id: 4
+      heading: 5
+      price: 168
+    - action: teleport guide1_1_1
+      npc_id: 50054
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50054
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50054
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50054
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50054
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50054
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50054
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50054
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50054
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50054
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50054
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50054
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50054
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50054
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50054
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50054
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50054
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50054
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50054
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50054
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50054
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50054
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50054
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50054
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50054
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50054
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50054
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50054
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50054
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50054
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50054
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50054
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50054
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50054
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50054
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50054
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50054
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50054
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50054
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50054
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50054
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50054
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50054
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50054
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50054
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50054
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50054
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50054
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50054
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport woods-aden
+      npc_id: 50054
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport woods-chaos
+      npc_id: 50054
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport woods-diad
+      npc_id: 50054
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 6500
+    - action: teleport woods-dragon
+      npc_id: 50054
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport woods-eva
+      npc_id: 50054
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport woods-giran
+      npc_id: 50054
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport woods-girdun
+      npc_id: 50054
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport woods-gludin
+      npc_id: 50054
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport woods-gludun
+      npc_id: 50054
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport woods-grape
+      npc_id: 50054
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport woods-gypsy
+      npc_id: 50054
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport woods-heine
+      npc_id: 50054
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport woods-ice
+      npc_id: 50054
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport woods-island
+      npc_id: 50054
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 500
+    - action: teleport woods-kent
+      npc_id: 50054
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport woods-lowful
+      npc_id: 50054
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 200
+    - action: teleport woods-mirr
+      npc_id: 50054
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport woods-oasis
+      npc_id: 50054
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport woods-oren
+      npc_id: 50054
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport woods-reed
+      npc_id: 50054
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport woods-silver
+      npc_id: 50054
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport woods-train
+      npc_id: 50054
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport woods-under
+      npc_id: 50054
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport woods-werldern
+      npc_id: 50054
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport woods-willow
+      npc_id: 50054
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport guide1_1_1
+      npc_id: 50056
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50056
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50056
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50056
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50056
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50056
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50056
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50056
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50056
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50056
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50056
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50056
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50056
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50056
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50056
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50056
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50056
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50056
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50056
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50056
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50056
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50056
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50056
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50056
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50056
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50056
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50056
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50056
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50056
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50056
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50056
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50056
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50056
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50056
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50056
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50056
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50056
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50056
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50056
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50056
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50056
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50056
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50056
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50056
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50056
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50056
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50056
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50056
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50056
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport silver-aden
+      npc_id: 50056
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 132
+    - action: teleport silver-behemoth
+      npc_id: 50056
+      x: 32779
+      "y": 32887
+      map_id: 1001
+      heading: 5
+      price: 198
+    - action: teleport silver-chaos
+      npc_id: 50056
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport silver-diad
+      npc_id: 50056
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7480
+    - action: teleport silver-dragon
+      npc_id: 50056
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport silver-eva
+      npc_id: 50056
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport silver-giran
+      npc_id: 50056
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 132
+    - action: teleport silver-girdun
+      npc_id: 50056
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport silver-gludin
+      npc_id: 50056
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 132
+    - action: teleport silver-gludun
+      npc_id: 50056
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport silver-grape
+      npc_id: 50056
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport silver-gypsy
+      npc_id: 50056
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport silver-heine
+      npc_id: 50056
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 55
+    - action: teleport silver-ice
+      npc_id: 50056
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport silver-island
+      npc_id: 50056
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 770
+    - action: teleport silver-kent
+      npc_id: 50056
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 55
+    - action: teleport silver-lowful
+      npc_id: 50056
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport silver-mirr
+      npc_id: 50056
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport silver-oasis
+      npc_id: 50056
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 110
+    - action: teleport silver-oren
+      npc_id: 50056
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 246
+    - action: teleport silver-reed
+      npc_id: 50056
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 363
+    - action: teleport silver-silveria
+      npc_id: 50056
+      x: 32841
+      "y": 32856
+      map_id: 1000
+      heading: 2
+      price: 246
+    - action: teleport silver-train
+      npc_id: 50056
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 110
+    - action: teleport silver-under
+      npc_id: 50056
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 242
+    - action: teleport silver-werldern
+      npc_id: 50056
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 198
+    - action: teleport silver-willow
+      npc_id: 50056
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 198
+    - action: teleport silver-woods
+      npc_id: 50056
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 55
+    - action: teleport firefieldtown
+      npc_id: 50057
+      x: 32745
+      "y": 32445
+      map_id: 4
+      heading: 5
+      price: 168
+    - action: teleport silver-trade-zone-silver
+      npc_id: 50058
+      x: 33083
+      "y": 33387
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport silvertz-girantz
+      npc_id: 50059
+      x: 32702
+      "y": 32842
+      map_id: 350
+      heading: 5
+      price: 680
+    - action: teleport silvertz-gludintz
+      npc_id: 50059
+      x: 32779
+      "y": 32848
+      map_id: 340
+      heading: 5
+      price: 580
+    - action: teleport silvertz-orentz
+      npc_id: 50059
+      x: 32733
+      "y": 32792
+      map_id: 360
+      heading: 5
+      price: 680
+    - action: teleport silver-silver-trade-zone
+      npc_id: 50060
+      x: 32733
+      "y": 32792
+      map_id: 370
+      heading: 5
+      price: 0
+    - action: teleport orc-dragonvalley
+      npc_id: 50063
+      x: 33432
+      "y": 32546
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport orc-elvendun
+      npc_id: 50063
+      x: 32760
+      "y": 32761
+      map_id: 21
+      heading: 5
+      price: 0
+    - action: teleport orc-village
+      npc_id: 50063
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport orctown-hiddendock
+      npc_id: 50064
+      x: 32738
+      "y": 32857
+      map_id: 445
+      heading: 5
+      price: 100
+    - action: teleport guide1_1_1
+      npc_id: 50066
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50066
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50066
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50066
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50066
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50066
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50066
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50066
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50066
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50066
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50066
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50066
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50066
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50066
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50066
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50066
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50066
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50066
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50066
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50066
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50066
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50066
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50066
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50066
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50066
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50066
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50066
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50066
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50066
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50066
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50066
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50066
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50066
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50066
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50066
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50066
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50066
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50066
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50066
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50066
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50066
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50066
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50066
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50066
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50066
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50066
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50066
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50066
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50066
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport heine-aden
+      npc_id: 50066
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport heine-chaos
+      npc_id: 50066
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 400
+    - action: teleport heine-diad
+      npc_id: 50066
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7100
+    - action: teleport heine-dragon
+      npc_id: 50066
+      x: 33435
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport heine-eva
+      npc_id: 50066
+      x: 33623
+      "y": 33501
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport heine-giran
+      npc_id: 50066
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport heine-girdun
+      npc_id: 50066
+      x: 33320
+      "y": 33060
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport heine-gludin
+      npc_id: 50066
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport heine-gludun
+      npc_id: 50066
+      x: 32700
+      "y": 32924
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport heine-grape
+      npc_id: 50066
+      x: 32871
+      "y": 32805
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport heine-gypsy
+      npc_id: 50066
+      x: 33977
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport heine-ice
+      npc_id: 50066
+      x: 34207
+      "y": 32251
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport heine-island
+      npc_id: 50066
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 800
+    - action: teleport heine-kent
+      npc_id: 50066
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport heine-lowful
+      npc_id: 50066
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 400
+    - action: teleport heine-mirr
+      npc_id: 50066
+      x: 33718
+      "y": 32928
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport heine-oasis
+      npc_id: 50066
+      x: 32861
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport heine-oren
+      npc_id: 50066
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport heine-reed
+      npc_id: 50066
+      x: 32746
+      "y": 32361
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport heine-silver
+      npc_id: 50066
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport heine-train
+      npc_id: 50066
+      x: 32983
+      "y": 33505
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport heine-under
+      npc_id: 50066
+      x: 32557
+      "y": 33466
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport heine-werldern
+      npc_id: 50066
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport heine-willow
+      npc_id: 50066
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport heine-woods
+      npc_id: 50066
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport heinec-evadun
+      npc_id: 50067
+      x: 32694
+      "y": 32828
+      map_id: 61
+      heading: 5
+      price: 0
+    - action: teleport heinec-forgotten
+      npc_id: 50067
+      x: 33427
+      "y": 33481
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport heinec-village
+      npc_id: 50067
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport guide1_1_1
+      npc_id: 50068
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50068
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50068
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50068
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50068
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50068
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50068
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50068
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50068
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50068
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50068
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50068
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50068
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50068
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50068
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50068
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50068
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50068
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50068
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50068
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50068
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50068
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50068
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50068
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50068
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50068
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50068
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50068
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50068
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50068
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50068
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50068
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50068
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50068
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50068
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50068
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50068
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50068
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50068
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50068
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50068
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50068
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50068
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50068
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50068
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50068
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50068
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50068
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50068
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport scave-aden
+      npc_id: 50068
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 1800
+    - action: teleport scave-giran
+      npc_id: 50068
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport scave-gludin
+      npc_id: 50068
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 1500
+    - action: teleport scave-heine
+      npc_id: 50068
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 1800
+    - action: teleport scave-kent
+      npc_id: 50068
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 800
+    - action: teleport scave-oren
+      npc_id: 50068
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 1000
+    - action: teleport escape-forgotten-island
+      npc_id: 50070
+      x: 33427
+      "y": 33481
+      map_id: 4
+      heading: 5
+      price: 7
+    - action: teleport escape-forgotten-island
+      npc_id: 50071
+      x: 33427
+      "y": 33481
+      map_id: 4
+      heading: 5
+      price: 1
+    - action: teleport guide1_1_1
+      npc_id: 50072
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50072
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50072
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50072
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50072
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50072
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50072
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50072
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50072
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50072
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50072
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50072
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50072
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50072
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50072
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50072
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50072
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50072
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50072
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50072
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50072
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50072
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50072
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50072
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50072
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50072
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50072
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50072
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50072
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50072
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50072
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50072
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50072
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50072
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50072
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50072
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50072
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50072
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50072
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50072
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50072
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50072
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50072
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50072
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50072
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50072
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50072
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50072
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50072
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport oum-aden
+      npc_id: 50072
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 1600
+    - action: teleport oum-chaos
+      npc_id: 50072
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 2000
+    - action: teleport oum-giran
+      npc_id: 50072
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 1000
+    - action: teleport oum-gludin
+      npc_id: 50072
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 2200
+    - action: teleport oum-heine
+      npc_id: 50072
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 2200
+    - action: teleport oum-kent
+      npc_id: 50072
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 1800
+    - action: teleport oum-lowful
+      npc_id: 50072
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 2000
+    - action: teleport oum-oren
+      npc_id: 50072
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 1200
+    - action: teleport oum-scave
+      npc_id: 50072
+      x: 32922
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 1300
+    - action: teleport diad-aden
+      npc_id: 50073
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 1600
+    - action: teleport diad-chaos
+      npc_id: 50073
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 2000
+    - action: teleport diad-giran
+      npc_id: 50073
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 1000
+    - action: teleport diad-gludin
+      npc_id: 50073
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 2200
+    - action: teleport diad-heine
+      npc_id: 50073
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 2200
+    - action: teleport diad-kent
+      npc_id: 50073
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 1800
+    - action: teleport diad-lowful
+      npc_id: 50073
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 2000
+    - action: teleport diad-oren
+      npc_id: 50073
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 1200
+    - action: teleport diad-oum
+      npc_id: 50073
+      x: 32864
+      "y": 32939
+      map_id: 310
+      heading: 5
+      price: 0
+    - action: teleport diad-scave
+      npc_id: 50073
+      x: 32922
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 1300
+    - action: teleport guide1_1_1
+      npc_id: 50073
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50073
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50073
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50073
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50073
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50073
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50073
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50073
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50073
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50073
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50073
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50073
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50073
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50073
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50073
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50073
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50073
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50073
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50073
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50073
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50073
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50073
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50073
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50073
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50073
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50073
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50073
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50073
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50073
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50073
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50073
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50073
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50073
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50073
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50073
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50073
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50073
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50073
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50073
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50073
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50073
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50073
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50073
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50073
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50073
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50073
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50073
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50073
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50073
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport diad-cavern
+      npc_id: 50074
+      x: 32570
+      "y": 32665
+      map_id: 400
+      heading: 5
+      price: 0
+    - action: teleport diadc-omantower
+      npc_id: 50075
+      x: 32795
+      "y": 32798
+      map_id: 101
+      heading: 5
+      price: 0
+    - action: teleport diadc-oumdun
+      npc_id: 50075
+      x: 32864
+      "y": 32939
+      map_id: 310
+      heading: 5
+      price: 0
+    - action: teleport diadc-village
+      npc_id: 50075
+      x: 32800
+      "y": 32801
+      map_id: 310
+      heading: 5
+      price: 0
+    - action: teleport elegrave-abysslake
+      npc_id: 50076
+      x: 0
+      "y": 0
+      map_id: 0
+      heading: 0
+      price: 0
+    - action: teleport elegrave-drakeIsland
+      npc_id: 50076
+      x: 0
+      "y": 0
+      map_id: 0
+      heading: 0
+      price: 0
+    - action: teleport abysslake-elegrave
+      npc_id: 50077
+      x: 0
+      "y": 0
+      map_id: 0
+      heading: 0
+      price: 0
+    - action: teleport piratedungeon-elementaltomb
+      npc_id: 50078
+      x: 0
+      "y": 0
+      map_id: 0
+      heading: 0
+      price: 0
+    - action: teleport diad-aden
+      npc_id: 50079
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport diad-cavern
+      npc_id: 50079
+      x: 32571
+      "y": 32676
+      map_id: 400
+      heading: 5
+      price: 1000
+    - action: teleport diad-chaos
+      npc_id: 50079
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport diad-giran
+      npc_id: 50079
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 650
+    - action: teleport diad-gludin
+      npc_id: 50079
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport diad-heine
+      npc_id: 50079
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport diad-island
+      npc_id: 50079
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 700
+    - action: teleport diad-kent
+      npc_id: 50079
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport diad-las
+      npc_id: 50079
+      x: 32683
+      "y": 32804
+      map_id: 450
+      heading: 5
+      price: 10000
+    - action: teleport diad-lowful
+      npc_id: 50079
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport diad-mincave
+      npc_id: 50079
+      x: 33004
+      "y": 32845
+      map_id: 320
+      heading: 5
+      price: 800
+    - action: teleport diad-occ
+      npc_id: 50079
+      x: 32729
+      "y": 32855
+      map_id: 320
+      heading: 5
+      price: 700
+    - action: teleport diad-oren
+      npc_id: 50079
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport diad-oumdun
+      npc_id: 50079
+      x: 32805
+      "y": 32797
+      map_id: 320
+      heading: 5
+      price: 800
+    - action: teleport diad-silver
+      npc_id: 50079
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport diad-werldern
+      npc_id: 50079
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 700
+    - action: teleport diad-willow
+      npc_id: 50079
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport diad-woods
+      npc_id: 50079
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport guide1_1_1
+      npc_id: 50079
+      x: 32787
+      "y": 32854
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_2
+      npc_id: 50079
+      x: 33154
+      "y": 33279
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_3
+      npc_id: 50079
+      x: 32640
+      "y": 32595
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_1_4
+      npc_id: 50079
+      x: 32663
+      "y": 32893
+      map_id: 4
+      heading: 5
+      price: 390
+    - action: teleport guide1_2_1
+      npc_id: 50079
+      x: 32662
+      "y": 33008
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_2
+      npc_id: 50079
+      x: 32673
+      "y": 33158
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_3
+      npc_id: 50079
+      x: 33083
+      "y": 33139
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_4
+      npc_id: 50079
+      x: 34168
+      "y": 32821
+      map_id: 4
+      heading: 5
+      price: 403
+    - action: teleport guide1_2_5
+      npc_id: 50079
+      x: 32641
+      "y": 32839
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_2_6
+      npc_id: 50079
+      x: 32516
+      "y": 32988
+      map_id: 0
+      heading: 5
+      price: 923
+    - action: teleport guide1_3_1
+      npc_id: 50079
+      x: 32960
+      "y": 33014
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_2
+      npc_id: 50079
+      x: 32638
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_3
+      npc_id: 50079
+      x: 33259
+      "y": 33013
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_4
+      npc_id: 50079
+      x: 33407
+      "y": 33410
+      map_id: 4
+      heading: 5
+      price: 480
+    - action: teleport guide1_3_5
+      npc_id: 50079
+      x: 32676
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 630
+    - action: teleport guide1_3_6
+      npc_id: 50079
+      x: 32414
+      "y": 33045
+      map_id: 0
+      heading: 5
+      price: 1080
+    - action: teleport guide1_3_7
+      npc_id: 50079
+      x: 32806
+      "y": 32814
+      map_id: 25
+      heading: 5
+      price: 630
+    - action: teleport guide2_1_1
+      npc_id: 50079
+      x: 32738
+      "y": 32680
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_2
+      npc_id: 50079
+      x: 33570
+      "y": 32582
+      map_id: 4
+      heading: 5
+      price: 600
+    - action: teleport guide2_1_3
+      npc_id: 50079
+      x: 32803
+      "y": 32815
+      map_id: 26
+      heading: 5
+      price: 750
+    - action: teleport guide2_1_4
+      npc_id: 50079
+      x: 32810
+      "y": 32728
+      map_id: 7
+      heading: 5
+      price: 750
+    - action: teleport guide2_2_1
+      npc_id: 50079
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_2
+      npc_id: 50079
+      x: 33913
+      "y": 32972
+      map_id: 4
+      heading: 5
+      price: 533
+    - action: teleport guide2_2_3
+      npc_id: 50079
+      x: 32811
+      "y": 32812
+      map_id: 27
+      heading: 5
+      price: 793
+    - action: teleport guide2_2_4
+      npc_id: 50079
+      x: 32761
+      "y": 32825
+      map_id: 307
+      heading: 5
+      price: 663
+    - action: teleport guide2_3_1
+      npc_id: 50079
+      x: 33443
+      "y": 33032
+      map_id: 4
+      heading: 5
+      price: 630
+    - action: teleport guide2_3_2
+      npc_id: 50079
+      x: 34223
+      "y": 32462
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide2_3_4
+      npc_id: 50079
+      x: 32797
+      "y": 32751
+      map_id: 9
+      heading: 5
+      price: 1080
+    - action: teleport guide2_3_5
+      npc_id: 50079
+      x: 32750
+      "y": 32827
+      map_id: 308
+      heading: 5
+      price: 930
+    - action: teleport guide3_1_1
+      npc_id: 50079
+      x: 34232
+      "y": 32260
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_2
+      npc_id: 50079
+      x: 34050
+      "y": 32446
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_3
+      npc_id: 50079
+      x: 34245
+      "y": 32355
+      map_id: 4
+      heading: 5
+      price: 750
+    - action: teleport guide3_1_4
+      npc_id: 50079
+      x: 32794
+      "y": 32800
+      map_id: 28
+      heading: 5
+      price: 1200
+    - action: teleport guide3_2_1
+      npc_id: 50079
+      x: 32813
+      "y": 33271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_2
+      npc_id: 50079
+      x: 33656
+      "y": 32954
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_3
+      npc_id: 50079
+      x: 34173
+      "y": 32271
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_4
+      npc_id: 50079
+      x: 33742
+      "y": 32396
+      map_id: 4
+      heading: 5
+      price: 663
+    - action: teleport guide3_2_5
+      npc_id: 50079
+      x: 32726
+      "y": 32727
+      map_id: 11
+      heading: 5
+      price: 1313
+    - action: teleport guide3_2_6
+      npc_id: 50079
+      x: 32754
+      "y": 32839
+      map_id: 309
+      heading: 5
+      price: 1053
+    - action: teleport guide3_2_7
+      npc_id: 50079
+      x: 32710
+      "y": 32788
+      map_id: 59
+      heading: 5
+      price: 793
+    - action: teleport guide3_3_1
+      npc_id: 50079
+      x: 33769
+      "y": 33318
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_2
+      npc_id: 50079
+      x: 33334
+      "y": 32444
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_3
+      npc_id: 50079
+      x: 33820
+      "y": 32634
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_4
+      npc_id: 50079
+      x: 34277
+      "y": 33222
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_5
+      npc_id: 50079
+      x: 33662
+      "y": 32339
+      map_id: 4
+      heading: 5
+      price: 780
+    - action: teleport guide3_3_7
+      npc_id: 50079
+      x: 32747
+      "y": 32861
+      map_id: 60
+      heading: 5
+      price: 1080
+    - action: teleport guide4_4
+      npc_id: 50079
+      x: 34279
+      "y": 33214
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_5
+      npc_id: 50079
+      x: 33662
+      "y": 32333
+      map_id: 4
+      heading: 5
+      price: 676
+    - action: teleport guide4_7
+      npc_id: 50079
+      x: 32745
+      "y": 32857
+      map_id: 60
+      heading: 5
+      price: 936
+    - action: teleport gludio-orcfortress
+      npc_id: 50080
+      x: 32657
+      "y": 32520
+      map_id: 4
+      heading: 5
+      price: 15
+    - action: teleport efores-in
+      npc_id: 50082
+      x: 33054
+      "y": 32323
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport scave-in
+      npc_id: 50082
+      x: 32922
+      "y": 32802
+      map_id: 304
+      heading: 5
+      price: 0
+    - action: teleport skt-in
+      npc_id: 50082
+      x: 33083
+      "y": 33387
+      map_id: 4
+      heading: 5
+      price: 0
+    - action: teleport ti-in
+      npc_id: 50082
+      x: 32593
+      "y": 32922
+      map_id: 0
+      heading: 5
+      price: 0
+    - action: teleport si-in
+      npc_id: 50083
+      x: 32778
+      "y": 32779
+      map_id: 68
+      heading: 2
+      price: 0
+    - action: teleport orcfortress-gludio
+      npc_id: 50085
+      x: 32654
+      "y": 32544
+      map_id: 4
+      heading: 5
+      price: 15
+    - action: teleport aden-chaos
+      npc_id: 50608
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-island
+      npc_id: 50608
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 900
+    - action: teleport aden-lowful
+      npc_id: 50608
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport aden-willow
+      npc_id: 50608
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport dark-elf-dungen
+      npc_id: 70853
+      x: 32727
+      "y": 32799
+      map_id: 209
+      heading: 5
+      price: 0
+    - action: teleport darkmar-dungen
+      npc_id: 70853
+      x: 32727
+      "y": 32799
+      map_id: 213
+      heading: 5
+      price: 0
+    - action: teleport town-in
+      npc_id: 71010
+      x: 32805
+      "y": 32850
+      map_id: 8011
+      heading: 6
+      price: 0
+    - action: teleport town-in
+      npc_id: 71012
+      x: 32870
+      "y": 32823
+      map_id: 8011
+      heading: 7
+      price: 0
+    - action: teleport dark island-in
+      npc_id: 71013
+      x: 32857
+      "y": 32896
+      map_id: 304
+      heading: 5
+      price: 0
+    - action: teleport town-out
+      npc_id: 71014
+      x: 32727
+      "y": 32764
+      map_id: 8015
+      heading: 2
+      price: 0
+    - action: teleport town-out
+      npc_id: 71015
+      x: 32796
+      "y": 32866
+      map_id: 8012
+      heading: 7
+      price: 0
+    - action: teleport town-in
+      npc_id: 71016
+      x: 32834
+      "y": 32791
+      map_id: 8011
+      heading: 4
+      price: 0
+    - action: teleport town-in
+      npc_id: 71017
+      x: 32868
+      "y": 32829
+      map_id: 8011
+      heading: 6
+      price: 0
+    - action: teleport dungeon-in
+      npc_id: 71026
+      x: 32872
+      "y": 32871
+      map_id: 86
+      heading: 7
+      price: 0
+    - action: teleport dungeon-in
+      npc_id: 71027
+      x: 32676
+      "y": 32865
+      map_id: 85
+      heading: 6
+      price: 0
+    - action: teleport town-in
+      npc_id: 71028
+      x: 32786
+      "y": 32840
+      map_id: 8012
+      heading: 5
+      price: 0
+    - action: teleport town-in
+      npc_id: 71029
+      x: 32817
+      "y": 32796
+      map_id: 8011
+      heading: 5
+      price: 0
+    - action: teleport si-in
+      npc_id: 71035
+      x: 32834
+      "y": 32858
+      map_id: 8011
+      heading: 5
+      price: 0
+    - action: teleport orcfcd
+      npc_id: 71039
+      x: 32982
+      "y": 32808
+      map_id: 244
+      heading: 5
+      price: 10000
+    - action: teleport umine
+      npc_id: 71078
+      x: 32680
+      "y": 32795
+      map_id: 255
+      heading: 5
+      price: 10000
+    - action: teleport heine-Cdungeon
+      npc_id: 71080
+      x: 32746
+      "y": 32860
+      map_id: 252
+      heading: 6
+      price: 10000
+    - action: teleport evil-dungeon
+      npc_id: 71095
+      x: 32608
+      "y": 32772
+      map_id: 4
+      heading: 4
+      price: 0
+    - action: teleport fishing-out
+      npc_id: 80083
+      x: 32608
+      "y": 32772
+      map_id: 4
+      heading: 4
+      price: 0
+    - action: teleport behemoth-aden
+      npc_id: 80132
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport behemoth-chaos
+      npc_id: 80132
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 400
+    - action: teleport behemoth-diad
+      npc_id: 80132
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 7700
+    - action: teleport behemoth-dragon
+      npc_id: 80132
+      x: 33434
+      "y": 32546
+      map_id: 4
+      heading: 5
+      price: 100
+    - action: teleport behemoth-eva
+      npc_id: 80132
+      x: 33627
+      "y": 33509
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport behemoth-giran
+      npc_id: 80132
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport behemoth-gludin
+      npc_id: 80132
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport behemoth-gludun
+      npc_id: 80132
+      x: 32719
+      "y": 32930
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport behemoth-gypsy
+      npc_id: 80132
+      x: 33969
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport behemoth-heine
+      npc_id: 80132
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport behemoth-island
+      npc_id: 80132
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 800
+    - action: teleport behemoth-kent
+      npc_id: 80132
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport behemoth-lowful
+      npc_id: 80132
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 400
+    - action: teleport behemoth-mirr
+      npc_id: 80132
+      x: 33717
+      "y": 32921
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport behemoth-oasis
+      npc_id: 80132
+      x: 32861
+      "y": 33255
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport behemoth-oren
+      npc_id: 80132
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport behemoth-reed
+      npc_id: 80132
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport behemoth-silver
+      npc_id: 80132
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport behemoth-silveria
+      npc_id: 80132
+      x: 32841
+      "y": 32856
+      map_id: 1000
+      heading: 5
+      price: 50
+    - action: teleport behemoth-train
+      npc_id: 80132
+      x: 32969
+      "y": 33514
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport behemoth-under
+      npc_id: 80132
+      x: 32561
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport behemoth-werldern
+      npc_id: 80132
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport behemoth-willow
+      npc_id: 80132
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport behemoth-woods
+      npc_id: 80132
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport silveria-aden
+      npc_id: 80146
+      x: 33965
+      "y": 33253
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport silveria-behemoth
+      npc_id: 80146
+      x: 32779
+      "y": 32887
+      map_id: 1001
+      heading: 5
+      price: 50
+    - action: teleport silveria-chaos
+      npc_id: 80146
+      x: 32885
+      "y": 32652
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport silveria-diad
+      npc_id: 80146
+      x: 32828
+      "y": 32900
+      map_id: 320
+      heading: 5
+      price: 8000
+    - action: teleport silveria-dragon
+      npc_id: 80146
+      x: 33434
+      "y": 32546
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport silveria-eva
+      npc_id: 80146
+      x: 33627
+      "y": 33509
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport silveria-giran
+      npc_id: 80146
+      x: 33438
+      "y": 32796
+      map_id: 4
+      heading: 5
+      price: 120
+    - action: teleport silveria-gludin
+      npc_id: 80146
+      x: 32608
+      "y": 32734
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport silveria-gludun
+      npc_id: 80146
+      x: 32719
+      "y": 32930
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport silveria-gypsy
+      npc_id: 80146
+      x: 33969
+      "y": 32941
+      map_id: 4
+      heading: 5
+      price: 220
+    - action: teleport silveria-heine
+      npc_id: 80146
+      x: 33612
+      "y": 33257
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport silveria-island
+      npc_id: 80146
+      x: 32583
+      "y": 32924
+      map_id: 0
+      heading: 5
+      price: 900
+    - action: teleport silveria-kent
+      npc_id: 80146
+      x: 33050
+      "y": 32782
+      map_id: 4
+      heading: 5
+      price: 180
+    - action: teleport silveria-lowful
+      npc_id: 80146
+      x: 33118
+      "y": 32933
+      map_id: 4
+      heading: 5
+      price: 500
+    - action: teleport silveria-mirr
+      npc_id: 80146
+      x: 33717
+      "y": 32921
+      map_id: 4
+      heading: 5
+      price: 330
+    - action: teleport silveria-oasis
+      npc_id: 80146
+      x: 32861
+      "y": 33255
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport silveria-oren
+      npc_id: 80146
+      x: 34062
+      "y": 32278
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport silveria-reed
+      npc_id: 80146
+      x: 32740
+      "y": 32377
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport silveria-silver
+      npc_id: 80146
+      x: 33080
+      "y": 33386
+      map_id: 4
+      heading: 5
+      price: 240
+    - action: teleport silveria-train
+      npc_id: 80146
+      x: 32969
+      "y": 33514
+      map_id: 4
+      heading: 5
+      price: 440
+    - action: teleport silveria-under
+      npc_id: 80146
+      x: 32561
+      "y": 33460
+      map_id: 4
+      heading: 5
+      price: 550
+    - action: teleport silveria-werldern
+      npc_id: 80146
+      x: 33709
+      "y": 32500
+      map_id: 4
+      heading: 5
+      price: 50
+    - action: teleport silveria-willow
+      npc_id: 80146
+      x: 32715
+      "y": 32448
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport silveria-woods
+      npc_id: 80146
+      x: 32640
+      "y": 33203
+      map_id: 4
+      heading: 5
+      price: 300
+    - action: teleport illusionist island-in
+      npc_id: 81258
+      x: 32792
+      "y": 32863
+      map_id: 1000
+      heading: 5
+      price: 0
+    - action: teleport dragonknight island-in
+      npc_id: 81259
+      x: 32811
+      "y": 32873
+      map_id: 1001
+      heading: 5
+      price: 0
+    - action: teleport giranD
+      npc_id: 81287
+      x: 32810
+      "y": 32731
+      map_id: 53
+      heading: 5
+      price: 1000
+    - action: teleport adencd
+      npc_id: 81298
+      x: 32660
+      "y": 32800
+      map_id: 257
+      heading: 2
+      price: 10000
+    - action: teleport grtel
+      npc_id: 81300
+      x: 32805
+      "y": 32793
+      map_id: 248
+      heading: 4
+      price: 10000
