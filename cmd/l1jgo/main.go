@@ -135,6 +135,7 @@ func run() error {
 	itemRepo := persist.NewItemRepo(db)
 	warehouseRepo := persist.NewWarehouseRepo(db)
 	walRepo := persist.NewWALRepo(db)
+	clanRepo := persist.NewClanRepo(db)
 
 	// 5. Create ECS World and game World State
 	ecsWorld := ecs.NewWorld()
@@ -229,6 +230,13 @@ func run() error {
 	}
 	defer luaEngine.Close()
 	printOK("Lua 腳本載入完成")
+
+	// 5d. Load clans from DB
+	clanCount, err := loadClans(ctx, worldState, clanRepo)
+	if err != nil {
+		return fmt.Errorf("load clans: %w", err)
+	}
+	printStat("血盟", clanCount)
 	fmt.Println()
 
 	// 6. Create packet handler registry and register handlers
@@ -254,6 +262,7 @@ func run() error {
 		MapData:        mapDataTable,
 		WarehouseRepo:  warehouseRepo,
 		WALRepo:        walRepo,
+		ClanRepo:       clanRepo,
 	}
 	handler.RegisterAll(pktReg, deps)
 
@@ -334,6 +343,53 @@ func run() error {
 			return nil
 		}
 	}
+}
+
+// loadClans loads all clans and members from DB into world state.
+func loadClans(ctx context.Context, ws *world.State, clanRepo *persist.ClanRepo) (int, error) {
+	clans, members, err := clanRepo.LoadAll(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	// Build clan map
+	clanMap := make(map[int32]*world.ClanInfo, len(clans))
+	for _, c := range clans {
+		clanMap[c.ClanID] = &world.ClanInfo{
+			ClanID:       c.ClanID,
+			ClanName:     c.ClanName,
+			LeaderID:     c.LeaderID,
+			LeaderName:   c.LeaderName,
+			FoundDate:    c.FoundDate,
+			HasCastle:    c.HasCastle,
+			HasHouse:     c.HasHouse,
+			Announcement: c.Announcement,
+			EmblemID:     c.EmblemID,
+			EmblemStatus: c.EmblemStatus,
+			Members:      make(map[int32]*world.ClanMember),
+		}
+	}
+
+	// Assign members
+	for _, m := range members {
+		clan, ok := clanMap[m.ClanID]
+		if !ok {
+			continue
+		}
+		clan.Members[m.CharID] = &world.ClanMember{
+			CharID:   m.CharID,
+			CharName: m.CharName,
+			Rank:     m.Rank,
+			Notes:    m.Notes,
+		}
+	}
+
+	// Register all clans
+	for _, clan := range clanMap {
+		ws.Clans.AddClan(clan)
+	}
+
+	return len(clans), nil
 }
 
 // spawnNpcs creates NPC instances from spawn list and adds them to world state.

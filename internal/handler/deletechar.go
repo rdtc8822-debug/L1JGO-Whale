@@ -31,6 +31,15 @@ func HandleDeleteChar(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
+	// Clan leader cannot delete character — must dissolve or transfer first
+	if ch.ClanID > 0 {
+		clan := deps.World.Clans.GetClan(ch.ClanID)
+		if clan != nil && clan.LeaderID == ch.ID {
+			sendServerMessage(sess, 518) // "血盟君主才可使用此命令" (reuse; means "you are leader, handle clan first")
+			return
+		}
+	}
+
 	cfg := deps.Config.Character
 
 	// Determine immediate vs 7-day delayed deletion

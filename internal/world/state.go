@@ -227,6 +227,7 @@ type State struct {
 
 	Parties     *PartyManager
 	ChatParties *ChatPartyManager
+	Clans       *ClanManager
 }
 
 func NewState() *State {
@@ -237,6 +238,7 @@ func NewState() *State {
 		aoi:         NewAOIGrid(),
 		Parties:     NewPartyManager(),
 		ChatParties: NewChatPartyManager(),
+		Clans:       NewClanManager(),
 		npcs:        make(map[int32]*NpcInfo),
 		groundItems: make(map[int32]*GroundItem),
 	}

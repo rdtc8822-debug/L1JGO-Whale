@@ -11,7 +11,7 @@ language = 3                  # 語系代碼：0=美國, 3=台灣, 4=日本, 5=�
 
 # ── 資料庫連線設定 ──────────────────────────────────────────
 [database]
-dsn = "postgres://postgres:your_password@localhost:5432/l1jgo?sslmode=disable"
+dsn = "postgres://postgres:aa123456@localhost:5432/l1jgo?sslmode=disable"
 max_open_conns = 20           # 最大連線數
 max_idle_conns = 5            # 閒置連線數
 conn_max_lifetime = "30m"     # 連線最大存活時間

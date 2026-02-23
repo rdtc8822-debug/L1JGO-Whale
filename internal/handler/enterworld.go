@@ -143,6 +143,12 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// 11. Send saved character config (F5-F12 hotkeys, UI positions)
 	loadAndSendCharConfig(sess, ch.ID, deps)
 
+	// 12. Send clan info on login
+	if player.ClanID > 0 {
+		sendClanName(sess, player.CharID, player.ClanName, player.ClanID, true)
+		sendClanAttention(sess)
+	}
+
 	// 10. RaiseAttr dialog if bonus stat points available (level 51+)
 	if player.Level >= bonusStatMinLevel {
 		available := player.Level - 50 - player.BonusStats

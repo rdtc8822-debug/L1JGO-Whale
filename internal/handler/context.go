@@ -33,6 +33,7 @@ type Deps struct {
 	MapData        *data.MapDataTable
 	WarehouseRepo  *persist.WarehouseRepo
 	WALRepo        *persist.WALRepo
+	ClanRepo       *persist.ClanRepo
 }
 
 // RegisterAll registers all packet handlers into the registry.
@@ -259,6 +260,43 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 	reg.Register(packet.C_OPCODE_CHAT_PARTY_CONTROL, inWorldStates,
 		func(sess any, r *packet.Reader) {
 			HandlePartyControl(sess.(*net.Session), r, deps)
+		},
+	)
+
+	// Clan
+	reg.Register(packet.C_OPCODE_CREATE_PLEDGE, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleCreateClan(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_JOIN_PLEDGE, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleJoinClan(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_LEAVE_PLEDGE, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleLeaveClan(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_BAN_MEMBER, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleBanMember(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_WHO_PLEDGE, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleWhoPledge(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_PLEDGE_WATCH, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandlePledgeWatch(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_RANK_CONTROL, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleRankControl(sess.(*net.Session), r, deps)
 		},
 	)
 

@@ -91,6 +91,23 @@ func HandleChat(sess *net.Session, r *packet.Reader, deps *Deps) {
 			}
 		})
 
+	case ChatClan:
+		// Clan chat: send to all online clan members
+		if player.ClanID == 0 {
+			return
+		}
+		clan := deps.World.Clans.GetClan(player.ClanID)
+		if clan == nil {
+			return
+		}
+		msg := fmt.Sprintf("{%s} %s", player.Name, text)
+		for charID := range clan.Members {
+			member := deps.World.GetByCharID(charID)
+			if member != nil {
+				sendGlobalChat(member.Session, ChatClan, msg)
+			}
+		}
+
 	case ChatParty:
 		// Party chat: send to all party members
 		party := deps.World.Parties.GetParty(player.CharID)

@@ -50,5 +50,8 @@ func HandleAttr(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	case 954: // Auto-share party invite: 玩家 %0 邀請您加入自動分配隊伍？(Y/N)
 		HandlePartyInviteResponse(player, data, accepted, deps)
+
+	case 97: // Clan join request: %0想加入你的血盟，是否同意？(Y/N)
+		HandleClanJoinResponse(sess, player, data, accepted, deps)
 	}
 }
