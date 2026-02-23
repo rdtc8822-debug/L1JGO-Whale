@@ -841,6 +841,10 @@ func gmSave(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 		Cha:        player.Cha,
 		Intel:      player.Intel,
 		BonusStats: player.BonusStats,
+		ClanID:     player.ClanID,
+		ClanName:   player.ClanName,
+		ClanRank:   player.ClanRank,
+		Title:      player.Title,
 	}
 	if err := deps.CharRepo.SaveCharacter(ctx, row); err != nil {
 		gmMsgf(sess, "\\f3存檔失敗: %v", err)

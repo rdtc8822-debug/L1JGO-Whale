@@ -32,6 +32,12 @@ func NextItemObjID() int32 {
 	return itemObjIDCounter.Add(1)
 }
 
+// SetItemObjIDStart sets the counter start value.
+// Called on startup with max(persisted_max_obj_id, 500_000_000) to avoid collisions.
+func SetItemObjIDStart(v int32) {
+	itemObjIDCounter.Store(v)
+}
+
 // InvItem represents a single item instance in a player's inventory.
 type InvItem struct {
 	ObjectID   int32  // unique per instance
@@ -94,6 +100,12 @@ func (inv *Inventory) IsFull() bool {
 // AddItem adds or stacks an item. Returns the affected item (new or existing).
 // Does NOT send packets — caller is responsible.
 func (inv *Inventory) AddItem(itemID int32, count int32, name string, invGfx int32, weight int32, stackable bool, bless byte) *InvItem {
+	return inv.AddItemWithID(0, itemID, count, name, invGfx, weight, stackable, bless)
+}
+
+// AddItemWithID adds an item with a specific ObjectID (used for DB reload to preserve shortcut references).
+// If objID is 0, a new ObjectID is generated.
+func (inv *Inventory) AddItemWithID(objID int32, itemID int32, count int32, name string, invGfx int32, weight int32, stackable bool, bless byte) *InvItem {
 	if stackable {
 		existing := inv.FindByItemID(itemID)
 		if existing != nil {
@@ -102,8 +114,12 @@ func (inv *Inventory) AddItem(itemID int32, count int32, name string, invGfx int
 		}
 	}
 
+	if objID == 0 {
+		objID = NextItemObjID()
+	}
+
 	item := &InvItem{
-		ObjectID:   NextItemObjID(),
+		ObjectID:   objID,
 		ItemID:     itemID,
 		Name:       name,
 		InvGfx:     invGfx,

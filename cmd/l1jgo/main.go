@@ -237,6 +237,27 @@ func run() error {
 		return fmt.Errorf("load clans: %w", err)
 	}
 	printStat("血盟", clanCount)
+
+	// 5e. Initialize item ObjectID counter from DB to avoid collisions
+	maxObjID, err := itemRepo.MaxObjID(ctx)
+	if err != nil {
+		return fmt.Errorf("query max obj_id: %w", err)
+	}
+	if maxObjID >= 500_000_000 {
+		world.SetItemObjIDStart(maxObjID)
+	}
+
+	// 5f. Initialize emblem ID counter from DB and ensure emblem directory exists
+	maxEmblemID, err := clanRepo.MaxEmblemID(ctx)
+	if err != nil {
+		return fmt.Errorf("query max emblem_id: %w", err)
+	}
+	if maxEmblemID > 0 {
+		world.SetEmblemIDStart(maxEmblemID)
+	}
+	if err := os.MkdirAll("emblem", 0755); err != nil {
+		return fmt.Errorf("create emblem dir: %w", err)
+	}
 	fmt.Println()
 
 	// 6. Create packet handler registry and register handlers
@@ -1049,6 +1070,10 @@ func saveAllPlayers(ws *world.State, charRepo *persist.CharacterRepo, itemRepo *
 			Cha:        p.Cha,
 			Intel:      p.Intel,
 			BonusStats: p.BonusStats,
+			ClanID:     p.ClanID,
+			ClanName:   p.ClanName,
+			ClanRank:   p.ClanRank,
+			Title:      p.Title,
 		}
 		if err := charRepo.SaveCharacter(ctx, row); err != nil {
 			log.Error("自動存檔角色失敗", zap.String("name", p.Name), zap.Error(err))

@@ -69,6 +69,7 @@ const (
 	S_OPCODE_REDMESSAGE             byte = 105 // S_RedMessage (center screen red text)
 	S_OPCODE_ITEMCOLOR              byte = 240 // S_ItemColor (bless/color update)
 	S_OPCODE_CLANNAME               byte = 72  // S_ClanName (clan name display update)
+	S_OPCODE_EMBLEM                 byte = 118 // S_Emblem (emblem data download)
 	S_OPCODE_CHARTITLE              byte = 183 // S_CharTitle (player title update)
 	S_OPCODE_CLANATTENTION          byte = 200 // S_ClanAttention (clan status change notify)
 )

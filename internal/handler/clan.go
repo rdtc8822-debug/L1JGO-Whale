@@ -2,13 +2,12 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/l1jgo/server/internal/net"
 	"github.com/l1jgo/server/internal/net/packet"
-	"github.com/l1jgo/server/internal/persist"
 	"github.com/l1jgo/server/internal/world"
 )
 
@@ -57,17 +56,14 @@ func HandleCreateClan(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
-	// DB transaction: deduct gold + create clan + add leader as member
+	// DB transaction: create clan + add leader as member
+	// Gold deduction is memory-only; batch save persists it.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	foundDate := int32(time.Now().Unix())
-	clanID, err := deps.ClanRepo.CreateClan(ctx, player.CharID, player.Name, clanName, foundDate, clanCreateCost)
+	clanID, err := deps.ClanRepo.CreateClan(ctx, player.CharID, player.Name, clanName, foundDate)
 	if err != nil {
-		if errors.Is(err, persist.ErrInsufficientGold) {
-			sendServerMessage(sess, 189)
-			return
-		}
 		deps.Log.Error(fmt.Sprintf("建立血盟失敗  player=%s  clan=%s  err=%v", player.Name, clanName, err))
 		return
 	}
@@ -106,6 +102,7 @@ func HandleCreateClan(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Send packets
 	sendServerMessageArgs(sess, 84, clanName) // "創立%0血盟"
 	sendClanName(sess, player.CharID, clanName, clanID, true)
+	sendPledgeEmblemStatus(sess, 0) // emblem off (new clan, no emblem)
 	sendClanAttention(sess)
 
 	// Broadcast to nearby players
@@ -193,13 +190,15 @@ func HandleJoinClan(sess *net.Session, r *packet.Reader, deps *Deps) {
 // HandleClanJoinResponse is called from HandleAttr when msgType=97 (clan join Y/N).
 // The responder is the clan leader/guardian; data = applicant CharID.
 func HandleClanJoinResponse(sess *net.Session, responder *world.PlayerInfo, applicantCharID int32, accepted bool, deps *Deps) {
-	if !accepted {
-		return
-	}
-
 	// Find applicant
 	applicant := deps.World.GetByCharID(applicantCharID)
 	if applicant == nil {
+		return
+	}
+
+	if !accepted {
+		// Java: S_ServerMessage(96, pc.getName()) — "拒絕你的請求"
+		sendServerMessageArgs(applicant.Session, 96, responder.Name)
 		return
 	}
 
@@ -240,18 +239,47 @@ func HandleClanJoinResponse(sess *net.Session, responder *world.PlayerInfo, appl
 	applicant.ClanID = clan.ClanID
 	applicant.ClanName = clan.ClanName
 	applicant.ClanRank = rank
+	applicant.Title = "" // Clear title on join (Java: joinPc.setTitle(""))
 
-	// Notify applicant
-	sendServerMessageArgs(applicant.Session, 95, clan.ClanName) // "加入%0血盟"
+	// Notify ALL online clan members (Java: for each clanMembers: S_ServerMessage(94))
+	for _, m := range clan.Members {
+		online := deps.World.GetByCharID(m.CharID)
+		if online != nil {
+			sendServerMessageArgs(online.Session, 94, applicant.Name) // "你接受%0當你的血盟成員"
+		}
+	}
+
+	// Clear title on applicant + broadcast (Java: S_CharTitle)
+	sendCharTitle(applicant.Session, applicant.CharID, "")
+	nearbyApp := deps.World.GetNearbyPlayers(applicant.X, applicant.Y, applicant.MapID, applicant.SessionID)
+	for _, other := range nearbyApp {
+		sendCharTitle(other.Session, applicant.CharID, "")
+	}
+
+	// Notify applicant — packet sequence matches Java C_Attr case 97
+	sendRankChanged(applicant.Session, byte(rank), applicant.Name) // S_PacketBox(27)
+	sendServerMessageArgs(applicant.Session, 95, clan.ClanName)    // "加入%0血盟"
 	sendClanName(applicant.Session, applicant.CharID, clan.ClanName, clan.ClanID, true)
+	sendCharResetEmblem(applicant.Session, applicant.CharID, clan.ClanID) // S_CharReset(objId, clanId)
+	sendPledgeEmblemStatus(applicant.Session, int(clan.EmblemStatus))
 	sendClanAttention(applicant.Session)
 
-	// Notify responder
-	sendServerMessageArgs(sess, 94, applicant.Name) // "你接受%0當你的血盟成員"
+	// Broadcast S_CharReset (emblem update) to ALL online clan members + their nearby players
+	// Java: for each online member → send S_CharReset(joinee.id, emblemId) to member,
+	//       member.broadcastPacket(S_CharReset(member.id, emblemId)) to nearby
+	for _, m := range clan.Members {
+		online := deps.World.GetByCharID(m.CharID)
+		if online != nil {
+			sendCharResetEmblem(online.Session, applicant.CharID, clan.EmblemID)
+			nearby := deps.World.GetNearbyPlayers(online.X, online.Y, online.MapID, online.SessionID)
+			for _, other := range nearby {
+				sendCharResetEmblem(other.Session, online.CharID, clan.EmblemID)
+			}
+		}
+	}
 
 	// Broadcast clan name update to nearby players of the applicant
-	nearby := deps.World.GetNearbyPlayers(applicant.X, applicant.Y, applicant.MapID, applicant.SessionID)
-	for _, other := range nearby {
+	for _, other := range nearbyApp {
 		sendClanName(other.Session, applicant.CharID, clan.ClanName, clan.ClanID, true)
 	}
 
@@ -262,19 +290,24 @@ func HandleClanJoinResponse(sess *net.Session, responder *world.PlayerInfo, appl
 // Java: C_LeaveClan.java
 // Packet: [S clanName]
 func HandleLeaveClan(sess *net.Session, r *packet.Reader, deps *Deps) {
-	_ = r.ReadS() // clanName (not used for validation; we use player's actual clan)
+	clanNamePkt := r.ReadS()
 
 	player := deps.World.GetBySession(sess.ID)
 	if player == nil {
+		deps.Log.Warn(fmt.Sprintf("退盟: player not found  sessID=%d", sess.ID))
 		return
 	}
 
+	deps.Log.Info(fmt.Sprintf("退盟請求  player=%s  clanID=%d  pktClanName=%s", player.Name, player.ClanID, clanNamePkt))
+
 	if player.ClanID == 0 {
+		deps.Log.Warn(fmt.Sprintf("退盟: player無血盟  player=%s", player.Name))
 		return
 	}
 
 	clan := deps.World.Clans.GetClan(player.ClanID)
 	if clan == nil {
+		deps.Log.Warn(fmt.Sprintf("退盟: 找不到clan  player=%s  clanID=%d", player.Name, player.ClanID))
 		return
 	}
 
@@ -574,16 +607,346 @@ func HandlePledgeWatch(sess *net.Session, r *packet.Reader, deps *Deps) {
 }
 
 // HandleRankControl processes C_RANK_CONTROL (opcode 63) — change member rank.
-// Java: C_RankControl.java — not fully implemented yet, stub for now.
+// Java: C_RestartMenu.java (data=1 branch) — rank change authority matrix.
+// Packet: [C data][C rank][S name]
 func HandleRankControl(sess *net.Session, r *packet.Reader, deps *Deps) {
-	// TODO: implement rank control when needed
-	// Packet: varies by sub-type
-	deps.Log.Debug("C_RankControl received (not yet implemented)")
+	data := r.ReadC()
+	if data != 1 {
+		return // only rank control sub-type (data=1) is handled
+	}
+
+	rank := int16(r.ReadC())
+	targetName := r.ReadS()
+
+	player := deps.World.GetBySession(sess.ID)
+	if player == nil {
+		return
+	}
+
+	// Must be in a clan
+	if player.ClanID == 0 {
+		return
+	}
+
+	clan := deps.World.Clans.GetClan(player.ClanID)
+	if clan == nil {
+		return
+	}
+
+	// Cannot change own rank
+	if targetName == player.Name {
+		sendServerMessage(sess, 2068) // "無法變更自己的階級"
+		return
+	}
+
+	// Validate rank range (2-10)
+	if rank < 2 || rank > 10 {
+		sendServerMessage(sess, 781) // invalid rank
+		return
+	}
+
+	// Alliance ranks (2-6) not implemented
+	if rank >= 2 && rank <= 6 {
+		return
+	}
+
+	// Authority matrix check
+	myRank := player.ClanRank
+	if !canGrantRank(myRank, rank) {
+		sendServerMessage(sess, 2065) // "不具此權限"
+		return
+	}
+
+	// Find target player (must be online)
+	target := deps.World.GetByName(targetName)
+	if target == nil {
+		sendServerMessage(sess, 2069) // "對方不在線上"
+		return
+	}
+
+	// Target must be in same clan
+	if target.ClanID != player.ClanID {
+		sendServerMessage(sess, 414) // "並非血盟成員"
+		return
+	}
+
+	// Cannot change rank of rank 9/10 members unless operator is rank 10
+	if (target.ClanRank == world.ClanRankGuardian || target.ClanRank == world.ClanRankPrince) && myRank != world.ClanRankPrince {
+		sendServerMessage(sess, 2065)
+		return
+	}
+
+	// Guardian (rank 9) level requirements
+	if rank == world.ClanRankGuardian {
+		// Operator must be level >= 40 (unless rank 10)
+		if myRank != world.ClanRankPrince && player.Level < 40 {
+			sendServerMessage(sess, 2472) // level too low to grant guardian
+			return
+		}
+		// Target must be level >= 40
+		if target.Level < 40 {
+			sendServerMessage(sess, 2473) // target level too low for guardian
+			return
+		}
+	}
+
+	// DB update
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := deps.ClanRepo.UpdateMemberRank(ctx, clan.ClanID, target.CharID, rank)
+	if err != nil {
+		deps.Log.Error(fmt.Sprintf("階級變更失敗  target=%s  err=%v", targetName, err))
+		return
+	}
+
+	// Memory update
+	target.ClanRank = rank
+	member := clan.Members[target.CharID]
+	if member != nil {
+		member.Rank = rank
+	}
+
+	// Send S_PacketBox(27) to both operator and target
+	sendRankChanged(sess, byte(rank), targetName)
+	sendRankChanged(target.Session, byte(rank), targetName)
+
+	deps.Log.Info(fmt.Sprintf("階級變更  target=%s  rank=%d  by=%s", targetName, rank, player.Name))
+}
+
+// canGrantRank checks if an operator with myRank can grant targetRank.
+// Authority matrix (Java C_RestartMenu.java):
+//   rank 10 (Prince): can grant 7, 8, 9
+//   rank 9  (Guardian): can grant 7, 8
+func canGrantRank(myRank, targetRank int16) bool {
+	switch myRank {
+	case world.ClanRankPrince: // 10
+		return targetRank == 7 || targetRank == 8 || targetRank == 9
+	case world.ClanRankGuardian: // 9
+		return targetRank == 7 || targetRank == 8
+	default:
+		return false
+	}
+}
+
+// HandleTitle processes C_TITLE (opcode 90) — set character title.
+// Java: C_Title.java
+// Packet: [S charName][S title]
+func HandleTitle(sess *net.Session, r *packet.Reader, deps *Deps) {
+	charName := r.ReadS()
+	title := r.ReadS()
+
+	player := deps.World.GetBySession(sess.ID)
+	if player == nil {
+		return
+	}
+
+	// Truncate title to reasonable length (Java: 16 chars)
+	if len(title) > 48 { // ~16 CJK chars × 3 bytes UTF-8
+		title = title[:48]
+	}
+
+	settingSelf := charName == player.Name
+
+	if settingSelf {
+		// --- Setting own title ---
+		if player.ClanID != 0 {
+			clan := deps.World.Clans.GetClan(player.ClanID)
+			if clan != nil && clan.LeaderID == player.CharID {
+				// Clan leader setting own title: level >= 10
+				if player.Level < 10 {
+					sendServerMessage(sess, 197) // "等級10以上才可設定稱號"
+					return
+				}
+			} else {
+				// Non-leader clan member setting own title
+				if !deps.Config.Character.ChangeTitleByOneself {
+					sendServerMessage(sess, 198) // "除了血盟君主之外，不可變更稱號"
+					return
+				}
+				if player.Level < 10 {
+					sendServerMessage(sess, 197)
+					return
+				}
+			}
+		} else {
+			// No clan: level >= 40
+			if player.Level < 40 {
+				sendServerMessage(sess, 200) // "等級40以上才可設定稱號"
+				return
+			}
+		}
+
+		// Apply title
+		player.Title = title
+		sendCharTitle(sess, player.CharID, title)
+
+		// Broadcast to nearby
+		nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
+		for _, other := range nearby {
+			sendCharTitle(other.Session, player.CharID, title)
+		}
+
+		// DB: title is saved by periodic saveAllPlayers via SaveCharacter
+	} else {
+		// --- Setting another player's title ---
+		// Must be clan leader
+		if player.ClanID == 0 {
+			return
+		}
+		clan := deps.World.Clans.GetClan(player.ClanID)
+		if clan == nil || clan.LeaderID != player.CharID {
+			return // only leader can set other's title
+		}
+
+		// Leader must be level >= 10
+		if player.Level < 10 {
+			sendServerMessage(sess, 197)
+			return
+		}
+
+		// Target must be online
+		target := deps.World.GetByName(charName)
+		if target == nil {
+			return
+		}
+
+		// Target must be in same clan
+		if target.ClanID != player.ClanID {
+			sendServerMessage(sess, 199) // "並非你血盟成員"
+			return
+		}
+
+		// Target level >= 10
+		if target.Level < 10 {
+			sendServerMessage(sess, 202) // "對方等級10以上才可設定稱號"
+			return
+		}
+
+		// Apply title
+		target.Title = title
+		sendCharTitle(target.Session, target.CharID, title)
+
+		// Broadcast to nearby of target
+		nearby := deps.World.GetNearbyPlayers(target.X, target.Y, target.MapID, target.SessionID)
+		for _, other := range nearby {
+			sendCharTitle(other.Session, target.CharID, title)
+		}
+
+		// Notify all online clan members
+		for charID := range clan.Members {
+			member := deps.World.GetByCharID(charID)
+			if member != nil {
+				sendServerMessageArgs(member.Session, 203, charName, title) // "盟主賦予%0稱號%1"
+			}
+		}
+	}
+}
+
+// HandleEmblemUpload processes C_UPLOAD_EMBLEM (opcode 18) — upload clan emblem.
+// Java: C_EmblemUpload.java
+// Packet: [384 bytes raw emblem data]
+func HandleEmblemUpload(sess *net.Session, r *packet.Reader, deps *Deps) {
+	player := deps.World.GetBySession(sess.ID)
+	if player == nil {
+		return
+	}
+
+	if player.ClanID == 0 {
+		return
+	}
+
+	// Only clan leader (rank 10) can upload emblem
+	if player.ClanRank != world.ClanRankPrince {
+		return
+	}
+
+	clan := deps.World.Clans.GetClan(player.ClanID)
+	if clan == nil {
+		return
+	}
+
+	// Read 384 bytes of emblem data
+	emblemData := r.ReadBytes(384)
+	if len(emblemData) < 384 {
+		return
+	}
+
+	// Generate new emblem ID
+	newEmblemID := world.NextEmblemID()
+
+	// Write emblem file to disk
+	emblemPath := fmt.Sprintf("emblem/%d", newEmblemID)
+	if err := os.WriteFile(emblemPath, emblemData, 0644); err != nil {
+		deps.Log.Error(fmt.Sprintf("盟徽寫入失敗  clanID=%d  err=%v", clan.ClanID, err))
+		return
+	}
+
+	// DB update
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := deps.ClanRepo.UpdateEmblemID(ctx, clan.ClanID, newEmblemID); err != nil {
+		deps.Log.Error(fmt.Sprintf("盟徽DB更新失敗  clanID=%d  err=%v", clan.ClanID, err))
+		return
+	}
+
+	// Memory update
+	clan.EmblemID = newEmblemID
+	clan.EmblemStatus = 1
+
+	// Broadcast S_CharReset (emblem sub-type 0x3c) to all online clan members
+	for charID := range clan.Members {
+		member := deps.World.GetByCharID(charID)
+		if member != nil {
+			sendCharResetEmblem(member.Session, member.CharID, newEmblemID)
+			sendPledgeEmblemStatus(member.Session, 1)
+		}
+	}
+
+	deps.Log.Info(fmt.Sprintf("盟徽上傳  clan=%s  emblemID=%d", clan.ClanName, newEmblemID))
+}
+
+// HandleEmblemDownload processes C_ALT_ATTACK / C_EMBLEM_DOWNLOAD (opcode 72) — download clan emblem.
+// Java: C_EmblemDownload.java
+// Packet: [D emblemId]
+func HandleEmblemDownload(sess *net.Session, r *packet.Reader, deps *Deps) {
+	emblemID := r.ReadD()
+	if emblemID <= 0 {
+		return
+	}
+
+	// Read emblem file from disk
+	emblemPath := fmt.Sprintf("emblem/%d", emblemID)
+	emblemData, err := os.ReadFile(emblemPath)
+	if err != nil {
+		// File not found or read error — silently ignore
+		return
+	}
+
+	// Send S_Emblem
+	sendEmblem(sess, emblemID, emblemData)
 }
 
 // --- Packet builders ---
 
 // sendClanName sends S_OPCODE_CLANNAME (72) — update clan name display.
+// sendPledgeEmblemStatus sends S_PacketBox(173) — notify client of clan emblem status.
+// Java: S_PacketBox case PLEDGE_EMBLEM_STATUS (173)
+// value: 0=off, 1=on
+func sendPledgeEmblemStatus(sess *net.Session, emblemStatus int) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+	w.WriteC(173) // PLEDGE_EMBLEM_STATUS subtype
+	w.WriteC(1)
+	if emblemStatus == 0 {
+		w.WriteC(0)
+	} else {
+		w.WriteC(1)
+	}
+	w.WriteD(0)
+	sess.Send(w.Bytes())
+}
+
 // Java: S_ClanName.java
 // join=true → flag 0x0a (active), join=false → flag 0x0b (leaving)
 func sendClanName(sess *net.Session, objID int32, clanName string, clanID int32, join bool) {
@@ -641,12 +1004,30 @@ func sendPledgeAnnounce(sess *net.Session, clan *world.ClanInfo) {
 // Java: S_Pledge.java (constructor with L1PcInstance)
 // onlineOnly=false → subtype 170 (all members), onlineOnly=true → subtype 171 (online only)
 func sendPledgeMembers(sess *net.Session, clan *world.ClanInfo, deps *Deps, onlineOnly bool) {
-	subType := byte(170) // HTML_PLEDGE_MEMBERS
 	if onlineOnly {
-		subType = 171 // HTML_PLEDGE_ONLINE_MEMBERS
+		// Subtype 171: lightweight online member list — names only.
+		// Java: S_PacketBox case 171 (HTML_PLEDGE_ONLINE_MEMBERS)
+		// Format: [C 171][H count][S name]...
+		var names []string
+		for _, m := range clan.Members {
+			if deps.World.GetByCharID(m.CharID) != nil {
+				names = append(names, m.CharName)
+			}
+		}
+
+		w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+		w.WriteC(171)
+		w.WriteH(uint16(len(names)))
+		for _, name := range names {
+			w.WriteS(name)
+		}
+		sess.Send(w.Bytes())
+		return
 	}
 
-	// Collect members to send
+	// Subtype 170: full member list (all members, online + offline).
+	// Java: S_Pledge.java
+	// Format: [C 170][H 1][C count][per member: S name, C rank, C level, 62B notes, D id, C classType]
 	type memberData struct {
 		name      string
 		rank      int16
@@ -658,11 +1039,6 @@ func sendPledgeMembers(sess *net.Session, clan *world.ClanInfo, deps *Deps, onli
 
 	var members []memberData
 	for _, m := range clan.Members {
-		online := deps.World.GetByCharID(m.CharID)
-		if onlineOnly && online == nil {
-			continue
-		}
-
 		md := memberData{
 			name:     m.CharName,
 			rank:     m.Rank,
@@ -670,6 +1046,7 @@ func sendPledgeMembers(sess *net.Session, clan *world.ClanInfo, deps *Deps, onli
 			memberID: m.CharID,
 		}
 
+		online := deps.World.GetByCharID(m.CharID)
 		if online != nil {
 			md.level = online.Level
 			md.classType = online.ClassType
@@ -679,7 +1056,7 @@ func sendPledgeMembers(sess *net.Session, clan *world.ClanInfo, deps *Deps, onli
 	}
 
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
-	w.WriteC(subType)
+	w.WriteC(170)
 	w.WriteH(1) // fixed value
 	w.WriteC(byte(len(members)))
 
@@ -697,6 +1074,38 @@ func sendPledgeMembers(sess *net.Session, clan *world.ClanInfo, deps *Deps, onli
 		w.WriteC(byte(m.classType))
 	}
 
+	sess.Send(w.Bytes())
+}
+
+// sendRankChanged sends S_PacketBox(27) — rank change notification.
+// Java: S_PacketBox case 27 (MSG_RANK_CHANGED)
+// Format: [C 27][C rank][S name]
+func sendRankChanged(sess *net.Session, rank byte, name string) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+	w.WriteC(27) // MSG_RANK_CHANGED
+	w.WriteC(rank)
+	w.WriteS(name)
+	sess.Send(w.Bytes())
+}
+
+// sendCharResetEmblem sends S_OPCODE_VOICE_CHAT (64) sub-type 0x3c — emblem update.
+// Java: S_CharReset.java (EMBLEM variant)
+// Format: [C 0x3c][D pcObjId][D emblemId]
+func sendCharResetEmblem(sess *net.Session, pcObjID int32, emblemID int32) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
+	w.WriteC(0x3c) // sub-type: emblem update
+	w.WriteD(pcObjID)
+	w.WriteD(emblemID)
+	sess.Send(w.Bytes())
+}
+
+// sendEmblem sends S_OPCODE_EMBLEM (118) — emblem data for client rendering.
+// Java: S_Emblem.java
+// Format: [D emblemId][N bytes emblem data]
+func sendEmblem(sess *net.Session, emblemID int32, data []byte) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EMBLEM)
+	w.WriteD(emblemID)
+	w.WriteBytes(data)
 	sess.Send(w.Bytes())
 }
 

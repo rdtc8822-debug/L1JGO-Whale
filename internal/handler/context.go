@@ -299,6 +299,21 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 			HandleRankControl(sess.(*net.Session), r, deps)
 		},
 	)
+	reg.Register(packet.C_OPCODE_TITLE, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleTitle(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_UPLOAD_EMBLEM, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleEmblemUpload(sess.(*net.Session), r, deps)
+		},
+	)
+	reg.Register(packet.C_OPCODE_ALT_ATTACK, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleEmblemDownload(sess.(*net.Session), r, deps)
+		},
+	)
 
 	// Trade
 	reg.Register(packet.C_OPCODE_ASK_XCHG, inWorldStates,

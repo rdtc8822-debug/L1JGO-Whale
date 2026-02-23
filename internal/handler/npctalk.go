@@ -26,8 +26,17 @@ func HandleNpcTalk(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
-	// TODO: check player lawful to choose normal vs caotic action
+	// Java: player.getLawful() < -1000 → chaotic action, else normal action.
+	// For pledge NPCs both fields are "bpledge2"; the CLIENT handles clan/no-clan UI internally.
+	player := deps.World.GetBySession(sess.ID)
+	if player == nil {
+		return
+	}
+
 	htmlID := action.NormalAction
+	if player.Lawful < -1000 && action.CaoticAction != "" {
+		htmlID = action.CaoticAction
+	}
 	if htmlID == "" {
 		return
 	}

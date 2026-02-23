@@ -180,13 +180,15 @@ func (r *CharacterRepo) SaveCharacter(ctx context.Context, c *CharacterRow) erro
 			x = $7, y = $8, map_id = $9, heading = $10,
 			lawful = $11, str = $12, dex = $13, con = $14, wis = $15, cha = $16, intel = $17,
 			bonus_stats = $18,
-			clan_id = $19, clan_name = $20, clan_rank = $21
-		WHERE name = $22`,
+			clan_id = $19, clan_name = $20, clan_rank = $21,
+			title = $22
+		WHERE name = $23`,
 		c.Level, c.Exp, c.HP, c.MP, c.MaxHP, c.MaxMP,
 		c.X, c.Y, c.MapID, c.Heading,
 		c.Lawful, c.Str, c.Dex, c.Con, c.Wis, c.Cha, c.Intel,
 		c.BonusStats,
 		c.ClanID, c.ClanName, c.ClanRank,
+		c.Title,
 		c.Name,
 	)
 	return err

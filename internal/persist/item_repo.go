@@ -17,6 +17,7 @@ type ItemRow struct {
 	Equipped   bool
 	Identified bool
 	EquipSlot  int16
+	ObjID      int32 // persisted ObjectID for shortcut bar stability
 }
 
 type ItemRepo struct {
@@ -30,7 +31,7 @@ func NewItemRepo(db *DB) *ItemRepo {
 // LoadByCharID returns all items belonging to a character.
 func (r *ItemRepo) LoadByCharID(ctx context.Context, charID int32) ([]ItemRow, error) {
 	rows, err := r.db.Pool.Query(ctx,
-		`SELECT id, char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot
+		`SELECT id, char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot, obj_id
 		 FROM character_items WHERE char_id = $1`, charID,
 	)
 	if err != nil {
@@ -44,6 +45,7 @@ func (r *ItemRepo) LoadByCharID(ctx context.Context, charID int32) ([]ItemRow, e
 		if err := rows.Scan(
 			&it.ID, &it.CharID, &it.ItemID, &it.Count,
 			&it.EnchantLvl, &it.Bless, &it.Equipped, &it.Identified, &it.EquipSlot,
+			&it.ObjID,
 		); err != nil {
 			return nil, err
 		}
@@ -52,7 +54,18 @@ func (r *ItemRepo) LoadByCharID(ctx context.Context, charID int32) ([]ItemRow, e
 	return result, rows.Err()
 }
 
+// MaxObjID returns the maximum obj_id across all character items.
+// Used on startup to initialize the ObjectID counter above all persisted values.
+func (r *ItemRepo) MaxObjID(ctx context.Context) (int32, error) {
+	var maxID int32
+	err := r.db.Pool.QueryRow(ctx,
+		`SELECT COALESCE(MAX(obj_id), 0) FROM character_items`,
+	).Scan(&maxID)
+	return maxID, err
+}
+
 // SaveInventory replaces all items for a character (delete + bulk insert).
+// Persists item.ObjectID as obj_id for shortcut bar reference stability.
 func (r *ItemRepo) SaveInventory(ctx context.Context, charID int32, inv *world.Inventory, equip *world.Equipment) error {
 	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
@@ -65,7 +78,7 @@ func (r *ItemRepo) SaveInventory(ctx context.Context, charID int32, inv *world.I
 		return err
 	}
 
-	// Insert current inventory
+	// Insert current inventory with persisted ObjectID
 	for _, item := range inv.Items {
 		equipSlot := int16(0)
 		if item.Equipped {
@@ -78,10 +91,10 @@ func (r *ItemRepo) SaveInventory(ctx context.Context, charID int32, inv *world.I
 			}
 		}
 		if _, err := tx.Exec(ctx,
-			`INSERT INTO character_items (char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+			`INSERT INTO character_items (char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot, obj_id)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
 			charID, item.ItemID, item.Count, int16(item.EnchantLvl), int16(item.Bless),
-			item.Equipped, item.Identified, equipSlot,
+			item.Equipped, item.Identified, equipSlot, item.ObjectID,
 		); err != nil {
 			return err
 		}

@@ -1,6 +1,24 @@
 package world
 
-import "strings"
+import (
+	"strings"
+	"sync/atomic"
+)
+
+// emblemIDCounter generates unique emblem IDs.
+// Starts at 1; initialized from DB max on startup.
+var emblemIDCounter atomic.Int32
+
+// NextEmblemID returns a unique emblem ID.
+func NextEmblemID() int32 {
+	return emblemIDCounter.Add(1)
+}
+
+// SetEmblemIDStart sets the emblem counter start value.
+// Called on startup with max(persisted_max_emblem_id, 0) to avoid collisions.
+func SetEmblemIDStart(v int32) {
+	emblemIDCounter.Store(v)
+}
 
 // Clan rank constants (Java: L1Clan.java)
 const (

@@ -283,6 +283,10 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 			Cha:        player.Cha,
 			Intel:      player.Intel,
 			BonusStats: player.BonusStats,
+			ClanID:     player.ClanID,
+			ClanName:   player.ClanName,
+			ClanRank:   player.ClanRank,
+			Title:      player.Title,
 		}
 		if err := s.charRepo.SaveCharacter(ctx, row); err != nil {
 			s.log.Error("斷線存檔角色失敗",

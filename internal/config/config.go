@@ -56,11 +56,12 @@ type RatesConfig struct {
 }
 
 type CharacterConfig struct {
-	DefaultSlots        int    `toml:"default_slots"`
-	AutoCreateAccounts  bool   `toml:"auto_create_accounts"`
-	Delete7Days         bool   `toml:"delete_7_days"`
-	Delete7DaysMinLevel int    `toml:"delete_7_days_min_level"`
-	ClientLanguageCode  string `toml:"client_language_code"`
+	DefaultSlots         int    `toml:"default_slots"`
+	AutoCreateAccounts   bool   `toml:"auto_create_accounts"`
+	Delete7Days          bool   `toml:"delete_7_days"`
+	Delete7DaysMinLevel  int    `toml:"delete_7_days_min_level"`
+	ClientLanguageCode   string `toml:"client_language_code"`
+	ChangeTitleByOneself bool   `toml:"change_title_by_oneself"`
 }
 
 type LoggingConfig struct {
@@ -120,11 +121,12 @@ func defaults() *Config {
 			ArmorChance:  1.0 / 3.0,
 		},
 		Character: CharacterConfig{
-			DefaultSlots:        6,
-			AutoCreateAccounts:  true,
-			Delete7Days:         true,
-			Delete7DaysMinLevel: 5,
-			ClientLanguageCode:  "MS950",
+			DefaultSlots:         6,
+			AutoCreateAccounts:   true,
+			Delete7Days:          true,
+			Delete7DaysMinLevel:  5,
+			ClientLanguageCode:   "MS950",
+			ChangeTitleByOneself: true,
 		},
 		Logging: LoggingConfig{
 			Level:  "info",

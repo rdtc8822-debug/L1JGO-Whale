@@ -88,26 +88,15 @@ func (r *ClanRepo) LoadAll(ctx context.Context) ([]ClanRow, []ClanMemberRow, err
 	return clans, members, nil
 }
 
-// CreateClan creates a new clan and deducts adena from the leader in a single transaction.
-// Returns the new clan ID. WAL-safe: DB first, memory second.
-func (r *ClanRepo) CreateClan(ctx context.Context, leaderCharID int32, leaderName, clanName string, foundDate int32, adenaCost int32) (int32, error) {
+// CreateClan creates a new clan in a single transaction.
+// Gold deduction is handled in memory by the handler; batch save persists it.
+// Returns the new clan ID.
+func (r *ClanRepo) CreateClan(ctx context.Context, leaderCharID int32, leaderName, clanName string, foundDate int32) (int32, error) {
 	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
 		return 0, err
 	}
 	defer tx.Rollback(ctx)
-
-	// Deduct adena from leader's inventory (gold item_id = 40308)
-	tag, err := tx.Exec(ctx,
-		`UPDATE items SET count = count - $1
-		 WHERE owner_id = $2 AND item_id = 40308 AND count >= $1`,
-		adenaCost, leaderCharID)
-	if err != nil {
-		return 0, err
-	}
-	if tag.RowsAffected() == 0 {
-		return 0, ErrInsufficientGold
-	}
 
 	// Insert clan
 	var clanID int32
@@ -285,6 +274,24 @@ func (r *ClanRepo) LoadOfflineCharClan(ctx context.Context, charName string) (in
 		return 0, 0, "", 0, err
 	}
 	return charID, clanID, clanName, clanRank, nil
+}
+
+// UpdateEmblemID updates a clan's emblem ID in the DB.
+func (r *ClanRepo) UpdateEmblemID(ctx context.Context, clanID, emblemID int32) error {
+	_, err := r.db.Pool.Exec(ctx,
+		`UPDATE clans SET emblem_id = $1, emblem_status = 1 WHERE clan_id = $2`,
+		emblemID, clanID)
+	return err
+}
+
+// MaxEmblemID returns the maximum emblem_id across all clans.
+// Used on startup to initialize the emblem ID counter above all persisted values.
+func (r *ClanRepo) MaxEmblemID(ctx context.Context) (int32, error) {
+	var maxID int32
+	err := r.db.Pool.QueryRow(ctx,
+		`SELECT COALESCE(MAX(emblem_id), 0) FROM clans`,
+	).Scan(&maxID)
+	return maxID, err
 }
 
 // ErrInsufficientGold is returned when the player doesn't have enough gold.

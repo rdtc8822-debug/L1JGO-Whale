@@ -100,7 +100,7 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// --- Send initialization packets (order matches Java) ---
 
 	// 1. S_ENTER_WORLD_CHECK (opcode 223) — LoginToGame
-	sendLoginGame(sess, ch.ClanID)
+	sendLoginGame(sess, ch.ClanID, ch.ID)
 
 	// 2. S_ADD_INVENTORY_BATCH (opcode 5) — inventory list
 	sendInvList(sess, player.Inv, deps.Items)
@@ -146,6 +146,10 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// 12. Send clan info on login
 	if player.ClanID > 0 {
 		sendClanName(sess, player.CharID, player.ClanName, player.ClanID, true)
+		clan := deps.World.Clans.GetClan(player.ClanID)
+		if clan != nil {
+			sendPledgeEmblemStatus(sess, int(clan.EmblemStatus))
+		}
 		sendClanAttention(sess)
 	}
 
@@ -178,11 +182,11 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	}
 }
 
-func sendLoginGame(sess *net.Session, clanID int32) {
+func sendLoginGame(sess *net.Session, clanID int32, clanMemberID int32) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_ENTER_WORLD_CHECK)
 	w.WriteC(0x03) // language
 	if clanID > 0 {
-		w.WriteD(0) // clan member ID (stub)
+		w.WriteD(clanMemberID) // clan member ID — must be non-zero for client to recognize clan membership
 	} else {
 		w.WriteC(0x53)
 		w.WriteC(0x01)
@@ -210,7 +214,8 @@ func loadInventoryFromDB(player *world.PlayerInfo, deps *Deps) {
 					continue
 				}
 				stackable := itemInfo.Stackable || row.ItemID == world.AdenaItemID
-				invItem := player.Inv.AddItem(
+				invItem := player.Inv.AddItemWithID(
+					row.ObjID, // preserve persisted ObjectID for shortcut bar stability (0 → generate new)
 					row.ItemID, row.Count, itemInfo.Name, itemInfo.InvGfx,
 					itemInfo.Weight, stackable, byte(row.Bless),
 				)
