@@ -87,10 +87,14 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Load known spells from DB (JSONB column)
 	loadKnownSpellsFromDB(player, deps)
 
+	// Detect complete armor set from loaded equipment (sets ActiveSetID before stats calc).
+	detectActiveArmorSet(player, deps.ArmorSets)
+
 	// Apply all equipment stat bonuses (AC, STR, DEX, etc.) silently — no packets yet.
-	// EquipBonuses starts at zero, so this correctly adds all equipment contributions.
+	// EquipBonuses starts at zero, so this correctly adds all equipment contributions
+	// including any active armor set stat bonuses.
 	player.AC = 10 // base AC before equipment
-	applyEquipStats(player, deps.Items)
+	applyEquipStats(player, deps.Items, deps.ArmorSets)
 
 	// Restore persisted buffs (including polymorph state)
 	loadAndRestoreBuffs(player, deps)

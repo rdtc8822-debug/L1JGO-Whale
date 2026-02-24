@@ -438,11 +438,22 @@ func handleEquipWeapon(sess *net.Session, player *world.PlayerInfo, invItem *wor
 	sendItemNameUpdate(sess, invItem, itemInfo)
 	sendEquipSlotUpdate(sess, invItem.ObjectID, world.SlotWeapon, true)
 
-	// Recalculate all equipment stats and send updates
+	// Check armor set completion before recalc so set bonuses are included
+	newSetPoly, oldSetPoly := updateArmorSetOnEquip(player, invItem.ItemID, deps.ArmorSets)
+
+	// Recalculate all equipment stats and send updates (includes set bonus if completed)
 	recalcEquipStats(sess, player, deps)
 
 	// Send visual update to self + nearby
 	broadcastVisualUpdate(sess, player, deps)
+
+	// Apply armor set polymorph change after stats are updated
+	if oldSetPoly > 0 {
+		UndoPoly(player, deps)
+	}
+	if newSetPoly > 0 {
+		DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, deps)
+	}
 
 	deps.Log.Debug("weapon equipped",
 		zap.String("player", player.Name),
@@ -579,8 +590,19 @@ func handleEquipArmor(sess *net.Session, player *world.PlayerInfo, invItem *worl
 	sendItemNameUpdate(sess, invItem, itemInfo)
 	sendEquipSlotUpdate(sess, invItem.ObjectID, slot, true)
 
-	// Recalculate all equipment stats and send updates
+	// Check armor set completion before recalc so set bonuses are included
+	newSetPoly, oldSetPoly := updateArmorSetOnEquip(player, invItem.ItemID, deps.ArmorSets)
+
+	// Recalculate all equipment stats and send updates (includes set bonus if completed)
 	recalcEquipStats(sess, player, deps)
+
+	// Apply armor set polymorph change after stats are updated
+	if oldSetPoly > 0 {
+		UndoPoly(player, deps)
+	}
+	if newSetPoly > 0 {
+		DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, deps)
+	}
 
 	deps.Log.Debug("armor equipped",
 		zap.String("player", player.Name),
@@ -601,6 +623,9 @@ func unequipSlot(sess *net.Session, player *world.PlayerInfo, slot world.EquipSl
 	item.Equipped = false
 	player.Equip.Set(slot, nil)
 
+	// Check if removing this item breaks the active armor set (before recalc)
+	brokenSetPoly := updateArmorSetOnUnequip(player, deps.ArmorSets)
+
 	// If unequipping weapon, clear visual
 	if slot == world.SlotWeapon {
 		player.CurrentWeapon = 0
@@ -612,8 +637,13 @@ func unequipSlot(sess *net.Session, player *world.PlayerInfo, slot world.EquipSl
 	sendItemNameUpdate(sess, item, itemInfo)
 	sendEquipSlotUpdate(sess, item.ObjectID, slot, false)
 
-	// Recalculate all equipment stats
+	// Recalculate all equipment stats (set bonus excluded since ActiveSetID was cleared)
 	recalcEquipStats(sess, player, deps)
+
+	// Revert armor set polymorph if set was broken
+	if brokenSetPoly > 0 {
+		UndoPoly(player, deps)
+	}
 }
 
 // findEquippedSlot finds which slot an item is in.
@@ -629,9 +659,9 @@ func findEquippedSlot(player *world.PlayerInfo, item *world.InvItem) world.Equip
 // applyEquipStats recalculates equipment stat contributions and applies the diff
 // to player fields, WITHOUT sending any packets. Used during enter-world init
 // before the client has received LoginToGame.
-func applyEquipStats(player *world.PlayerInfo, items *data.ItemTable) {
+func applyEquipStats(player *world.PlayerInfo, items *data.ItemTable, armorSets *data.ArmorSetTable) {
 	old := player.EquipBonuses
-	neo := CalcEquipStats(player, items)
+	neo := CalcEquipStats(player, items, armorSets)
 
 	player.AC += int16(neo.AC - old.AC)
 	player.Str += int16(neo.AddStr - old.AddStr)
@@ -661,11 +691,107 @@ func applyEquipStats(player *world.PlayerInfo, items *data.ItemTable) {
 	player.EquipBonuses = neo
 }
 
+// ---------- Armor set helpers ----------
+
+// equippedItemSet returns the set of currently equipped item IDs.
+func equippedItemSet(player *world.PlayerInfo) map[int32]bool {
+	m := make(map[int32]bool, 14)
+	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
+		if item := player.Equip.Get(i); item != nil {
+			m[item.ItemID] = true
+		}
+	}
+	return m
+}
+
+// detectActiveArmorSet checks equipped items and sets player.ActiveSetID if a
+// complete armor set is found. Used during enter-world initialisation before
+// any packets are sent.
+func detectActiveArmorSet(player *world.PlayerInfo, armorSets *data.ArmorSetTable) {
+	if armorSets == nil {
+		return
+	}
+	equipped := equippedItemSet(player)
+	checked := make(map[int]bool)
+	for itemID := range equipped {
+		for _, set := range armorSets.GetSetsForItem(itemID) {
+			if checked[set.ID] {
+				continue
+			}
+			checked[set.ID] = true
+			count := 0
+			for _, sid := range set.Items {
+				if equipped[sid] {
+					count++
+				}
+			}
+			if count >= len(set.Items) {
+				player.ActiveSetID = set.ID
+				return
+			}
+		}
+	}
+}
+
+// updateArmorSetOnEquip detects if equipping itemID completes an armor set.
+// Updates player.ActiveSetID and returns the polyIDs of the newly activated
+// set and any previously active set that was replaced (0 if none).
+func updateArmorSetOnEquip(player *world.PlayerInfo, itemID int32, armorSets *data.ArmorSetTable) (newPolyID, oldPolyID int32) {
+	if armorSets == nil {
+		return 0, 0
+	}
+	equipped := equippedItemSet(player)
+	for _, set := range armorSets.GetSetsForItem(itemID) {
+		count := 0
+		for _, sid := range set.Items {
+			if equipped[sid] {
+				count++
+			}
+		}
+		if count >= len(set.Items) && player.ActiveSetID != set.ID {
+			if player.ActiveSetID != 0 {
+				if old := armorSets.GetByID(player.ActiveSetID); old != nil {
+					oldPolyID = old.PolyID
+				}
+			}
+			player.ActiveSetID = set.ID
+			return set.PolyID, oldPolyID
+		}
+	}
+	return 0, 0
+}
+
+// updateArmorSetOnUnequip checks if the active armor set is broken after
+// an item is removed. Clears player.ActiveSetID and returns the broken
+// set's polyID (0 if the active set is still intact or none was active).
+func updateArmorSetOnUnequip(player *world.PlayerInfo, armorSets *data.ArmorSetTable) (brokenPolyID int32) {
+	if armorSets == nil || player.ActiveSetID == 0 {
+		return 0
+	}
+	set := armorSets.GetByID(player.ActiveSetID)
+	if set == nil {
+		player.ActiveSetID = 0
+		return 0
+	}
+	equipped := equippedItemSet(player)
+	count := 0
+	for _, sid := range set.Items {
+		if equipped[sid] {
+			count++
+		}
+	}
+	if count < len(set.Items) {
+		player.ActiveSetID = 0
+		return set.PolyID
+	}
+	return 0
+}
+
 // recalcEquipStats recalculates all equipment stat contributions, applies the diff,
 // and sends update packets. Used on equip/unequip while in-world.
 func recalcEquipStats(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 	old := player.EquipBonuses
-	applyEquipStats(player, deps.Items)
+	applyEquipStats(player, deps.Items, deps.ArmorSets)
 
 	// Send update packets
 	sendPlayerStatus(sess, player)
@@ -679,9 +805,9 @@ func recalcEquipStats(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 	}
 }
 
-// CalcEquipStats computes total stat bonuses from all equipped items.
+// CalcEquipStats computes total stat bonuses from all equipped items plus any active armor set.
 // Includes enchant level in AC for non-accessory slots (Java L1EquipmentSlot.set()).
-func CalcEquipStats(player *world.PlayerInfo, items *data.ItemTable) world.EquipStats {
+func CalcEquipStats(player *world.PlayerInfo, items *data.ItemTable, armorSets *data.ArmorSetTable) world.EquipStats {
 	var stats world.EquipStats
 	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
 		invItem := player.Equip.Get(i)
@@ -719,6 +845,28 @@ func CalcEquipStats(player *world.PlayerInfo, items *data.ItemTable) world.Equip
 		stats.AddMPR += info.AddMPR
 		stats.AddSP += info.AddSP
 		stats.MDef += info.MDef
+	}
+	// Active armor set stat bonuses
+	if player.ActiveSetID > 0 && armorSets != nil {
+		if set := armorSets.GetByID(player.ActiveSetID); set != nil {
+			stats.AC += set.AC
+			stats.AddHP += set.HP
+			stats.AddMP += set.MP
+			stats.AddHPR += set.HPR
+			stats.AddMPR += set.MPR
+			stats.MDef += set.MR
+			stats.AddStr += set.Str
+			stats.AddDex += set.Dex
+			stats.AddCon += set.Con
+			stats.AddInt += set.Intl
+			stats.AddWis += set.Wis
+			stats.AddCha += set.Cha
+			stats.HitMod += set.Hit
+			stats.DmgMod += set.Dmg
+			stats.BowHitMod += set.BowHit
+			stats.BowDmgMod += set.BowDmg
+			stats.AddSP += set.SP
+		}
 	}
 	return stats
 }
@@ -910,6 +1058,18 @@ func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerI
 				applyBluePotion(sess, player, pot.Duration, int32(pot.GfxID), deps)
 				consumed = true
 			}
+
+		case "cure_poison":
+			// Remove any active poison debuff.
+			// Poison status system is not yet fully implemented;
+			// for now we consume the item and play a cure effect.
+			removeBuffAndRevert(player, 35, deps) // skill 35 = POISON in L1J
+			consumed = true
+			sendEffectOnPlayer(sess, player.CharID, 177) // green cure sparkle
+			nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
+			for _, other := range nearby {
+				sendEffectOnPlayer(other.Session, player.CharID, 177)
+			}
 		}
 	} else if itemInfo.FoodVolume > 0 {
 		// Java: foodvolume1 = item.getFoodVolume() / 10; if <= 0 then 5
@@ -984,7 +1144,7 @@ func handleEnchantScroll(sess *net.Session, r *packet.Reader, player *world.Play
 
 	// Call Lua enchant formula
 	result := deps.Scripting.CalcEnchant(scripting.EnchantContext{
-		ScrollBless:  int(scroll.Bless),
+		ScrollBless:  enchantScrollBless(scroll.ItemID, int(scroll.Bless)),
 		EnchantLvl:   int(target.EnchantLvl),
 		SafeEnchant:  targetInfo.SafeEnchant,
 		Category:     category,
@@ -1817,6 +1977,22 @@ const (
 	teleportScrollAncient    int32 = 40086  // Ancient Scroll of Teleportation
 	teleportScrollSpecial    int32 = 40863  // Special Scroll of Teleportation
 )
+
+// enchantScrollBless returns the correct bless classification (0=normal, 1=blessed, 2=cursed)
+// based on item ID rather than the YAML bless field, which incorrectly labels
+// normal scrolls 40074 (armor) and 40087 (weapon) as bless:1.
+// All other enchant scrolls (140xxx blessed, ancient, phantom, Zian, Jinkan, ivory tower)
+// correctly have bless:1 in YAML and are treated as blessed.
+func enchantScrollBless(itemID int32, yamlBless int) int {
+	if yamlBless == 2 {
+		return 2 // cursed scroll — YAML value is correct
+	}
+	// These two are mislabeled bless:1 in YAML; they are normal (always +1)
+	if itemID == 40074 || itemID == 40087 {
+		return 0
+	}
+	return yamlBless
+}
 
 func isTeleportScroll(itemID int32) bool {
 	switch itemID {

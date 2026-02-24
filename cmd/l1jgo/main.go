@@ -236,6 +236,12 @@ func run() error {
 	}
 	printStat("變身形態", polymorphTable.Count())
 
+	armorSetTable, err := data.LoadArmorSetTable("data/yaml/armor_set_list.yaml")
+	if err != nil {
+		return fmt.Errorf("load armor set table: %w", err)
+	}
+	printStat("套裝定義", armorSetTable.Count())
+
 	doorTable, err := data.LoadDoorTable("data/yaml/door_gfx.yaml", "data/yaml/door_spawn.yaml")
 	if err != nil {
 		return fmt.Errorf("load door table: %w", err)
@@ -302,6 +308,7 @@ func run() error {
 		MobSkills:      mobSkillTable,
 		MapData:        mapDataTable,
 		Polys:          polymorphTable,
+		ArmorSets:      armorSetTable,
 		SprTable:       sprTable,
 		WarehouseRepo:  warehouseRepo,
 		WALRepo:        walRepo,

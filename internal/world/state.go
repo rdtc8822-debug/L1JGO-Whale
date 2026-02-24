@@ -75,6 +75,7 @@ type PlayerInfo struct {
 
 	TempCharGfx int32 // 0=use ClassID; >0=current polymorph GFX sprite
 	PolyID      int32 // current polymorph poly_id (for equip/skill checks; 0=not polymorphed)
+	ActiveSetID int   // armor set ID currently active (0=none); cleared when set is incomplete
 
 	Inv          *Inventory // in-memory inventory
 	Equip        Equipment  // equipped items (value type, zero-initialized = all slots empty)
