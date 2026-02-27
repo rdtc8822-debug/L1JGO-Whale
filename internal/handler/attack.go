@@ -507,3 +507,20 @@ func calcHeading(sx, sy, tx, ty int32) int16 {
 	}
 	return 0
 }
+
+// --- Exported wrappers for system package usage ---
+
+// HandleNpcDeath 處理 NPC 死亡（經驗、掉落、移除）。
+func HandleNpcDeath(npc *world.NpcInfo, killer *world.PlayerInfo, nearby []*world.PlayerInfo, deps *Deps) *NpcKillResult {
+	return handleNpcDeath(npc, killer, nearby, deps)
+}
+
+// FindArrow 在玩家背包中找到可用的箭矢。
+func FindArrow(player *world.PlayerInfo, deps *Deps) *world.InvItem {
+	return findArrow(player, deps)
+}
+
+// CalcHeading 計算兩點間的朝向。
+func CalcHeading(sx, sy, tx, ty int32) int16 {
+	return calcHeading(sx, sy, tx, ty)
+}

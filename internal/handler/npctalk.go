@@ -43,6 +43,22 @@ func HandleNpcTalk(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
+	// L1Dwarf（倉庫 NPC）— Java L1DwarfInstance.onTalkAction() 對所有倉庫 NPC
+	// 強制回傳 "storage"（3.53C 新版倉庫介面），客戶端內建索回＋存放兩個 tab。
+	// 只有 NPC 60028（精靈倉庫）對非精靈玩家回傳 "elCE1" 拒絕訊息。
+	if npc.Impl == "L1Dwarf" {
+		player := deps.World.GetBySession(sess.ID)
+		if player == nil {
+			return
+		}
+		htmlID := "storage"
+		if npc.NpcID == 60028 && player.ClassType != 2 { // 2=精靈
+			htmlID = "elCE1"
+		}
+		sendHypertext(sess, objID, htmlID)
+		return
+	}
+
 	// Look up dialog data for this NPC template
 	action := deps.NpcActions.Get(npc.NpcID)
 	if action == nil {

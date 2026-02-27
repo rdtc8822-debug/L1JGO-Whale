@@ -237,6 +237,7 @@ func sendUseAttackSkill(viewer *net.Session, casterID, targetID int32, damage in
 
 // sendHpMeter sends S_HP_METER (opcode 237) — NPC HP bar.
 // Format: [C opcode][D objectID][H hpRatio(0-100)]
+// 0xFF = 清除 HP 條。
 func sendHpMeter(viewer *net.Session, objectID int32, hpRatio int16) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_HP_METER)
 	w.WriteD(objectID)
@@ -431,6 +432,21 @@ func sendBluePotionIcon(sess *net.Session, timeSec uint16) {
 	sendIconGfx(sess, 34, timeSec)
 }
 
+// SendFoodUpdate 發送食物欄更新。Exported for system package usage.
+func SendFoodUpdate(sess *net.Session, food int16) {
+	sendFoodUpdate(sess, food)
+}
+
+// SendWisdomPotionIcon 發送慎重藥水圖示。Exported for system package usage.
+func SendWisdomPotionIcon(sess *net.Session, timeSec uint16) {
+	sendWisdomPotionIcon(sess, timeSec)
+}
+
+// SendBluePotionIcon 發送藍色藥水圖示。Exported for system package usage.
+func SendBluePotionIcon(sess *net.Session, timeSec uint16) {
+	sendBluePotionIcon(sess, timeSec)
+}
+
 // sendWeightUpdate sends S_PacketBox(WEIGHT) (opcode 250, subcode 10) — lightweight weight bar update.
 // Java: S_PacketBox.WEIGHT = 10; format: [C opcode=250][C 10][C weight242]
 // Sent after every inventory add/remove/count change.
@@ -514,6 +530,31 @@ func sendPoison(viewer *net.Session, objectID int32, poisonType byte) {
 	viewer.Send(w.Bytes())
 }
 
+// SendWeightUpdate 匯出 sendWeightUpdate — 供 system 套件發送負重更新。
+func SendWeightUpdate(sess *net.Session, p *world.PlayerInfo) {
+	sendWeightUpdate(sess, p)
+}
+
+// SendSkillEffect 匯出 sendSkillEffect — 供 system 套件發送技能特效。
+func SendSkillEffect(viewer *net.Session, objectID int32, gfxID int32) {
+	sendSkillEffect(viewer, objectID, gfxID)
+}
+
+// SendExpUpdate 匯出 sendExpUpdate — 供 system 套件發送經驗值更新。
+func SendExpUpdate(sess *net.Session, level int16, totalExp int32) {
+	sendExpUpdate(sess, level, totalExp)
+}
+
+// SendHpMeter 匯出 sendHpMeter — 供 system 套件發送 HP 條更新。
+func SendHpMeter(viewer *net.Session, objectID int32, hpRatio int16) {
+	sendHpMeter(viewer, objectID, hpRatio)
+}
+
+// SendMagicStatus 匯出 sendMagicStatus — 供 system 套件發送 SP/MR。
+func SendMagicStatus(sess *net.Session, sp byte, mr uint16) {
+	sendMagicStatus(sess, sp, mr)
+}
+
 // sendCurseBlind 發送 S_CurseBlind (opcode 47) — 致盲螢幕遮罩。
 // Java 格式：[C opcode=47][H type]
 // type: 0=解除, 1=施加, 2=減弱施加
@@ -521,4 +562,56 @@ func sendCurseBlind(sess *net.Session, blindType uint16) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CURSEBLIND)
 	w.WriteH(blindType)
 	sess.Send(w.Bytes())
+}
+
+// --- Exported wrappers for system package usage ---
+
+// SendActionGfx 廣播施法動畫。
+func SendActionGfx(viewer *net.Session, objectID int32, actionCode byte) {
+	sendActionGfx(viewer, objectID, actionCode)
+}
+
+// SendAttackPacket 廣播近戰攻擊封包。
+func SendAttackPacket(viewer *net.Session, attackerID, targetID, damage int32, heading int16) {
+	sendAttackPacket(viewer, attackerID, targetID, damage, heading)
+}
+
+// SendUseAttackSkill 廣播技能攻擊封包。
+func SendUseAttackSkill(viewer *net.Session, casterID, targetID int32, damage int16, heading int16, gfxID int32, useType byte, cx, cy, tx, ty int32) {
+	sendUseAttackSkill(viewer, casterID, targetID, damage, heading, gfxID, useType, cx, cy, tx, ty)
+}
+
+// SendParalysis 發送麻痺/凍結/睡眠狀態封包。
+func SendParalysis(sess *net.Session, subtype byte) {
+	sendParalysis(sess, subtype)
+}
+
+// SendCurseBlind 發送致盲螢幕遮罩封包。
+func SendCurseBlind(sess *net.Session, blindType uint16) {
+	sendCurseBlind(sess, blindType)
+}
+
+// SendIconShield 發送防禦型 buff 圖示。
+func SendIconShield(sess *net.Session, durationSec uint16, iconType byte) {
+	sendIconShield(sess, durationSec, iconType)
+}
+
+// SendIconStrup 發送 STR 增益 buff 圖示。
+func SendIconStrup(sess *net.Session, durationSec uint16, currentStr byte, iconType byte) {
+	sendIconStrup(sess, durationSec, currentStr, iconType)
+}
+
+// SendIconDexup 發送 DEX 增益 buff 圖示。
+func SendIconDexup(sess *net.Session, durationSec uint16, currentDex byte, iconType byte) {
+	sendIconDexup(sess, durationSec, currentDex, iconType)
+}
+
+// SendIconAura 發送光環型 buff 圖示。
+func SendIconAura(sess *net.Session, iconID byte, durationSec uint16) {
+	sendIconAura(sess, iconID, durationSec)
+}
+
+// SendInvisible 發送隱身狀態封包。
+func SendInvisible(sess *net.Session, objectID int32, invisible bool) {
+	sendInvisible(sess, objectID, invisible)
 }

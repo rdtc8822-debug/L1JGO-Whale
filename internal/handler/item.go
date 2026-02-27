@@ -2,13 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
 
 	"github.com/l1jgo/server/internal/data"
 	"github.com/l1jgo/server/internal/net"
 	"github.com/l1jgo/server/internal/net/packet"
-	"github.com/l1jgo/server/internal/scripting"
 	"github.com/l1jgo/server/internal/world"
 	"go.uber.org/zap"
 )
@@ -354,19 +352,25 @@ func HandleUseItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	// Teleport scrolls have additional data in the packet: [H mapID][D bookmarkID]
 	if isTeleportScroll(invItem.ItemID) {
-		handleUseTeleportScroll(sess, r, player, invItem, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.UseTeleportScroll(sess, r, player, invItem)
+		}
 		return
 	}
 
 	// Home scrolls (回家卷軸): no extra packet data, teleport to respawn location
 	if isHomeScroll(invItem.ItemID) {
-		handleUseHomeScroll(sess, player, invItem, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.UseHomeScroll(sess, player, invItem)
+		}
 		return
 	}
 
 	// Fixed-destination teleport scrolls (指定傳送卷軸): loc_x/loc_y/map_id set in etcitem YAML
 	if itemInfo.LocX != 0 && itemInfo.Category == data.CategoryEtcItem {
-		handleUseFixedTeleportScroll(sess, player, invItem, itemInfo, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.UseFixedTeleportScroll(sess, player, invItem, itemInfo)
+		}
 		return
 	}
 
@@ -378,277 +382,24 @@ func HandleUseItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	switch itemInfo.Category {
 	case data.CategoryWeapon:
-		handleEquipWeapon(sess, player, invItem, itemInfo, deps)
+		if deps.Equip != nil {
+			deps.Equip.EquipWeapon(sess, player, invItem, itemInfo)
+		}
 	case data.CategoryArmor:
-		handleEquipArmor(sess, player, invItem, itemInfo, deps)
+		if deps.Equip != nil {
+			deps.Equip.EquipArmor(sess, player, invItem, itemInfo)
+		}
 	case data.CategoryEtcItem:
 		handleUseEtcItem(sess, r, player, invItem, itemInfo, deps)
 	}
 }
 
-// ---------- Equipment: Weapon ----------
+// ---------- 裝備系統委派（穿脫 + 屬性計算委派 EquipSystem） ----------
 
-func handleEquipWeapon(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo, deps *Deps) {
-	if invItem.Equipped {
-		// Cursed items cannot be unequipped (Java: bless == 2, message 150)
-		if invItem.Bless == 2 {
-			sendServerMessage(sess, 150)
-			return
-		}
-		// Already equipped → unequip
-		unequipSlot(sess, player, world.SlotWeapon, deps)
-		return
-	}
-
-	// Class restriction check
-	if !canClassUse(player.ClassType, itemInfo) {
-		sendServerMessage(sess, msgClassCannotUse)
-		return
-	}
-
-	// Level restriction check
-	if !checkLevelRestriction(sess, player.Level, itemInfo) {
-		return
-	}
-
-	// Polymorph weapon restriction check
-	if player.PolyID != 0 && deps.Polys != nil {
-		poly := deps.Polys.GetByID(player.PolyID)
-		if poly != nil && !poly.IsWeaponEquipable(itemInfo.Type) {
-			sendServerMessage(sess, 285) // "此形態無法裝備此武器。"
-			return
-		}
-	}
-
-	// Unequip current weapon if any
-	if cur := player.Equip.Weapon(); cur != nil {
-		unequipSlot(sess, player, world.SlotWeapon, deps)
-	}
-
-	// Two-handed weapon: also unequip shield/guarder
-	if world.IsTwoHanded(itemInfo.Type) {
-		if player.Equip.Get(world.SlotShield) != nil {
-			unequipSlot(sess, player, world.SlotShield, deps)
-		}
-		if player.Equip.Get(world.SlotGuarder) != nil {
-			unequipSlot(sess, player, world.SlotGuarder, deps)
-		}
-	}
-
-	// Equip
-	invItem.Equipped = true
-	player.Equip.Set(world.SlotWeapon, invItem)
-	player.CurrentWeapon = world.WeaponVisualID(itemInfo.Type)
-
-	// Send inventory status update (mark as equipped)
-	sendItemNameUpdate(sess, invItem, itemInfo)
-	sendEquipSlotUpdate(sess, invItem.ObjectID, world.SlotWeapon, true)
-
-	// Check armor set completion before recalc so set bonuses are included
-	newSetPoly, oldSetPoly := updateArmorSetOnEquip(player, invItem.ItemID, deps.ArmorSets)
-
-	// Recalculate all equipment stats and send updates (includes set bonus if completed)
-	recalcEquipStats(sess, player, deps)
-
-	// Send visual update to self + nearby
-	broadcastVisualUpdate(sess, player, deps)
-
-	// Apply armor set polymorph change after stats are updated
-	if oldSetPoly > 0 {
-		UndoPoly(player, deps)
-	}
-	if newSetPoly > 0 {
-		DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, deps)
-	}
-
-	deps.Log.Debug("weapon equipped",
-		zap.String("player", player.Name),
-		zap.String("weapon", invItem.Name),
-		zap.String("type", itemInfo.Type),
-	)
-}
-
-// ---------- Equipment: Armor ----------
-
-func handleEquipArmor(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo, deps *Deps) {
-	slot := world.ArmorSlotFromType(itemInfo.Type)
-	if slot == world.SlotNone {
-		deps.Log.Debug("unknown armor type", zap.String("type", itemInfo.Type))
-		return
-	}
-
-	if invItem.Equipped {
-		// Cursed items cannot be unequipped (Java: bless == 2, message 150)
-		if invItem.Bless == 2 {
-			sendServerMessage(sess, 150)
-			return
-		}
-
-		eqSlot := findEquippedSlot(player, invItem)
-		if eqSlot == world.SlotNone {
-			return
-		}
-
-		// Unequip layering restrictions (Java C_ItemUSe.java):
-		// T-Shirt cannot be removed if Body Armor is equipped
-		if eqSlot == world.SlotTShirt && player.Equip.Get(world.SlotArmor) != nil {
-			sendServerMessage(sess, 127)
-			return
-		}
-		// Body Armor or T-Shirt cannot be removed if Cloak is equipped
-		if (eqSlot == world.SlotArmor || eqSlot == world.SlotTShirt) && player.Equip.Get(world.SlotCloak) != nil {
-			sendServerMessage(sess, 127)
-			return
-		}
-
-		unequipSlot(sess, player, eqSlot, deps)
-		return
-	}
-
-	// Class restriction check
-	if !canClassUse(player.ClassType, itemInfo) {
-		sendServerMessage(sess, msgClassCannotUse)
-		return
-	}
-
-	// Level restriction check
-	if !checkLevelRestriction(sess, player.Level, itemInfo) {
-		return
-	}
-
-	// Polymorph armor restriction check
-	if player.PolyID != 0 && deps.Polys != nil {
-		poly := deps.Polys.GetByID(player.PolyID)
-		if poly != nil && !poly.IsArmorEquipable(itemInfo.Type) {
-			sendServerMessage(sess, 285) // "此形態無法裝備此防具。"
-			return
-		}
-	}
-
-	// Ring: choose empty slot (Ring1 or Ring2)
-	if slot == world.SlotRing1 {
-		if player.Equip.Get(world.SlotRing1) == nil {
-			slot = world.SlotRing1
-		} else if player.Equip.Get(world.SlotRing2) == nil {
-			slot = world.SlotRing2
-		} else {
-			// Both ring slots full, unequip Ring1
-			unequipSlot(sess, player, world.SlotRing1, deps)
-			slot = world.SlotRing1
-		}
-	}
-
-	// Shield + Belt mutual exclusivity (Java: type 7 and type 13)
-	if slot == world.SlotShield || slot == world.SlotGuarder {
-		if player.Equip.Get(world.SlotBelt) != nil {
-			sendServerMessage(sess, 124)
-			return
-		}
-	}
-	if slot == world.SlotBelt {
-		if player.Equip.Get(world.SlotShield) != nil || player.Equip.Get(world.SlotGuarder) != nil {
-			sendServerMessage(sess, 124)
-			return
-		}
-	}
-
-	// Shield: can't equip with two-handed weapon
-	if slot == world.SlotShield || slot == world.SlotGuarder {
-		wpn := player.Equip.Weapon()
-		if wpn != nil {
-			wpnInfo := deps.Items.Get(wpn.ItemID)
-			if wpnInfo != nil && world.IsTwoHanded(wpnInfo.Type) {
-				// Unequip two-handed weapon first
-				unequipSlot(sess, player, world.SlotWeapon, deps)
-			}
-		}
-	}
-
-	// Armor/TShirt/Cloak layering restrictions (Java C_ItemUSe.java)
-	// T-Shirt cannot be equipped over Cloak or Body Armor
-	if slot == world.SlotTShirt {
-		if player.Equip.Get(world.SlotCloak) != nil {
-			sendServerMessageS(sess, 126, "$224", "$225")
-			return
-		}
-		if player.Equip.Get(world.SlotArmor) != nil {
-			sendServerMessageS(sess, 126, "$224", "$226")
-			return
-		}
-	}
-	// Body Armor cannot be equipped over Cloak
-	if slot == world.SlotArmor {
-		if player.Equip.Get(world.SlotCloak) != nil {
-			sendServerMessageS(sess, 126, "$226", "$225")
-			return
-		}
-	}
-
-	// Unequip current item in this slot
-	if cur := player.Equip.Get(slot); cur != nil {
-		unequipSlot(sess, player, slot, deps)
-	}
-
-	// Equip
-	invItem.Equipped = true
-	player.Equip.Set(slot, invItem)
-
-	sendItemNameUpdate(sess, invItem, itemInfo)
-	sendEquipSlotUpdate(sess, invItem.ObjectID, slot, true)
-
-	// Check armor set completion before recalc so set bonuses are included
-	newSetPoly, oldSetPoly := updateArmorSetOnEquip(player, invItem.ItemID, deps.ArmorSets)
-
-	// Recalculate all equipment stats and send updates (includes set bonus if completed)
-	recalcEquipStats(sess, player, deps)
-
-	// Apply armor set polymorph change after stats are updated
-	if oldSetPoly > 0 {
-		UndoPoly(player, deps)
-	}
-	if newSetPoly > 0 {
-		DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, deps)
-	}
-
-	deps.Log.Debug("armor equipped",
-		zap.String("player", player.Name),
-		zap.String("armor", invItem.Name),
-		zap.String("slot", itemInfo.Type),
-	)
-}
-
-// ---------- Equip helpers ----------
-
-// unequipSlot removes an item from an equipment slot.
+// unequipSlot 脫下指定欄位的裝備。委派給 EquipSystem。
 func unequipSlot(sess *net.Session, player *world.PlayerInfo, slot world.EquipSlot, deps *Deps) {
-	item := player.Equip.Get(slot)
-	if item == nil {
-		return
-	}
-
-	item.Equipped = false
-	player.Equip.Set(slot, nil)
-
-	// Check if removing this item breaks the active armor set (before recalc)
-	brokenSetPoly := updateArmorSetOnUnequip(player, deps.ArmorSets)
-
-	// If unequipping weapon, clear visual
-	if slot == world.SlotWeapon {
-		player.CurrentWeapon = 0
-		broadcastVisualUpdate(sess, player, deps)
-	}
-
-	// Update item name (remove equipped suffix)
-	itemInfo := deps.Items.Get(item.ItemID)
-	sendItemNameUpdate(sess, item, itemInfo)
-	sendEquipSlotUpdate(sess, item.ObjectID, slot, false)
-
-	// Recalculate all equipment stats (set bonus excluded since ActiveSetID was cleared)
-	recalcEquipStats(sess, player, deps)
-
-	// Revert armor set polymorph if set was broken
-	if brokenSetPoly > 0 {
-		UndoPoly(player, deps)
+	if deps.Equip != nil {
+		deps.Equip.UnequipSlot(sess, player, slot)
 	}
 }
 
@@ -662,226 +413,11 @@ func findEquippedSlot(player *world.PlayerInfo, item *world.InvItem) world.Equip
 	return world.SlotNone
 }
 
-// applyEquipStats recalculates equipment stat contributions and applies the diff
-// to player fields, WITHOUT sending any packets. Used during enter-world init
-// before the client has received LoginToGame.
-func applyEquipStats(player *world.PlayerInfo, items *data.ItemTable, armorSets *data.ArmorSetTable) {
-	old := player.EquipBonuses
-	neo := CalcEquipStats(player, items, armorSets)
-
-	player.AC += int16(neo.AC - old.AC)
-	player.Str += int16(neo.AddStr - old.AddStr)
-	player.Dex += int16(neo.AddDex - old.AddDex)
-	player.Con += int16(neo.AddCon - old.AddCon)
-	player.Intel += int16(neo.AddInt - old.AddInt)
-	player.Wis += int16(neo.AddWis - old.AddWis)
-	player.Cha += int16(neo.AddCha - old.AddCha)
-	player.MaxHP += int16(neo.AddHP - old.AddHP)
-	player.MaxMP += int16(neo.AddMP - old.AddMP)
-	player.HitMod += int16(neo.HitMod - old.HitMod)
-	player.DmgMod += int16(neo.DmgMod - old.DmgMod)
-	player.BowHitMod += int16(neo.BowHitMod - old.BowHitMod)
-	player.BowDmgMod += int16(neo.BowDmgMod - old.BowDmgMod)
-	player.HPR += int16(neo.AddHPR - old.AddHPR)
-	player.MPR += int16(neo.AddMPR - old.AddMPR)
-	player.SP += int16(neo.AddSP - old.AddSP)
-	player.MR += int16(neo.MDef - old.MDef)
-
-	if player.HP > player.MaxHP {
-		player.HP = player.MaxHP
-	}
-	if player.MP > player.MaxMP {
-		player.MP = player.MaxMP
-	}
-
-	player.EquipBonuses = neo
-}
-
-// ---------- Armor set helpers ----------
-
-// equippedItemSet returns the set of currently equipped item IDs.
-func equippedItemSet(player *world.PlayerInfo) map[int32]bool {
-	m := make(map[int32]bool, 14)
-	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
-		if item := player.Equip.Get(i); item != nil {
-			m[item.ItemID] = true
-		}
-	}
-	return m
-}
-
-// detectActiveArmorSet checks equipped items and sets player.ActiveSetID if a
-// complete armor set is found. Used during enter-world initialisation before
-// any packets are sent.
-func detectActiveArmorSet(player *world.PlayerInfo, armorSets *data.ArmorSetTable) {
-	if armorSets == nil {
-		return
-	}
-	equipped := equippedItemSet(player)
-	checked := make(map[int]bool)
-	for itemID := range equipped {
-		for _, set := range armorSets.GetSetsForItem(itemID) {
-			if checked[set.ID] {
-				continue
-			}
-			checked[set.ID] = true
-			count := 0
-			for _, sid := range set.Items {
-				if equipped[sid] {
-					count++
-				}
-			}
-			if count >= len(set.Items) {
-				player.ActiveSetID = set.ID
-				return
-			}
-		}
-	}
-}
-
-// updateArmorSetOnEquip detects if equipping itemID completes an armor set.
-// Updates player.ActiveSetID and returns the polyIDs of the newly activated
-// set and any previously active set that was replaced (0 if none).
-func updateArmorSetOnEquip(player *world.PlayerInfo, itemID int32, armorSets *data.ArmorSetTable) (newPolyID, oldPolyID int32) {
-	if armorSets == nil {
-		return 0, 0
-	}
-	equipped := equippedItemSet(player)
-	for _, set := range armorSets.GetSetsForItem(itemID) {
-		count := 0
-		for _, sid := range set.Items {
-			if equipped[sid] {
-				count++
-			}
-		}
-		if count >= len(set.Items) && player.ActiveSetID != set.ID {
-			if player.ActiveSetID != 0 {
-				if old := armorSets.GetByID(player.ActiveSetID); old != nil {
-					oldPolyID = old.PolyID
-				}
-			}
-			player.ActiveSetID = set.ID
-			return set.PolyID, oldPolyID
-		}
-	}
-	return 0, 0
-}
-
-// updateArmorSetOnUnequip checks if the active armor set is broken after
-// an item is removed. Clears player.ActiveSetID and returns the broken
-// set's polyID (0 if the active set is still intact or none was active).
-func updateArmorSetOnUnequip(player *world.PlayerInfo, armorSets *data.ArmorSetTable) (brokenPolyID int32) {
-	if armorSets == nil || player.ActiveSetID == 0 {
-		return 0
-	}
-	set := armorSets.GetByID(player.ActiveSetID)
-	if set == nil {
-		player.ActiveSetID = 0
-		return 0
-	}
-	equipped := equippedItemSet(player)
-	count := 0
-	for _, sid := range set.Items {
-		if equipped[sid] {
-			count++
-		}
-	}
-	if count < len(set.Items) {
-		player.ActiveSetID = 0
-		return set.PolyID
-	}
-	return 0
-}
-
-// recalcEquipStats recalculates all equipment stat contributions, applies the diff,
-// and sends update packets. Used on equip/unequip while in-world.
+// recalcEquipStats 重新計算裝備屬性並發送更新封包。委派給 EquipSystem。
 func recalcEquipStats(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
-	old := player.EquipBonuses
-	applyEquipStats(player, deps.Items, deps.ArmorSets)
-
-	// Send update packets
-	sendPlayerStatus(sess, player)
-	sendAbilityScores(sess, player)
-	sendMagicStatus(sess, byte(player.SP), uint16(player.MR))
-
-	// Weight capacity changes when STR/CON change
-	neo := player.EquipBonuses
-	if neo.AddStr != old.AddStr || neo.AddCon != old.AddCon {
-		sendWeightUpdate(sess, player)
+	if deps.Equip != nil {
+		deps.Equip.RecalcEquipStats(sess, player)
 	}
-}
-
-// CalcEquipStats computes total stat bonuses from all equipped items plus any active armor set.
-// Includes enchant level in AC for non-accessory slots (Java L1EquipmentSlot.set()).
-func CalcEquipStats(player *world.PlayerInfo, items *data.ItemTable, armorSets *data.ArmorSetTable) world.EquipStats {
-	var stats world.EquipStats
-	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
-		invItem := player.Equip.Get(i)
-		if invItem == nil {
-			continue
-		}
-		info := items.Get(invItem.ItemID)
-		if info == nil {
-			continue
-		}
-		// AC: accessories don't get enchant level bonus
-		if world.IsAccessorySlot(i) {
-			stats.AC += info.AC
-		} else {
-			stats.AC += info.AC - int(invItem.EnchantLvl)
-		}
-		stats.HitMod += info.HitMod
-		stats.DmgMod += info.DmgMod
-		// Weapon enchant bonus: Java L1Attack.java — enchant adds to hit/dmg
-		if i == world.SlotWeapon && invItem.EnchantLvl > 0 {
-			stats.HitMod += int(invItem.EnchantLvl) / 2
-			stats.DmgMod += int(invItem.EnchantLvl)
-		}
-		// NPC magic enchant bonuses (item-level temporary)
-		if invItem.DmgByMagic > 0 && invItem.DmgMagicExpiry > 0 {
-			stats.DmgMod += int(invItem.DmgByMagic)
-		}
-		if invItem.AcByMagic > 0 && invItem.AcMagicExpiry > 0 {
-			stats.AC -= int(invItem.AcByMagic) // lower AC = better defense
-		}
-		stats.BowHitMod += info.BowHitMod
-		stats.BowDmgMod += info.BowDmgMod
-		stats.AddStr += info.AddStr
-		stats.AddDex += info.AddDex
-		stats.AddCon += info.AddCon
-		stats.AddInt += info.AddInt
-		stats.AddWis += info.AddWis
-		stats.AddCha += info.AddCha
-		stats.AddHP += info.AddHP
-		stats.AddMP += info.AddMP
-		stats.AddHPR += info.AddHPR
-		stats.AddMPR += info.AddMPR
-		stats.AddSP += info.AddSP
-		stats.MDef += info.MDef
-	}
-	// Active armor set stat bonuses
-	if player.ActiveSetID > 0 && armorSets != nil {
-		if set := armorSets.GetByID(player.ActiveSetID); set != nil {
-			stats.AC += set.AC
-			stats.AddHP += set.HP
-			stats.AddMP += set.MP
-			stats.AddHPR += set.HPR
-			stats.AddMPR += set.MPR
-			stats.MDef += set.MR
-			stats.AddStr += set.Str
-			stats.AddDex += set.Dex
-			stats.AddCon += set.Con
-			stats.AddInt += set.Intl
-			stats.AddWis += set.Wis
-			stats.AddCha += set.Cha
-			stats.HitMod += set.Hit
-			stats.DmgMod += set.Dmg
-			stats.BowHitMod += set.BowHit
-			stats.BowDmgMod += set.BowDmg
-			stats.AddSP += set.SP
-		}
-	}
-	return stats
 }
 
 // ---------- Equipment packets ----------
@@ -919,46 +455,6 @@ func buildViewName(item *world.InvItem, itemInfo *data.ItemInfo) string {
 	return name
 }
 
-// sendEquipSlotUpdate sends S_EquipmentSlot for a single equip/unequip action.
-// Java: S_OPCODE_CHARRESET (opcode 64), type=0x42 (TYPE_EQUIPACTION).
-// Tells the client which visual equipment slot an item occupies.
-func sendEquipSlotUpdate(sess *net.Session, itemObjID int32, slot world.EquipSlot, equipped bool) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
-	w.WriteC(0x42) // TYPE_EQUIPACTION
-	w.WriteD(itemObjID)
-	w.WriteC(world.EquipClientIndex(slot))
-	if equipped {
-		w.WriteC(1)
-	} else {
-		w.WriteC(0)
-	}
-	sess.Send(w.Bytes())
-}
-
-// sendEquipSlotList sends the full equipment list on login.
-// Java: S_OPCODE_CHARRESET (opcode 64), type=0x41 (TYPE_EQUIPONLOGIN).
-func sendEquipSlotList(sess *net.Session, player *world.PlayerInfo) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
-	w.WriteC(0x41) // TYPE_EQUIPONLOGIN
-	count := byte(0)
-	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
-		if player.Equip.Get(i) != nil {
-			count++
-		}
-	}
-	w.WriteC(count)
-	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
-		item := player.Equip.Get(i)
-		if item != nil {
-			w.WriteD(item.ObjectID)
-			w.WriteD(int32(world.EquipClientIndex(i)))
-		}
-	}
-	w.WriteD(0) // terminator
-	w.WriteC(0) // terminator
-	sess.Send(w.Bytes())
-}
-
 // sendServerMessageS sends S_ServerMessage (opcode 71) with string arguments.
 // Java: new S_ServerMessage(msgID, arg1, arg2, ...)
 // Wire format: [H msgID][C argCount][S arg1][S arg2]...
@@ -993,10 +489,10 @@ func sendCharVisualUpdate(viewer *net.Session, player *world.PlayerInfo) {
 	viewer.Send(w.Bytes())
 }
 
-// ---------- Use EtcItem (potions, food, scrolls) ----------
+// ---------- Use EtcItem (thin dispatcher) ----------
 
-// handleUseEtcItem processes consumable items.
-// Potion definitions are in Lua (scripts/item/potions.lua).
+// handleUseEtcItem 路由消耗品至對應系統。
+// 寵物/魔法娃娃留在 handler，其餘委派給 ItemUseSystem。
 func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo, deps *Deps) {
 	// Level restriction check for consumables
 	if !checkLevelRestriction(sess, player.Level, itemInfo) {
@@ -1005,19 +501,25 @@ func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerI
 
 	// Enchant scrolls: use_type "dai" (weapon) or "zel" (armor)
 	if itemInfo.UseType == "dai" || itemInfo.UseType == "zel" {
-		handleEnchantScroll(sess, r, player, invItem, itemInfo, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.EnchantItem(sess, r, player, invItem, itemInfo)
+		}
 		return
 	}
 
 	// Identify scroll: use_type "identify"
 	if itemInfo.UseType == "identify" {
-		handleIdentifyScroll(sess, r, player, invItem, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.IdentifyItem(sess, r, player, invItem)
+		}
 		return
 	}
 
 	// Skill book: item_type "spellbook"
 	if itemInfo.ItemType == "spellbook" {
-		handleUseSpellBook(sess, player, invItem, itemInfo, deps)
+		if deps.ItemUse != nil {
+			deps.ItemUse.UseSpellBook(sess, player, invItem, itemInfo)
+		}
 		return
 	}
 
@@ -1035,334 +537,13 @@ func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerI
 		}
 	}
 
-	consumed := false
-
-	// Check Lua potion definitions first
-	pot := deps.Scripting.GetPotionEffect(int(invItem.ItemID))
-	if pot != nil {
-		// DECAY_POTION check (Java: skill 71) — blocks ALL drinkable potions.
-		// Message 698: "喉嚨灼熱，無法喝東西"
-		if player.HasBuff(SkillDecayPotion) {
-			sendServerMessage(sess, 698)
-			return
-		}
-
-		switch pot.Type {
-		case "heal":
-			// Java ref: Potion.UseHeallingPotion — always consumes, always plays sound/msg.
-			// Apply Gaussian random ±20%: healHp *= (gaussian/5 + 1)
-			if pot.Amount > 0 {
-				healAmt := float64(pot.Amount) * (rand.NormFloat64()/5.0 + 1.0)
-				if healAmt < 1 {
-					healAmt = 1
-				}
-				if player.HP < player.MaxHP {
-					player.HP += int16(healAmt)
-					if player.HP > player.MaxHP {
-						player.HP = player.MaxHP
-					}
-					sendHpUpdate(sess, player)
-				}
-				gfx := int32(pot.GfxID)
-				if gfx == 0 {
-					gfx = 189 // fallback to small blue sparkle
-				}
-				broadcastEffect(sess, player, gfx, deps)
-				sendServerMessage(sess, 77) // "你覺得舒服多了"
-				consumed = true
-			}
-
-		case "mana":
-			// Java ref: Potion.UseMpPotion — always consumes, always plays sound/msg.
-			// If range > 0: mpAmount = base + rand(range); else fixed amount.
-			if pot.Amount > 0 {
-				mpAmt := pot.Amount
-				if pot.Range > 0 {
-					mpAmt = pot.Amount + rand.Intn(pot.Range)
-				}
-				if player.MP < player.MaxMP {
-					player.MP += int16(mpAmt)
-					if player.MP > player.MaxMP {
-						player.MP = player.MaxMP
-					}
-					sendMpUpdate(sess, player)
-				}
-				broadcastEffect(sess, player, 190, deps)
-				sendServerMessage(sess, 338) // "你的 魔力 漸漸恢復"
-				consumed = true
-			}
-
-		case "haste":
-			if pot.Duration > 0 {
-				applyHaste(sess, player, pot.Duration, int32(pot.GfxID), deps)
-				consumed = true
-			}
-
-		case "brave":
-			// Class restrictions from Lua: "knight","elf","crown","notDKIL","DKIL"
-			// Non-matching class: send message 79 "沒有任何事情發生" + consume item.
-			if pot.Duration > 0 {
-				braveType := byte(pot.BraveType)
-				classOK := checkBraveClassRestrict(player.ClassType, pot.ClassRestrict)
-				if classOK {
-					applyBrave(sess, player, pot.Duration, braveType, int32(pot.GfxID), deps)
-				} else {
-					sendServerMessage(sess, 79) // "沒有任何事情發生"
-				}
-				consumed = true // always consumed regardless of class
-			}
-
-		case "wisdom":
-			// Java: wisdom potion is wizard-only.
-			// Non-wizard: send message 79, item NOT consumed.
-			if pot.Duration > 0 {
-				if player.ClassType == 3 { // Wizard only
-					applyWisdom(sess, player, pot.Duration, int16(pot.SP), int32(pot.GfxID), deps)
-					consumed = true
-				} else {
-					sendServerMessage(sess, 79) // "沒有任何事情發生"
-					// intentionally not consumed (matches Java behavior)
-				}
-			}
-
-		case "blue_potion":
-			if pot.Duration > 0 {
-				applyBluePotion(sess, player, pot.Duration, int32(pot.GfxID), deps)
-				consumed = true
-			}
-
-		case "eva_breath":
-			// Java: Potion.useBlessOfEva — duration STACKS (existing + new), capped at 7200s.
-			if pot.Duration > 0 {
-				applyEvaBreath(sess, player, pot.Duration, int32(pot.GfxID), deps)
-				consumed = true
-			}
-
-		case "third_speed":
-			// Java: Potion.ThirdSpeed — STATUS_THIRD_SPEED (1027)
-			// gfx 7976, sends S_Liquor(8), msg 1065
-			if pot.Duration > 0 {
-				applyThirdSpeed(sess, player, pot.Duration, int32(pot.GfxID), deps)
-				consumed = true
-			}
-
-		case "blind":
-			// Java: Potion.useBlindPotion — self-inflicted CURSE_BLIND, fixed duration.
-			if pot.Duration > 0 {
-				applyBlindPotion(sess, player, pot.Duration, deps)
-				consumed = true
-			}
-
-		case "cure_poison":
-			// Remove any active poison debuff.
-			removeBuffAndRevert(player, 35, deps) // skill 35 = POISON in L1J
-			consumed = true
-			gfx := int32(pot.GfxID)
-			if gfx == 0 {
-				gfx = 192
-			}
-			broadcastEffect(sess, player, gfx, deps)
-		}
-	} else if itemInfo.FoodVolume > 0 {
-		// Java: foodvolume1 = item.getFoodVolume() / 10; if <= 0 then 5
-		addFood := int16(itemInfo.FoodVolume / 10)
-		if addFood <= 0 {
-			addFood = 5
-		}
-		maxFood := int16(deps.Config.Gameplay.MaxFoodSatiety)
-		if player.Food >= maxFood {
-			// Already full — send packet but don't increase (matches Java)
-			sendFoodUpdate(sess, player.Food)
-		} else {
-			player.Food += addFood
-			if player.Food > maxFood {
-				player.Food = maxFood
-			}
-			sendFoodUpdate(sess, player.Food)
-		}
-		consumed = true
-	} else {
-		deps.Log.Debug("unhandled etcitem use",
-			zap.Int32("item_id", invItem.ItemID),
-			zap.String("use_type", itemInfo.UseType),
-		)
-	}
-
-	if consumed {
-		removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-		if removed {
-			sendRemoveInventoryItem(sess, invItem.ObjectID)
-		} else {
-			sendItemCountUpdate(sess, invItem)
-		}
-		sendWeightUpdate(sess, player)
+	// All other consumables (potions, food) → ItemUseSystem
+	if deps.ItemUse != nil {
+		deps.ItemUse.UseConsumable(sess, player, invItem, itemInfo)
 	}
 }
 
-// handleEnchantScroll processes weapon/armor enchant scroll usage.
-// C_USE_ITEM continuation: [D targetObjectID]
-// Java ref: Enchant.java — scrollOfEnchantWeapon / scrollOfEnchantArmor
-func handleEnchantScroll(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, scroll *world.InvItem, scrollInfo *data.ItemInfo, deps *Deps) {
-	targetObjID := r.ReadD()
-
-	target := player.Inv.FindByObjectID(targetObjID)
-	if target == nil {
-		return
-	}
-
-	targetInfo := deps.Items.Get(target.ItemID)
-	if targetInfo == nil {
-		return
-	}
-
-	// Sealed items cannot be enchanted (Java: getBless() >= 128)
-	if target.Bless >= 128 {
-		sendServerMessage(sess, 79) // "沒有任何事情發生。"
-		return
-	}
-
-	// Validate scroll targets correct category
-	if scrollInfo.UseType == "dai" && targetInfo.Category != data.CategoryWeapon {
-		return
-	}
-	if scrollInfo.UseType == "zel" && targetInfo.Category != data.CategoryArmor {
-		return
-	}
-
-	// Determine category for Lua
-	category := 1 // weapon
-	if targetInfo.Category == data.CategoryArmor {
-		category = 2
-	}
-
-	// Call Lua enchant formula
-	result := deps.Scripting.CalcEnchant(scripting.EnchantContext{
-		ScrollBless:  enchantScrollBless(scroll.ItemID, int(scroll.Bless)),
-		EnchantLvl:   int(target.EnchantLvl),
-		SafeEnchant:  targetInfo.SafeEnchant,
-		Category:     category,
-		WeaponChance: deps.Config.Enchant.WeaponChance,
-		ArmorChance:  deps.Config.Enchant.ArmorChance,
-	})
-
-	// Consume the scroll
-	scrollRemoved := player.Inv.RemoveItem(scroll.ObjectID, 1)
-	if scrollRemoved {
-		sendRemoveInventoryItem(sess, scroll.ObjectID)
-	} else {
-		sendItemCountUpdate(sess, scroll)
-	}
-	sendWeightUpdate(sess, player)
-
-	// Light color for S_ServerMessage: $245=blue(weapon), $252=silver(armor), $246=black(cursed)
-	lightColor := "$245"
-	if targetInfo.Category == data.CategoryArmor {
-		lightColor = "$252"
-	}
-	// Item display name for message (Java: getLogName includes enchant prefix)
-	itemLogName := buildViewName(target, targetInfo)
-
-	switch result.Result {
-	case "success":
-		target.EnchantLvl += int8(result.Amount)
-		sendItemStatusUpdate(sess, target, targetInfo) // refresh item detail display (AC/enchant)
-		sendItemNameUpdate(sess, target, targetInfo)
-		sendEffectOnPlayer(sess, player.CharID, 2583) // enchant success GFX
-
-		// S_ServerMessage 161: "%0%s radiates %1 light and becomes %2"
-		resultDesc := "$247" // brighter (+1)
-		if result.Amount >= 2 {
-			resultDesc = "$248" // even more shining (+2, +3)
-		}
-		sendServerMessageArgs(sess, 161, itemLogName, lightColor, resultDesc)
-
-		// Recalculate stats only if item is currently equipped
-		if target.Equipped {
-			recalcEquipStats(sess, player, deps)
-		}
-
-		deps.Log.Info(fmt.Sprintf("衝裝成功  角色=%s  道具=%s  衝裝等級=%d", player.Name, targetInfo.Name, target.EnchantLvl))
-
-	case "nochange":
-		// Failed: intense light but nothing happens
-		// S_ServerMessage 160: "%0%s radiates intense %1 light but %2"
-		sendServerMessageArgs(sess, 160, itemLogName, lightColor, "$248")
-		deps.Log.Info(fmt.Sprintf("衝裝無變化  角色=%s  道具=%s", player.Name, targetInfo.Name))
-
-	case "break":
-		// Equipment destroyed (normal scroll +9+ fail / cursed scroll <= -7)
-		// S_ServerMessage 164: "%0%s radiates %1 light and disappears"
-		breakColor := lightColor
-		if target.EnchantLvl < 0 {
-			breakColor = "$246" // black for cursed items
-		}
-		sendServerMessageArgs(sess, 164, itemLogName, breakColor)
-
-		if target.Equipped {
-			slot := findEquippedSlot(player, target)
-			if slot != world.SlotNone {
-				unequipSlot(sess, player, slot, deps)
-			}
-		}
-		player.Inv.RemoveItem(target.ObjectID, target.Count)
-		sendRemoveInventoryItem(sess, target.ObjectID)
-		sendWeightUpdate(sess, player)
-
-		deps.Log.Info(fmt.Sprintf("衝裝碎裂  角色=%s  道具=%s", player.Name, targetInfo.Name))
-
-	case "minus":
-		// Cursed scroll: -N (black light $246, brighter $247)
-		target.EnchantLvl -= int8(result.Amount)
-		sendItemStatusUpdate(sess, target, targetInfo) // refresh item detail display
-		sendItemNameUpdate(sess, target, targetInfo)
-
-		// S_ServerMessage 161 with black light
-		sendServerMessageArgs(sess, 161, itemLogName, "$246", "$247")
-
-		if target.Equipped {
-			recalcEquipStats(sess, player, deps)
-		}
-
-		deps.Log.Info(fmt.Sprintf("衝裝降級  角色=%s  道具=%s  衝裝等級=%d", player.Name, targetInfo.Name, target.EnchantLvl))
-	}
-}
-
-// handleIdentifyScroll processes identify scroll usage.
-// C_USE_ITEM continuation: [D targetObjectID]
-func handleIdentifyScroll(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, scroll *world.InvItem, deps *Deps) {
-	targetObjID := r.ReadD()
-
-	target := player.Inv.FindByObjectID(targetObjID)
-	if target == nil {
-		return
-	}
-
-	targetInfo := deps.Items.Get(target.ItemID)
-	if targetInfo == nil {
-		return
-	}
-
-	// Set identified flag
-	target.Identified = true
-
-	// Send item status update with full status bytes (weapon/armor stats visible)
-	sendItemStatusUpdate(sess, target, targetInfo)
-
-	// Send bless color update (name brightens from unidentified=3 to actual bless)
-	sendItemColor(sess, target.ObjectID, target.Bless)
-
-	// Send identify description popup
-	sendIdentifyDesc(sess, target, targetInfo)
-
-	// Consume scroll
-	removed := player.Inv.RemoveItem(scroll.ObjectID, 1)
-	if removed {
-		sendRemoveInventoryItem(sess, scroll.ObjectID)
-	} else {
-		sendItemCountUpdate(sess, scroll)
-	}
-	sendWeightUpdate(sess, player)
-}
+// ---------- Identification packets ----------
 
 // sendIdentifyDesc sends S_IdentifyDesc (opcode 245) — shows item stats on identify.
 // Format varies by item type (weapon/armor/etcitem), matching Java S_IdentifyDesc.
@@ -1409,8 +590,6 @@ func sendIdentifyDesc(sess *net.Session, item *world.InvItem, info *data.ItemInf
 
 	sess.Send(w.Bytes())
 }
-
-// ---------- Identification helpers ----------
 
 // sendItemColor sends S_ItemColor (opcode 240) — updates item bless/color display.
 // Format: [D objectID][C bless]
@@ -1630,361 +809,7 @@ func appendUint16LE(buf []byte, v uint16) []byte {
 	return append(buf, byte(v), byte(v>>8))
 }
 
-// ---------- Skill Book (技能書/精靈水晶/龍騎士書板/記憶水晶) ----------
-
-// spellBookPrefixes maps book name prefix → nothing (just for stripping).
-// Java resolves skill by matching item name "魔法書(技能名)" → skill name.
-var spellBookPrefixes = []string{
-	"魔法書(",       // Wizard / common (45000-45022, 40170-40225)
-	"技術書(",       // Knight (40164-40166, 41147-41148)
-	"精靈水晶(",     // Elf (40232-40264, 41149-41153)
-	"黑暗精靈水晶(", // Dark Elf (40265-40279)
-	"龍騎士書板(",   // Dragon Knight (49102-49116)
-	"記憶水晶(",     // Illusionist (49117-49136)
-}
-
-// extractSkillName strips the book prefix and trailing ")" from item name.
-// Returns the skill name or "" if not a valid spellbook name pattern.
-func extractSkillName(itemName string) string {
-	for _, prefix := range spellBookPrefixes {
-		if len(itemName) > len(prefix) && itemName[:len(prefix)] == prefix {
-			// Strip prefix and trailing ")"
-			inner := itemName[len(prefix):]
-			if len(inner) > 0 && inner[len(inner)-1] == ')' {
-				return inner[:len(inner)-1]
-			}
-			return inner
-		}
-	}
-	return ""
-}
-
-// spellBookLevelReq — REMOVED: migrated to data/yaml/spellbook_level_req.yaml + data.SpellbookReqTable.
-// Use deps.SpellbookReqs.GetLevelReq(classType, itemID) instead.
-
-// handleUseSpellBook processes a spellbook item use.
-// Extracts skill name from item name, validates class/level, learns skill.
-func handleUseSpellBook(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo, deps *Deps) {
-	// Extract skill name from item name (e.g. "魔法書(初級治癒術)" → "初級治癒術")
-	skillName := extractSkillName(itemInfo.Name)
-	if skillName == "" {
-		deps.Log.Debug("spellbook: cannot extract skill name",
-			zap.String("item_name", itemInfo.Name))
-		return
-	}
-
-	// Look up the skill by name
-	skill := deps.Skills.GetByName(skillName)
-	if skill == nil {
-		deps.Log.Debug("spellbook: skill not found",
-			zap.String("skill_name", skillName))
-		return
-	}
-
-	// Check class/level requirement (data-driven from YAML)
-	reqLevel := deps.SpellbookReqs.GetLevelReq(player.ClassType, invItem.ItemID)
-	if reqLevel == 0 {
-		// This class cannot use this book
-		sendServerMessage(sess, msgClassCannotUse) // 264: 你的職業無法使用此道具。
-		return
-	}
-	if int(player.Level) < reqLevel {
-		// Level too low — message 318: 等級 %0以上才可使用此道具。
-		sendServerMessageStr(sess, msgLevelTooLow, strconv.Itoa(reqLevel))
-		return
-	}
-
-	// Check if already learned
-	for _, sid := range player.KnownSpells {
-		if sid == skill.SkillID {
-			// Message 78: 你已經學會了。
-			sendServerMessage(sess, 78)
-			return
-		}
-	}
-
-	// Learn the skill
-	player.KnownSpells = append(player.KnownSpells, skill.SkillID)
-	sendAddSingleSkill(sess, skill)
-
-	// Play learn effect (GFX 224)
-	sendSkillEffect(sess, player.CharID, 224)
-	nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, other := range nearby {
-		sendSkillEffect(other.Session, player.CharID, 224)
-	}
-
-	// Consume the book
-	removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-	if removed {
-		sendRemoveInventoryItem(sess, invItem.ObjectID)
-	} else {
-		sendItemCountUpdate(sess, invItem)
-	}
-	sendWeightUpdate(sess, player)
-
-	deps.Log.Info(fmt.Sprintf("玩家從技能書學習技能  角色=%s  技能=%s  技能ID=%d  書籍=%s", player.Name, skill.Name, skill.SkillID, itemInfo.Name))
-}
-
-// applyHaste applies haste speed buff to a player (movement + attack speed).
-// Creates an ActiveBuff so the buff persists across logout/login.
-// Java ref: Potion.useGreenPotion → setSkillEffect(STATUS_HASTE, time*1000) + setMoveSpeed(1)
-func applyHaste(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32, deps *Deps) {
-	// Remove conflicting haste/slow buffs (Java: Potion.useGreenPotion lines 217-257)
-	for _, conflictID := range []int32{43, 54, SkillStatusHaste} { // HASTE, GREATER_HASTE, STATUS_HASTE
-		removeBuffAndRevert(player, conflictID, deps)
-	}
-
-	buff := &world.ActiveBuff{
-		SkillID:      SkillStatusHaste,
-		TicksLeft:    durationSec * 5, // 200ms per tick
-		SetMoveSpeed: 1,
-	}
-	old := player.AddBuff(buff)
-	if old != nil {
-		revertBuffStats(player, old)
-	}
-
-	player.MoveSpeed = 1
-	player.HasteTicks = buff.TicksLeft
-
-	sendSpeedPacket(sess, player.CharID, 1, uint16(durationSec))
-	nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, other := range nearby {
-		sendSpeedPacket(other.Session, player.CharID, 1, 0)
-	}
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyBrave applies brave speed buff to a player (attack speed + movement speed).
-// Creates an ActiveBuff so the buff persists across logout/login.
-// Java ref: Potion.buff_brave → setSkillEffect(skillId, time*1000) + setBraveSpeed(type)
-func applyBrave(sess *net.Session, player *world.PlayerInfo, durationSec int, braveType byte, gfxID int32, deps *Deps) {
-	// Remove conflicting brave buffs (Java: Potion.buff_brave lines 92-112)
-	for _, conflictID := range []int32{
-		SkillStatusBrave, SkillStatusElfBrave,
-		42,  // HOLY_WALK
-		150, // MOVING_ACCELERATION
-		101, // WIND_WALK
-		52,  // BLOODLUST
-	} {
-		removeBuffAndRevert(player, conflictID, deps)
-	}
-
-	// Determine SkillID based on brave type (Java: 1=STATUS_BRAVE, 3=STATUS_ELFBRAVE)
-	skillID := SkillStatusBrave
-	if braveType == 3 {
-		skillID = SkillStatusElfBrave
-	}
-
-	buff := &world.ActiveBuff{
-		SkillID:       skillID,
-		TicksLeft:     durationSec * 5, // 200ms per tick
-		SetBraveSpeed: braveType,
-	}
-	old := player.AddBuff(buff)
-	if old != nil {
-		revertBuffStats(player, old)
-	}
-
-	player.BraveSpeed = braveType
-	player.BraveTicks = buff.TicksLeft
-
-	sendBravePacket(sess, player.CharID, braveType, uint16(durationSec))
-	nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, other := range nearby {
-		sendBravePacket(other.Session, player.CharID, braveType, 0)
-	}
-	broadcastVisualUpdate(sess, player, deps)
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyWisdom applies wisdom potion buff (SP bonus for duration).
-// Creates an ActiveBuff so the buff persists across logout/login.
-// Java ref: Potion.useWisdomPotion → addSp(2) + setSkillEffect(STATUS_WISDOM_POTION, time*1000)
-func applyWisdom(sess *net.Session, player *world.PlayerInfo, durationSec int, sp int16, gfxID int32, deps *Deps) {
-	// Java: if already has wisdom, don't add SP again — just extend timer
-	alreadyHas := player.HasBuff(SkillStatusWisdomPotion)
-	if alreadyHas {
-		removeBuffAndRevert(player, SkillStatusWisdomPotion, deps)
-	}
-
-	buff := &world.ActiveBuff{
-		SkillID:   SkillStatusWisdomPotion,
-		TicksLeft: durationSec * 5, // 200ms per tick
-		DeltaSP:   sp,
-	}
-	old := player.AddBuff(buff)
-	if old != nil {
-		revertBuffStats(player, old)
-	}
-
-	// Apply SP bonus
-	player.SP += sp
-	player.WisdomSP = sp
-	player.WisdomTicks = buff.TicksLeft
-
-	// Send wisdom potion icon (Java: S_SkillIconWisdomPotion(time/4))
-	sendWisdomPotionIcon(sess, uint16(durationSec))
-	sendPlayerStatus(sess, player)
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyBluePotion applies blue potion buff (enhanced MP regen for duration).
-// Creates an ActiveBuff so the buff persists across logout/login.
-// Java ref: Potion.useBluePotion → setSkillEffect(STATUS_BLUE_POTION, time*1000)
-// The actual MP regen boost is checked in regen system via HasBuff(1002).
-func applyBluePotion(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32, deps *Deps) {
-	removeBuffAndRevert(player, SkillStatusBluePotion, deps)
-
-	buff := &world.ActiveBuff{
-		SkillID:   SkillStatusBluePotion,
-		TicksLeft: durationSec * 5, // 200ms per tick
-	}
-	player.AddBuff(buff)
-
-	sendBluePotionIcon(sess, uint16(durationSec))
-	sendServerMessage(sess, 1007) // "你感覺到魔力恢復速度加快"
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyEvaBreath applies underwater breathing buff.
-// Java ref: Potion.useBlessOfEva → STATUS_UNDERWATER_BREATH (1003)
-// Duration STACKS with existing buff, capped at 7200 seconds.
-func applyEvaBreath(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32, deps *Deps) {
-	totalSec := durationSec
-	// Stack with existing duration
-	existing := player.GetBuff(SkillStatusUnderwaterBreath)
-	if existing != nil {
-		remainingSec := existing.TicksLeft / 5
-		totalSec += remainingSec
-		if totalSec > 7200 {
-			totalSec = 7200
-		}
-		removeBuffAndRevert(player, SkillStatusUnderwaterBreath, deps)
-	}
-
-	buff := &world.ActiveBuff{
-		SkillID:   SkillStatusUnderwaterBreath,
-		TicksLeft: totalSec * 5, // 200ms per tick
-	}
-	player.AddBuff(buff)
-
-	// S_SkillIconBlessOfEva: S_PacketBox sub 44, duration in seconds
-	sendEvaBreathIcon(sess, player.CharID, uint16(totalSec))
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyThirdSpeed applies third-speed buff (3段加速).
-// Java ref: Potion.ThirdSpeed → STATUS_THIRD_SPEED (1027)
-// Sends S_Liquor(8) for visual + gfx 7976 + msg 1065.
-func applyThirdSpeed(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32, deps *Deps) {
-	// Remove conflicting third speed buff
-	removeBuffAndRevert(player, SkillStatusThirdSpeed, deps)
-
-	buff := &world.ActiveBuff{
-		SkillID:   SkillStatusThirdSpeed,
-		TicksLeft: durationSec * 5, // 200ms per tick
-	}
-	player.AddBuff(buff)
-
-	// S_Liquor(8) = 1.15x character size visual
-	sendLiquorPacket(sess, 8)
-	sendServerMessage(sess, 1065) // "將發生神秘的奇蹟力量"
-	broadcastEffect(sess, player, gfxID, deps)
-}
-
-// applyBlindPotion applies self-inflicted blind curse.
-// Java ref: Potion.useBlindPotion → CURSE_BLIND, fixed duration.
-func applyBlindPotion(sess *net.Session, player *world.PlayerInfo, durationSec int, deps *Deps) {
-	// Remove existing CURSE_BLIND or DARKNESS before applying
-	removeBuffAndRevert(player, SkillCurseBlind, deps)
-
-	buff := &world.ActiveBuff{
-		SkillID:   SkillCurseBlind,
-		TicksLeft: durationSec * 5, // 200ms per tick
-	}
-	player.AddBuff(buff)
-
-	// Send S_CurseBlind packet (1 = normal blind)
-	sendCurseBlindPacket(sess, 1)
-}
-
-// checkBraveClassRestrict checks if the player's class matches the brave potion restriction.
-// ClassType: 0=Prince, 1=Knight, 2=Elf, 3=Wizard, 4=DarkElf, 5=DragonKnight, 6=Illusionist
-func checkBraveClassRestrict(classType int16, restrict string) bool {
-	switch restrict {
-	case "knight":
-		return classType == 1
-	case "elf":
-		return classType == 2
-	case "crown":
-		return classType == 0
-	case "notDKIL":
-		return classType != 5 && classType != 6 // everyone except DK and IL
-	case "DKIL":
-		return classType == 5 || classType == 6 // DragonKnight or Illusionist only
-	default:
-		return true // no restriction
-	}
-}
-
-// sendEvaBreathIcon sends S_SkillIconBlessOfEva (S_PacketBox sub 44).
-func sendEvaBreathIcon(sess *net.Session, charID int32, timeSec uint16) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT) // 250
-	w.WriteC(44)                                           // sub opcode for Eva breath icon
-	w.WriteD(charID)
-	w.WriteH(timeSec)
-	sess.Send(w.Bytes())
-}
-
-// sendLiquorPacket sends S_DRUNKEN (opcode 103) — visual character size change.
-// type 1 = drunk, 8 = third speed (1.15x size).
-func sendLiquorPacket(sess *net.Session, liquorType byte) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_DRUNKEN)
-	w.WriteC(liquorType)
-	sess.Send(w.Bytes())
-}
-
-// sendCurseBlindPacket sends S_CurseBlind (S_PacketBox sub 45).
-// type 1 = normal blind, 2 = floating eye blind.
-func sendCurseBlindPacket(sess *net.Session, blindType byte) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT) // 250
-	w.WriteC(45)                                           // sub opcode for curse blind
-	w.WriteC(blindType)
-	sess.Send(w.Bytes())
-}
-
-// broadcastEffect sends S_EFFECT to self and nearby players.
-func broadcastEffect(sess *net.Session, player *world.PlayerInfo, gfxID int32, deps *Deps) {
-	sendEffectOnPlayer(sess, player.CharID, gfxID)
-	nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, other := range nearby {
-		sendEffectOnPlayer(other.Session, player.CharID, gfxID)
-	}
-}
-
-// sendSpeedPacket sends S_SkillHaste (opcode 255) — haste/一段加速 buff.
-// type 0 = cancel, type 1 = haste (移動+攻擊加速).
-func sendSpeedPacket(sess *net.Session, charID int32, speedType byte, duration uint16) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_SPEED)
-	w.WriteD(charID)
-	w.WriteC(speedType)
-	w.WriteH(duration)
-	sess.Send(w.Bytes())
-}
-
-// sendBravePacket sends S_SkillBrave (opcode 67) — brave/二段加速 buff.
-// type 0 = cancel, type 1 = brave (勇敢藥水), type 3 = elf brave (精靈餅乾).
-func sendBravePacket(sess *net.Session, charID int32, braveType byte, duration uint16) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_SKILLBRAVE)
-	w.WriteD(charID)
-	w.WriteC(braveType)
-	w.WriteH(duration)
-	sess.Send(w.Bytes())
-}
-
-// --- Packet helpers ---
+// ---------- Packet helpers (shared with other handler files) ----------
 
 func sendHpUpdate(sess *net.Session, player *world.PlayerInfo) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_HIT_POINT)
@@ -2000,14 +825,27 @@ func sendMpUpdate(sess *net.Session, player *world.PlayerInfo) {
 	sess.Send(w.Bytes())
 }
 
-func sendEffectOnPlayer(sess *net.Session, charID int32, gfxID int32) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EFFECT)
+// sendBravePacket sends S_SkillBrave (opcode 67) — brave/二段加速 buff.
+// type 0 = cancel, type 1 = brave (勇敢藥水), type 3 = elf brave (精靈餅乾).
+func sendBravePacket(sess *net.Session, charID int32, braveType byte, duration uint16) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_SKILLBRAVE)
 	w.WriteD(charID)
-	w.WriteH(uint16(gfxID))
+	w.WriteC(braveType)
+	w.WriteH(duration)
 	sess.Send(w.Bytes())
 }
 
-// --- Teleport scrolls ---
+// sendSpeedPacket sends S_SkillHaste (opcode 255) — haste/一段加速 buff.
+// type 0 = cancel, type 1 = haste (移動+攻擊加速).
+func sendSpeedPacket(sess *net.Session, charID int32, speedType byte, duration uint16) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_SPEED)
+	w.WriteD(charID)
+	w.WriteC(speedType)
+	w.WriteH(duration)
+	sess.Send(w.Bytes())
+}
+
+// ---------- Teleport scroll routing ----------
 
 // Teleport scroll item IDs (Java L1ItemId constants)
 const (
@@ -2017,22 +855,6 @@ const (
 	teleportScrollAncient    int32 = 40086  // Ancient Scroll of Teleportation
 	teleportScrollSpecial    int32 = 40863  // Special Scroll of Teleportation
 )
-
-// enchantScrollBless returns the correct bless classification (0=normal, 1=blessed, 2=cursed)
-// based on item ID rather than the YAML bless field, which incorrectly labels
-// normal scrolls 40074 (armor) and 40087 (weapon) as bless:1.
-// All other enchant scrolls (140xxx blessed, ancient, phantom, Zian, Jinkan, ivory tower)
-// correctly have bless:1 in YAML and are treated as blessed.
-func enchantScrollBless(itemID int32, yamlBless int) int {
-	if yamlBless == 2 {
-		return 2 // cursed scroll — YAML value is correct
-	}
-	// These two are mislabeled bless:1 in YAML; they are normal (always +1)
-	if itemID == 40074 || itemID == 40087 {
-		return 0
-	}
-	return yamlBless
-}
 
 func isTeleportScroll(itemID int32) bool {
 	switch itemID {
@@ -2057,201 +879,6 @@ func isHomeScroll(itemID int32) bool {
 	return false
 }
 
-// handleUseHomeScroll processes home scroll (回家卷軸) usage.
-// Java ref: C_ItemUSe.java lines 1503-1511, L1Teleport.teleport()
-// Items: 40079 (Scroll of Return), 40095 (Ivory Tower Return), 40521 (Elf Wings)
-// No extra packet data beyond the standard objectID.
-// Java sends departure GFX BEFORE teleport, NO arrival GFX, S_Paralysis is commented out.
-func handleUseHomeScroll(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, deps *Deps) {
-	if player.Dead {
-		return
-	}
-
-	// Java: pc.getMap().isEscapable() check
-	// TODO: implement map escapable flag; for now allow all maps (GM always allowed)
-
-	// Get respawn/getback location for current map
-	loc := deps.Scripting.GetRespawnLocation(int(player.MapID))
-	if loc == nil {
-		// Fallback: SKT default (Java: 33089, 33397, map 4)
-		loc = &scripting.RespawnLocation{X: 33089, Y: 33397, Map: 4}
-	}
-
-	// Cancel active trade
-	cancelTradeIfActive(player, deps)
-
-	// Consume the scroll
-	removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-	if removed {
-		sendRemoveInventoryItem(sess, invItem.ObjectID)
-	} else {
-		sendItemCountUpdate(sess, invItem)
-	}
-	sendWeightUpdate(sess, player)
-
-	// Departure effect BEFORE teleport (Java: S_SkillSound(169) + Thread.sleep(196ms))
-	// We can't block the game loop, so send effect and teleport immediately.
-	sendEffectOnPlayer(sess, player.CharID, 169)
-	oldNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, viewer := range oldNearby {
-		sendEffectOnPlayer(viewer.Session, player.CharID, 169)
-	}
-
-	// Teleport to respawn location (Java heading = 5)
-	teleportPlayer(sess, player, int32(loc.X), int32(loc.Y), int16(loc.Map), 5, deps)
-
-	// NO arrival effect — sending S_EFFECT with own charID after S_OwnCharPack
-	// causes the 3.80C client to hide the character sprite.
-	// Java also has no arrival effect; departure effect only.
-
-	deps.Log.Info(fmt.Sprintf("回家卷軸  角色=%s  目標=(%d,%d) 地圖=%d", player.Name, loc.X, loc.Y, loc.Map))
-}
-
-// handleUseFixedTeleportScroll processes fixed-destination teleport scrolls (指定傳送卷軸).
-// These items have loc_x/loc_y/map_id set in etcitem YAML. No extra packet data.
-// Java ref: C_ItemUSe.java — dozens of itemId checks like 40080-40125, 40801-40857, 49292-49301 etc.
-// All follow the same pattern: L1Teleport.teleport(pc, locX, locY, mapId, 5, true) + removeItem.
-func handleUseFixedTeleportScroll(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo, deps *Deps) {
-	if player.Dead {
-		return
-	}
-
-	// Cancel active trade
-	cancelTradeIfActive(player, deps)
-
-	// Consume the scroll
-	removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-	if removed {
-		sendRemoveInventoryItem(sess, invItem.ObjectID)
-	} else {
-		sendItemCountUpdate(sess, invItem)
-	}
-	sendWeightUpdate(sess, player)
-
-	// Departure effect BEFORE teleport (Java: S_SkillSound(169) + Thread.sleep(196ms))
-	sendEffectOnPlayer(sess, player.CharID, 169)
-	oldNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-	for _, viewer := range oldNearby {
-		sendEffectOnPlayer(viewer.Session, player.CharID, 169)
-	}
-
-	// Teleport to fixed destination (Java heading = 5)
-	teleportPlayer(sess, player, itemInfo.LocX, itemInfo.LocY, itemInfo.LocMapID, 5, deps)
-
-	deps.Log.Info(fmt.Sprintf("指定傳送  角色=%s  道具=%s  目標=(%d,%d) 地圖=%d",
-		player.Name, itemInfo.Name, itemInfo.LocX, itemInfo.LocY, itemInfo.LocMapID))
-}
-
-// handleUseTeleportScroll processes teleport scroll usage.
-// Packet continuation after objectID: [H mapID][D bookmarkID]
-// Java ref: C_ItemUSe.java lines 1572-1625, L1Teleport.teleport()
-// Java sends departure GFX BEFORE teleport, NO arrival GFX, and S_Paralysis is commented out.
-func handleUseTeleportScroll(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, invItem *world.InvItem, deps *Deps) {
-	_ = r.ReadH()           // mapID from client
-	bookmarkID := r.ReadD() // bookmark ID (0 = no bookmark → random teleport)
-
-	if player.Dead {
-		return
-	}
-
-	// Cancel active trade (Java: L1Teleport.teleport checks this)
-	cancelTradeIfActive(player, deps)
-
-	// Find the bookmark by ID
-	var target *world.Bookmark
-	if bookmarkID != 0 {
-		for i := range player.Bookmarks {
-			if player.Bookmarks[i].ID == bookmarkID {
-				target = &player.Bookmarks[i]
-				break
-			}
-		}
-	}
-
-	if target != nil {
-		// Bookmark teleport
-		// Consume the scroll
-		removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-		if removed {
-			sendRemoveInventoryItem(sess, invItem.ObjectID)
-		} else {
-			sendItemCountUpdate(sess, invItem)
-		}
-		sendWeightUpdate(sess, player)
-
-		// Departure effect BEFORE teleport (Java: S_SkillSound(169) then Thread.sleep(196ms))
-		sendEffectOnPlayer(sess, player.CharID, 169)
-		bkNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-		for _, viewer := range bkNearby {
-			sendEffectOnPlayer(viewer.Session, player.CharID, 169)
-		}
-
-		teleportPlayer(sess, player, target.X, target.Y, target.MapID, 5, deps)
-
-		deps.Log.Info(fmt.Sprintf("書籤傳送  角色=%s  書籤=%s  x=%d  y=%d  地圖=%d", player.Name, target.Name, target.X, target.Y, target.MapID))
-	} else {
-		// No bookmark → random teleport within 200 tiles (Java: randomLocation(200, true))
-		// Consume the scroll
-		removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
-		if removed {
-			sendRemoveInventoryItem(sess, invItem.ObjectID)
-		} else {
-			sendItemCountUpdate(sess, invItem)
-		}
-		sendWeightUpdate(sess, player)
-
-		// Random location within 200 tiles, clamped to map bounds (Java: randomLocation(200, true))
-		curMap := player.MapID
-		newX := player.X
-		newY := player.Y
-		minRX := player.X - 200
-		maxRX := player.X + 200
-		minRY := player.Y - 200
-		maxRY := player.Y + 200
-		if deps.MapData != nil {
-			if mi := deps.MapData.GetInfo(curMap); mi != nil {
-				if minRX < mi.StartX {
-					minRX = mi.StartX
-				}
-				if maxRX > mi.EndX {
-					maxRX = mi.EndX
-				}
-				if minRY < mi.StartY {
-					minRY = mi.StartY
-				}
-				if maxRY > mi.EndY {
-					maxRY = mi.EndY
-				}
-			}
-		}
-		diffX := maxRX - minRX
-		diffY := maxRY - minRY
-		if diffX > 0 && diffY > 0 {
-			for attempt := 0; attempt < 40; attempt++ {
-				rx := minRX + int32(world.RandInt(int(diffX)+1))
-				ry := minRY + int32(world.RandInt(int(diffY)+1))
-				if deps.MapData != nil && deps.MapData.IsInMap(curMap, rx, ry) &&
-					deps.MapData.IsPassablePoint(curMap, rx, ry) {
-					newX = rx
-					newY = ry
-					break
-				}
-			}
-		}
-
-		// Departure effect BEFORE teleport (Java: S_SkillSound(169) then Thread.sleep(196ms))
-		sendEffectOnPlayer(sess, player.CharID, 169)
-		rdNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-		for _, viewer := range rdNearby {
-			sendEffectOnPlayer(viewer.Session, player.CharID, 169)
-		}
-
-		teleportPlayer(sess, player, newX, newY, curMap, 5, deps)
-
-		deps.Log.Info(fmt.Sprintf("隨機傳送  角色=%s  x=%d  y=%d", player.Name, newX, newY))
-	}
-}
-
 // sendTeleportUnlock sends S_Paralysis(TYPE_TELEPORT_UNLOCK) to unfreeze the client.
 // Java: S_Paralysis.java — TYPE_TELEPORT_UNLOCK = 7, writeC(7)
 // MUST be sent after every teleport scroll use, even on error.
@@ -2261,109 +888,57 @@ func sendTeleportUnlock(sess *net.Session) {
 	sess.Send(w.Bytes())
 }
 
-// --- Drop system ---
+// ---------- 委派給 ItemUseSystem 的薄層 ----------
 
-// GiveDrops rolls drops for a killed NPC and adds them to the killer's inventory.
+// GiveDrops 為擊殺的 NPC 擲骰掉落物品。委派給 ItemUseSystem。
 func GiveDrops(killer *world.PlayerInfo, npcID int32, deps *Deps) {
-	if deps.Drops == nil {
-		return
+	if deps.ItemUse != nil {
+		deps.ItemUse.GiveDrops(killer, npcID)
 	}
-	dropList := deps.Drops.Get(npcID)
-	if dropList == nil {
-		return
+}
+
+// broadcastEffect 向自己和附近玩家廣播特效。委派給 ItemUseSystem。
+func broadcastEffect(sess *net.Session, player *world.PlayerInfo, gfxID int32, deps *Deps) {
+	if deps.ItemUse != nil {
+		deps.ItemUse.BroadcastEffect(sess, player, gfxID)
 	}
+}
 
-	dropRate := deps.Config.Rates.DropRate
-	goldRate := deps.Config.Rates.GoldRate
-
-	for _, drop := range dropList {
-		// Apply drop rate multiplier to chance
-		chance := drop.Chance
-		if drop.ItemID == world.AdenaItemID {
-			if goldRate > 0 {
-				chance = int(float64(chance) * goldRate)
-			}
-		} else {
-			if dropRate > 0 {
-				chance = int(float64(chance) * dropRate)
-			}
-		}
-		if chance > 1000000 {
-			chance = 1000000
-		}
-
-		roll := world.RandInt(1000000)
-		if roll >= chance {
-			continue
-		}
-
-		if killer.Inv.IsFull() {
-			break
-		}
-
-		qty := int32(drop.Min)
-		if drop.Max > drop.Min {
-			qty = int32(drop.Min + world.RandInt(drop.Max-drop.Min+1))
-		}
-		if qty <= 0 {
-			qty = 1
-		}
-
-		// Apply gold rate to adena quantity
-		if drop.ItemID == world.AdenaItemID && goldRate > 0 {
-			qty = int32(float64(qty) * goldRate)
-			if qty <= 0 {
-				qty = 1
-			}
-		}
-
-		itemInfo := deps.Items.Get(drop.ItemID)
-		if itemInfo == nil {
-			continue
-		}
-
-		stackable := itemInfo.Stackable || drop.ItemID == world.AdenaItemID
-		existing := killer.Inv.FindByItemID(drop.ItemID)
-		wasExisting := existing != nil && stackable
-
-		item := killer.Inv.AddItem(
-			drop.ItemID,
-			qty,
-			itemInfo.Name,
-			itemInfo.InvGfx,
-			itemInfo.Weight,
-			stackable,
-			byte(drop.EnchantLevel),
-		)
-		item.UseType = itemInfo.UseTypeID
-		// Equipment drops from monsters start unidentified (dark name, no stats)
-		if itemInfo.Category == data.CategoryWeapon || itemInfo.Category == data.CategoryArmor {
-			item.Identified = false
-		}
-
-		if wasExisting {
-			sendItemCountUpdate(killer.Session, item)
-		} else {
-			sendAddItem(killer.Session, item)
-		}
-		sendWeightUpdate(killer.Session, killer)
-
-		// Notify player about the drop
-		if drop.ItemID == world.AdenaItemID {
-			msg := fmt.Sprintf("獲得 %d 金幣", qty)
-			sendGlobalChat(killer.Session, 9, msg)
-		} else {
-			name := itemInfo.Name
-			if drop.EnchantLevel > 0 {
-				name = fmt.Sprintf("+%d %s", drop.EnchantLevel, name)
-			}
-			if qty > 1 {
-				msg := fmt.Sprintf("獲得 %s (%d)", name, qty)
-				sendGlobalChat(killer.Session, 9, msg)
-			} else {
-				msg := fmt.Sprintf("獲得 %s", name)
-				sendGlobalChat(killer.Session, 9, msg)
-			}
-		}
+// applyHaste 套用加速效果。委派給 ItemUseSystem。
+func applyHaste(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32, deps *Deps) {
+	if deps.ItemUse != nil {
+		deps.ItemUse.ApplyHaste(sess, player, durationSec, gfxID)
 	}
+}
+
+// ---------- Exported wrappers for system package ----------
+
+// BroadcastVisualUpdate 廣播角色外觀更新。Exported for system package usage.
+func BroadcastVisualUpdate(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
+	broadcastVisualUpdate(sess, player, deps)
+}
+
+// SendItemStatusUpdate sends S_ItemStatus. Exported for system package usage.
+func SendItemStatusUpdate(sess *net.Session, item *world.InvItem, info *data.ItemInfo) {
+	sendItemStatusUpdate(sess, item, info)
+}
+
+// SendItemNameUpdate sends S_CHANGE_ITEM_DESC. Exported for system package usage.
+func SendItemNameUpdate(sess *net.Session, item *world.InvItem, info *data.ItemInfo) {
+	sendItemNameUpdate(sess, item, info)
+}
+
+// SendItemColor sends S_ItemColor. Exported for system package usage.
+func SendItemColor(sess *net.Session, objectID int32, bless byte) {
+	sendItemColor(sess, objectID, bless)
+}
+
+// SendIdentifyDesc sends S_IdentifyDesc. Exported for system package usage.
+func SendIdentifyDesc(sess *net.Session, item *world.InvItem, info *data.ItemInfo) {
+	sendIdentifyDesc(sess, item, info)
+}
+
+// BuildViewName 建構物品顯示名稱。Exported for system package usage.
+func BuildViewName(item *world.InvItem, info *data.ItemInfo) string {
+	return buildViewName(item, info)
 }

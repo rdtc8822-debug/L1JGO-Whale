@@ -70,6 +70,7 @@ type PlayerInfo struct {
 	Invisible  bool  // true when under Invisibility
 	Paralyzed  bool  // true when frozen/stunned/bound
 	Sleeped    bool  // true when under sleep effect
+	Silenced   bool  // 沉默狀態（沉默毒 / silence 技能）— 禁止施法
 	PKMode     bool  // true when PK button is toggled on (client sends C_DUEL to toggle)
 
 	LastMoveTime int64 // time.Now().UnixNano() of last accepted move (0 = no throttle)
@@ -122,6 +123,18 @@ type PlayerInfo struct {
 	TradeOk         bool       // true when this side has pressed confirm
 	TradeItems      []*InvItem // items offered in trade
 	TradeGold       int32      // gold offered in trade
+
+	// --- 中毒系統（Java L1Poison）---
+	// PoisonType: 0=無, 1=傷害毒, 2=沉默毒, 3=麻痺毒延遲中, 4=麻痺毒已麻痺
+	PoisonType      byte
+	PoisonTicksLeft int    // 毒剩餘 ticks（傷害毒:150, 麻痺延遲:100, 麻痺:80）
+	PoisonDmgTimer  int    // 傷害毒：距下次扣血的 tick 計數（每 15 tick 扣一次）
+	PoisonAttacker  uint64 // 施毒者 SessionID（傷害毒歸屬用）
+
+	// --- 詛咒麻痺系統（Java L1CurseParalysis，與毒系統獨立）---
+	// CurseType: 0=無, 1=詛咒延遲中, 2=詛咒已麻痺
+	CurseType      byte
+	CurseTicksLeft int // 詛咒剩餘 ticks（延遲:25, 麻痺:20）
 
 	// AOI 可見性追蹤（VisibilitySystem 使用）
 	Known *KnownEntities

@@ -2,7 +2,7 @@
 
 html_data:
     - action_name: teleportURL
-      html_id: telekent2
+      html_id: teleisland2
       npc_id: 50015
       data:
         - "50"

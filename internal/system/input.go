@@ -279,6 +279,15 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 			}
 		}
 
+		// 釋放血盟倉庫鎖定（Java: QuitGame / L1PcInstance 離線清理）
+		if player.ClanID != 0 {
+			if clan := s.worldState.Clans.GetClan(player.ClanID); clan != nil {
+				if clan.WarehouseUsingCharID == player.CharID {
+					clan.WarehouseUsingCharID = 0
+				}
+			}
+		}
+
 		// Clean up all companion entities (summons, dolls, followers)
 		s.cleanupCompanions(player)
 

@@ -202,6 +202,11 @@ func sendGlobalChat(sess *net.Session, chatType byte, msg string) {
 	sess.Send(w.Bytes())
 }
 
+// SendGlobalChat 匯出 sendGlobalChat — 供 system 套件發送全域聊天訊息。
+func SendGlobalChat(sess *net.Session, chatType byte, msg string) {
+	sendGlobalChat(sess, chatType, msg)
+}
+
 // sendWhisperReceive sends S_TELL (opcode 67) — incoming whisper.
 func sendWhisperReceive(sess *net.Session, senderName, text string) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_TELL)

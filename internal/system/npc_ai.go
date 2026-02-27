@@ -383,6 +383,11 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 		return
 	}
 	sendHPUpdate(target.Session, target.HP, target.MaxHP)
+
+	// 怪物施毒判定（Java L1AttackNpc.addNpcPoisonAttack）
+	if npc.PoisonAtk > 0 {
+		handler.ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
+	}
 }
 
 func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerInfo) {
@@ -421,6 +426,11 @@ func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerIn
 		return
 	}
 	sendHPUpdate(target.Session, target.HP, target.MaxHP)
+
+	// 怪物施毒判定（Java L1AttackNpc.addNpcPoisonAttack）
+	if npc.PoisonAtk > 0 {
+		handler.ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
+	}
 }
 
 // executeNpcSkill handles an NPC using a skill on a player.

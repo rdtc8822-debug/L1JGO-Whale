@@ -249,6 +249,7 @@ func DismissPet(pet *world.PetInfo, player *world.PlayerInfo, deps *Deps) {
 			Lawful:    tmpl.Lawful,
 			Size:      tmpl.Size,
 			MR:        tmpl.MR,
+			PoisonAtk: tmpl.PoisonAtk,
 			X:         pet.X,
 			Y:         pet.Y,
 			MapID:     pet.MapID,

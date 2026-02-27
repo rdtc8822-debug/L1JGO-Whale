@@ -131,6 +131,11 @@ func sendAbilityScores(sess *net.Session, p *world.PlayerInfo) {
 	sess.Send(w.Bytes())
 }
 
+// SendAbilityScores 匯出 sendAbilityScores — 供 system 套件發送 AC + 屬性抗性。
+func SendAbilityScores(sess *net.Session, p *world.PlayerInfo) {
+	sendAbilityScores(sess, p)
+}
+
 // sendRaiseAttrDialog sends the "RaiseAttr" HTML dialog for bonus stat allocation.
 // Matches Java S_bonusstats: S_OPCODE_SHOWHTML + charID + "RaiseAttr".
 func sendRaiseAttrDialog(sess *net.Session, charID int32) {

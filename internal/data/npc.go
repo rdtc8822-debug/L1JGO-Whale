@@ -33,6 +33,7 @@ type NpcTemplate struct {
 	Undead       bool   `yaml:"undead"`
 	Agro         bool   `yaml:"agro"`
 	Tameable     bool   `yaml:"tameable"`
+	PoisonAtk    byte   `yaml:"poison_atk"` // 毒攻擊類型: 0=無, 1=傷害毒, 2=沉默毒, 4=麻痺毒
 }
 
 // SpawnEntry defines where and how many NPCs to spawn.

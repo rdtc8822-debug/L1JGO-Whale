@@ -27,6 +27,8 @@ func (s *BuffTickSystem) Update(_ time.Duration) {
 		prevBuffCount := len(p.ActiveBuffs)
 		handler.TickPlayerBuffs(p, s.deps)
 		handler.TickItemMagicEnchants(p, s.deps)
+		handler.TickPlayerPoison(p, s.deps)
+		handler.TickPlayerCurse(p, s.deps)
 		if len(p.ActiveBuffs) < prevBuffCount {
 			p.Dirty = true
 		}

@@ -46,6 +46,7 @@ type NpcInfo struct {
 	Ranged  int16  // attack range (1 = melee, >1 = ranged attacker)
 	AtkSpeed   int16 // attack animation speed (ms, 0 = default)
 	MoveSpeed  int16 // passive/move speed (ms, 0 = default)
+	PoisonAtk  byte  // 怪物施毒能力（從模板載入）: 0=無, 1=傷害毒, 2=沉默毒, 4=麻痺毒
 
 	// Spawn data for respawning
 	SpawnX       int32

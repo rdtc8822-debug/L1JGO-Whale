@@ -598,6 +598,7 @@ func gmSpawn(sess *net.Session, player *world.PlayerInfo, args []string, deps *D
 			Ranged:       tmpl.Ranged,
 			AtkSpeed:     atkSpeed,
 			MoveSpeed:    moveSpeed,
+			PoisonAtk:    tmpl.PoisonAtk,
 			SpawnX:       x,
 			SpawnY:       y,
 			SpawnMapID:   player.MapID,

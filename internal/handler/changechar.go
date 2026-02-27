@@ -25,21 +25,8 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 	// Remove from world if in-world
 	player := deps.World.RemovePlayer(sess.ID)
 	if player != nil {
-		// Clean up trade if in progress
-		if player.TradePartnerID != 0 {
-			partner := deps.World.GetByCharID(player.TradePartnerID)
-			if partner != nil {
-				// Restore partner's trade items, cancel their trade
-				restoreTradeItems(partner, deps)
-				if partner.TradeWindowOpen {
-					sendTradeStatus(partner.Session, 1)
-				}
-				clearTradeState(partner)
-			}
-			// Restore our own trade items (back to inventory for save)
-			restoreTradeItems(player, deps)
-			clearTradeState(player)
-		}
+		// 清理進行中的交易
+		cancelTradeIfActive(player, deps)
 
 		// Clean up party membership and notify remaining members
 		if player.PartyID != 0 {

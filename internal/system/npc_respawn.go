@@ -80,6 +80,9 @@ func (s *NpcRespawnSystem) respawnNpc(npc *world.NpcInfo) {
 	npc.AttackTimer = 0
 	npc.MoveTimer = 0
 	npc.StuckTicks = 0
+	npc.Paralyzed = false
+	npc.Sleeped = false
+	npc.ActiveDebuffs = nil
 
 	// Set tile as blocked (map passability for NPC pathfinding)
 	if s.maps != nil {

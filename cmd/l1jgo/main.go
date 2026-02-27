@@ -456,6 +456,17 @@ func run() error {
 		)
 	})
 
+	// 交易系統（直接呼叫，非 Phase 系統）
+	deps.Trade = system.NewTradeSystem(deps)
+	// 隊伍系統（直接呼叫，非 Phase 系統）
+	deps.Party = system.NewPartySystem(deps)
+	// 血盟系統（直接呼叫，非 Phase 系統）
+	deps.Clan = system.NewClanSystem(deps)
+	// 裝備系統（直接呼叫，非 Phase 系統）
+	deps.Equip = system.NewEquipSystem(deps)
+	// 物品使用系統（直接呼叫，非 Phase 系統）
+	deps.ItemUse = system.NewItemUseSystem(deps)
+
 	// Phase 2: Game logic
 	combatSys := system.NewCombatSystem(deps)
 	deps.Combat = combatSys
@@ -634,6 +645,7 @@ func spawnNpcs(ws *world.State, npcTable *data.NpcTable, spawns []data.SpawnEntr
 				Ranged:       tmpl.Ranged,
 				AtkSpeed:     atkSpeed,
 				MoveSpeed:    moveSpeed,
+				PoisonAtk:    tmpl.PoisonAtk,
 				SpawnX:       x,
 				SpawnY:       y,
 				SpawnMapID:   spawn.MapID,

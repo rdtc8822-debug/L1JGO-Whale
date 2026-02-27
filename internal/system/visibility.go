@@ -62,6 +62,18 @@ func (s *VisibilitySystem) updatePlayerVisibility(p *world.PlayerInfo) {
 			// 新進入視野
 			handler.SendPutObject(p.Session, other)
 			p.Known.Players[other.CharID] = world.KnownPos{X: other.X, Y: other.Y}
+
+			// 同步毒/詛咒色調（讓新進入視野的玩家看到正確的中毒視覺）
+			if other.PoisonType > 0 {
+				if other.PoisonType == 4 {
+					handler.SendPoison(p.Session, other.CharID, 2) // 灰色（麻痺毒已麻痺）
+				} else {
+					handler.SendPoison(p.Session, other.CharID, 1) // 綠色（傷害/沉默/麻痺延遲）
+				}
+			}
+			if other.CurseType > 0 {
+				handler.SendPoison(p.Session, other.CharID, 2) // 灰色（詛咒麻痺）
+			}
 		} else {
 			// 持續在視野內：更新記錄的位置（可能已移動）
 			p.Known.Players[other.CharID] = world.KnownPos{X: other.X, Y: other.Y}

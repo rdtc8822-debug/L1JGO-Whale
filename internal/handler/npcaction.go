@@ -93,19 +93,32 @@ func HandleNpcAction(sess *net.Session, r *packet.Reader, deps *Deps) {
 		"teleporturlh", "teleporturli", "teleporturlj", "teleporturlk":
 		handleTeleportURLGeneric(sess, npc.NpcID, objID, action, deps)
 
-	// Warehouse
+	// Warehouse — 個人帳號倉庫
 	case "retrieve":
 		OpenWarehouse(sess, player, objID, WhTypePersonal, deps)
-	case "retrieve-elven":
-		OpenWarehouse(sess, player, objID, WhTypeElf, deps)
-	case "retrieve-pledge":
-		OpenWarehouse(sess, player, objID, WhTypeClan, deps)
 	case "deposit":
 		OpenWarehouseDeposit(sess, player, objID, WhTypePersonal, deps)
+
+	// Warehouse — 角色專屬倉庫（Java: retrieve-char → S_RetrieveChaList type=18）
+	case "retrieve-char":
+		OpenWarehouse(sess, player, objID, WhTypeCharacter, deps)
+
+	// Warehouse — 精靈倉庫
+	case "retrieve-elven":
+		OpenWarehouse(sess, player, objID, WhTypeElf, deps)
 	case "deposit-elven":
 		OpenWarehouseDeposit(sess, player, objID, WhTypeElf, deps)
+
+	// Warehouse — 血盟倉庫（含權限驗證 + 單人鎖定）
+	case "retrieve-pledge":
+		OpenClanWarehouse(sess, player, objID, deps)
 	case "deposit-pledge":
-		OpenWarehouseDeposit(sess, player, objID, WhTypeClan, deps)
+		OpenClanWarehouse(sess, player, objID, deps) // 同 retrieve，客戶端內建 tab 處理
+	case "history":
+		// 血盟倉庫歷史記錄（Java: S_PledgeWarehouseHistory）
+		if player.ClanID > 0 {
+			SendClanWarehouseHistory(sess, player.ClanID, deps)
+		}
 
 	// EXP recovery / PK redemption (stub)
 	case "exp":
@@ -373,7 +386,21 @@ func handleTeleport(sess *net.Session, player *world.PlayerInfo, npcID int32, ac
 //  5. S_OwnCharPack — self character at new position (live player data)
 //  6. updateObject equivalent — send nearby players, NPCs, ground items to self
 //  7. S_CharVisualUpdate — weapon/poly visual fix (LAST per Java)
+// TeleportPlayer 處理完整傳送流程。Exported for system package usage.
+func TeleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, mapID, heading int16, deps *Deps) {
+	teleportPlayer(sess, player, x, y, mapID, heading, deps)
+}
+
 func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, mapID, heading int16, deps *Deps) {
+	// 傳送時釋放血盟倉庫鎖定（Java: Teleportation.java 行 122-123）
+	if player.ClanID != 0 {
+		if clan := deps.World.Clans.GetClan(player.ClanID); clan != nil {
+			if clan.WarehouseUsingCharID == player.CharID {
+				clan.WarehouseUsingCharID = 0
+			}
+		}
+	}
+
 	// Reset move speed timer (teleport resets speed validation)
 	player.LastMoveTime = 0
 

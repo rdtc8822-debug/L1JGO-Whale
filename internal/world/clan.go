@@ -54,6 +54,12 @@ type ClanInfo struct {
 	EmblemID     int32
 	EmblemStatus int16
 	Members      map[int32]*ClanMember // charID → member
+
+	// 血盟倉庫單人使用鎖定（Java: L1Clan._warehouse）
+	// 0 = 無人使用；>0 = 該角色 ID 正在使用血盟倉庫。
+	// 設定時機：開啟血盟倉庫時設為 charID。
+	// 清除時機：操作完成、按取消、離線、傳送、退盟。
+	WarehouseUsingCharID int32
 }
 
 // MemberCount returns the number of members in the clan.

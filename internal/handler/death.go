@@ -170,6 +170,14 @@ func KillPlayer(player *world.PlayerInfo, deps *Deps) {
 	}
 	sendActionGfx(player.Session, player.CharID, 8)
 
+	// 死亡時清除所有毒和詛咒
+	if player.PoisonType != 0 {
+		CurePoison(player, deps)
+	}
+	if player.CurseType != 0 {
+		CureCurseParalysis(player, deps)
+	}
+
 	// Clear ALL buffs on death (good and bad, no exceptions)
 	clearAllBuffsOnDeath(player, deps)
 

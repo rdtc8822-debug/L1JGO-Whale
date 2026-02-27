@@ -93,14 +93,10 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Load exclude/block list from DB
 	loadExcludesFromDB(player, deps)
 
-	// Detect complete armor set from loaded equipment (sets ActiveSetID before stats calc).
-	detectActiveArmorSet(player, deps.ArmorSets)
-
-	// Apply all equipment stat bonuses (AC, STR, DEX, etc.) silently — no packets yet.
-	// EquipBonuses starts at zero, so this correctly adds all equipment contributions
-	// including any active armor set stat bonuses.
-	player.AC = int16(deps.Config.Gameplay.BaseAC)
-	applyEquipStats(player, deps.Items, deps.ArmorSets)
+	// 初始化裝備屬性（偵測套裝 + 設定基礎 AC + 計算裝備加成）
+	if deps.Equip != nil {
+		deps.Equip.InitEquipStats(player)
+	}
 
 	// Restore persisted buffs (including polymorph state)
 	loadAndRestoreBuffs(player, deps)
@@ -114,7 +110,9 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	sendInvList(sess, player.Inv, deps.Items)
 
 	// 2b. S_EquipmentSlot (opcode 64, TYPE_EQUIPONLOGIN 0x41) — tell client which slots are occupied
-	sendEquipSlotList(sess, player)
+	if deps.Equip != nil {
+		deps.Equip.SendEquipList(sess, player)
+	}
 
 	// 3. S_STATUS (opcode 8) — OwnCharStatus (use PlayerInfo for live stats)
 	sendPlayerStatus(sess, player)

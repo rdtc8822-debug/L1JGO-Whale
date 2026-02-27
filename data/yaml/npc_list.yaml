@@ -431,6 +431,7 @@ npcs:
     undead: false
     agro: false
     tameable: true
+    poison_atk: 4
   - npc_id: 45021
     name: 鹿
     nameid: '$930'
@@ -623,6 +624,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45029
     name: 蘑菇
     nameid: '$757'
@@ -647,6 +649,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45030
     name: 蘑菇
     nameid: '$757'
@@ -671,6 +674,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45032
     name: 布拉伯
     nameid: '$758'
@@ -1343,6 +1347,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45060
     name: 史萊姆
     nameid: '$8'
@@ -1631,6 +1636,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45072
     name: 弱化蟑螂人
     nameid: '$1743'
@@ -1655,6 +1661,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45073
     name: 弱化骷髏鬥士
     nameid: '$1707'
@@ -1703,6 +1710,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45075
     name: 弱化蟹人
     nameid: '$1741'
@@ -1751,6 +1759,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45077
     name: 魟魚
     nameid: '$1489'
@@ -1871,6 +1880,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45082
     name: 妖魔鬥士
     nameid: '$266'
@@ -2231,6 +2241,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 4
   - npc_id: 45098
     name: 甘地妖魔
     nameid: '$496'
@@ -2375,6 +2386,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45104
     name: 妖魔殭屍
     nameid: '$1041'
@@ -2399,6 +2411,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45105
     name: 人形殭屍
     nameid: '$57'
@@ -2495,6 +2508,7 @@ npcs:
     undead: true
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45110
     name: 受封印的思克巴女皇
     nameid: '$1745'
@@ -2663,6 +2677,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45117
     name: 污濁妖魔
     nameid: '$3957'
@@ -3143,6 +3158,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45138
     name: 妖魔巡守
     nameid: '$511'
@@ -3191,6 +3207,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45140
     name: 哈柏哥布林
     nameid: '$1111'
@@ -3263,6 +3280,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 2
   - npc_id: 45143
     name: 都達瑪拉妖魔
     nameid: '$498'
@@ -3479,6 +3497,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45153
     name: 污濁精靈
     nameid: '$3964'
@@ -3503,6 +3522,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45154
     name: 美人魚
     nameid: '$1405'
@@ -3599,6 +3619,7 @@ npcs:
     undead: true
     agro: true
     tameable: true
+    poison_atk: 4
   - npc_id: 45158
     name: 狂暴蜥蜴人
     nameid: '$3381'
@@ -4151,6 +4172,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45185
     name: 妖魔城堡警衛
     nameid: '$607'
@@ -4223,6 +4245,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45188
     name: 奇岩 卡司特王
     nameid: '$1242 $619'
@@ -4247,6 +4270,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45189
     name: 變形怪
     nameid: '$1554'
@@ -4391,6 +4415,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 45196
     name: 鱷魚
     nameid: '$1407'
@@ -4583,6 +4608,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 2
   - npc_id: 45214
     name: 鼴鼠
     nameid: '$3149'
@@ -4775,6 +4801,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45223
     name: 食人妖精
     nameid: '$325'
@@ -4919,6 +4946,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45230
     name: 奇岩 蛇女
     nameid: '$1242 $1428'
@@ -4943,6 +4971,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45231
     name: 混沌的司祭
     nameid: '$3780'
@@ -5567,6 +5596,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45260
     name: 毒蠍
     nameid: '$966'
@@ -5591,6 +5621,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45262
     name: 龍龜
     nameid: '$1498'
@@ -5855,6 +5886,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45274
     name: 海賊骷髏士兵
     nameid: '$3388'
@@ -5951,6 +5983,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45278
     name: 歐吉
     nameid: '$953'
@@ -6407,6 +6440,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45297
     name: 地底蟹人
     nameid: '$3270'
@@ -6791,6 +6825,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45313
     name: 老虎
     nameid: '$3041'
@@ -7055,6 +7090,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45326
     name: 黑暗棲林者
     nameid: '$3142'
@@ -7223,6 +7259,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45333
     name: 黑暗妖精法師
     nameid: '$2888'
@@ -7511,6 +7548,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 2
   - npc_id: 45347
     name: 黑暗棲林者
     nameid: '$3142'
@@ -7559,6 +7597,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45349
     name: 多眼怪
     nameid: '$1001'
@@ -7847,6 +7886,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45361
     name: 亞力安
     nameid: '$969'
@@ -8279,6 +8319,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45379
     name: 黑暗妖精法師
     nameid: '$2888'
@@ -8375,6 +8416,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45383
     name: 地底蛇蠍
     nameid: '$3276'
@@ -8399,6 +8441,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45384
     name: 恐怖的火炎蛋
     nameid: '$2386'
@@ -8495,6 +8538,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45389
     name: 萊肯
     nameid: '$990'
@@ -8807,6 +8851,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45402
     name: 殘暴的骷髏斧兵
     nameid: '$2389'
@@ -8951,6 +8996,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45408
     name: 烈炎獸
     nameid: '$1568'
@@ -9647,6 +9693,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 45455
     name: 殘暴的史巴托
     nameid: '$2387'
@@ -9983,6 +10030,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45469
     name: 巨大鱷魚
     nameid: '$1406'
@@ -10031,6 +10079,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45471
     name: 恐怖的地獄犬
     nameid: '$2385'
@@ -10775,6 +10824,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45502
     name: 深淵弓箭手
     nameid: '$3478'
@@ -11063,6 +11113,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45514
     name: 火焰之靈魂
     nameid: '$2393'
@@ -11951,6 +12002,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45552
     name: 火蜥蜴
     nameid: '$1505'
@@ -12551,6 +12603,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45582
     name: 墮落的司祭
     nameid: '$2655'
@@ -12695,6 +12748,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45588
     name: 魔獸師長．辛克萊
     nameid: '$3806'
@@ -13607,6 +13661,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45626
     name: 混沌的司祭
     nameid: '$3780'
@@ -14759,6 +14814,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45683
     name: 法利昂
     nameid: '$1426'
@@ -15623,6 +15679,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 45719
     name: 深海巨大鱷魚
     nameid: '$4310'
@@ -15863,6 +15920,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45729
     name: 隱藏的深海魚
     nameid: '$4655'
@@ -15887,6 +15945,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45730
     name: 半魚人
     nameid: '$4291'
@@ -15911,6 +15970,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45731
     name: 隱藏的半魚人
     nameid: '$4654'
@@ -15935,6 +15995,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45732
     name: 深海伊萊克頓
     nameid: '$4317'
@@ -16031,6 +16092,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 45736
     name: 小惡魔
     nameid: '$2112'
@@ -16247,6 +16309,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45745
     name: 狄高
     nameid: '$4332'
@@ -16271,6 +16334,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45746
     name: 小安加斯
     nameid: '$4335'
@@ -16895,6 +16959,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 45772
     name: 污濁 妖魔戰士
     nameid: '$4145 $4915'
@@ -16967,6 +17032,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45775
     name: 污濁 深淵之花
     nameid: '$4145 $3148'
@@ -17015,6 +17081,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45777
     name: 污濁 芮克妮
     nameid: '$8642'
@@ -17039,6 +17106,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45778
     name: 污濁 人類
     nameid: '$4145 $4146'
@@ -17471,6 +17539,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45796
     name: 瑪依奴夏門的石頭高崙
     nameid: '$4869'
@@ -17687,6 +17756,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45805
     name: 蜥蜴人
     nameid: '$1174'
@@ -17951,6 +18021,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45816
     name: 鯊魚
     nameid: '$1496'
@@ -18023,6 +18094,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 45819
     name: 伊萊克頓
     nameid: '$1433'
@@ -18095,6 +18167,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45822
     name: 龍龜
     nameid: '$1498'
@@ -20471,6 +20544,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 45921
     name: 受詛咒的 穴居人
     nameid: '$228$1432'
@@ -20519,6 +20593,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45923
     name: 海音的惡靈
     nameid: '$4359'
@@ -20591,6 +20666,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 45926
     name: 受詛咒的 多眼怪
     nameid: '$228 $1001'
@@ -20663,6 +20739,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45929
     name: 受詛咒的 蛇女
     nameid: '$228 $1428'
@@ -20687,6 +20764,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 45930
     name: 受詛咒的 蜥蜴人
     nameid: '$228 $1174'
@@ -20807,6 +20885,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 4
   - npc_id: 45935
     name: 受詛咒的 梅杜莎
     nameid: '$228$2113'
@@ -23063,6 +23142,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 46029
     name: 腐爛的 骷髏弓箭手
     nameid: '$4793 $986'
@@ -23327,6 +23407,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 46040
     name: 瑪雅的召喚物
     nameid: '$4851'
@@ -24311,6 +24392,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 46081
     name: 被拋棄的魔族
     nameid: '$4986'
@@ -24335,6 +24417,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 46082
     name: 巡邏兵 1
     nameid: '$4987 1'
@@ -25055,6 +25138,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 46112
     name: 底比斯 凱比斯
     nameid: '$5494'
@@ -25079,6 +25163,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 46113
     name: 底比斯 尖碑石奴
     nameid: '$5495'
@@ -59639,6 +59724,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 81043
     name: 凶猛的雪怪
     nameid: '$2447'
@@ -60095,6 +60181,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 81076
     name: 蛇女
     nameid: '$1428'
@@ -60119,6 +60206,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 81077
     name: 毒蠍
     nameid: '$10104'
@@ -60143,6 +60231,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 81078
     name: 變種巨大兵蟻
     nameid: '$10101'
@@ -60191,6 +60280,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 4
   - npc_id: 81080
     name: 強盜
     nameid: '$2099'
@@ -60311,6 +60401,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 81085
     name: 巨大兵蟻
     nameid: '$961'
@@ -60863,6 +60954,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 81108
     name: 人形殭屍
     nameid: '$57'
@@ -62879,6 +62971,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 81218
     name: 狂野之魔
     nameid: '$3380'
@@ -71159,6 +71252,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 95005
     name: 提卡爾 艾庫尤卡
     nameid: '$6437'
@@ -71183,6 +71277,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 95006
     name: 提卡爾 艾庫卡伊拉
     nameid: '$6438'
@@ -71207,6 +71302,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 95007
     name: 提卡爾 艾庫卡伊拉
     nameid: '$6438'
@@ -71231,6 +71327,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 95008
     name: 提卡爾 艾庫巴拉
     nameid: '$6439'
@@ -71927,6 +72024,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97007
     name: 安塔瑞
     nameid: 安塔瑞斯
@@ -71951,6 +72049,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97008
     name: 安塔瑞斯
     nameid: '$1116'
@@ -71975,6 +72074,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97009
     name: 喀瑪焰
     nameid: '$7754'
@@ -73607,6 +73707,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97077
     name: 冷冽的 雪人
     nameid: '$12891 $1783'
@@ -74015,6 +74116,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97094
     name: 林德拜爾
     nameid: '$2116'
@@ -74615,6 +74717,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97119
     name: 骷髏警衛(龍之谷)
     nameid: '$14280'
@@ -74663,6 +74766,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97121
     name: 德卡勒
     nameid: '$13720'
@@ -75335,6 +75439,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97149
     name: 阿勒尼亞
     nameid: '$13747'
@@ -75359,6 +75464,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97150
     name: 蒼狼
     nameid: '$13749'
@@ -75695,6 +75801,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 97164
     name: 巴風特的追蹤者
     nameid: '$13842'
@@ -75911,6 +76018,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 97173
     name: 漆黑的食屍鬼
     nameid: '$15648'
@@ -75935,6 +76043,7 @@ npcs:
     undead: true
     agro: true
     tameable: true
+    poison_atk: 4
   - npc_id: 97174
     name: 漆黑的食人妖精
     nameid: '$15649'
@@ -76103,6 +76212,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97181
     name: 艾爾摩兵士
     nameid: '$14268'
@@ -76823,6 +76933,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 97213
     name: 試煉的污濁安特
     nameid: '$14485'
@@ -76847,6 +76958,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 97214
     name: 試煉的污濁妖魔
     nameid: '$14486'
@@ -76943,6 +77055,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 2
   - npc_id: 97218
     name: 試煉的火之牙
     nameid: '$14490'
@@ -77135,6 +77248,7 @@ npcs:
     undead: false
     agro: false
     tameable: false
+    poison_atk: 1
   - npc_id: 97226
     name: 試煉的小惡魔
     nameid: '$14515'
@@ -77399,6 +77513,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97236
     name: 試煉的凶猛的雪怪
     nameid: '$14247'
@@ -77639,6 +77754,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 97247
     name: 暗黑的沙毒蠍
     nameid: '$14259'
@@ -77663,6 +77779,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97248
     name: 暗黑的沙花
     nameid: '$14260'
@@ -77855,6 +77972,7 @@ npcs:
     undead: true
     agro: true
     tameable: true
+    poison_atk: 4
   - npc_id: 97256
     name: 試煉的骷髏近衛兵
     nameid: '$13853'
@@ -78503,6 +78621,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97283
     name: 海岸 龍龜
     nameid: '$14214 $1498'
@@ -78623,6 +78742,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 2
   - npc_id: 97288
     name: 森林 妖魔殭屍
     nameid: '$14213 $1041'
@@ -78647,6 +78767,7 @@ npcs:
     undead: true
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97289
     name: 森林 人形殭屍
     nameid: '$14213 $57'
@@ -78935,6 +79056,7 @@ npcs:
     undead: true
     agro: true
     tameable: true
+    poison_atk: 4
   - npc_id: 97301
     name: 狩獵 食人妖精
     nameid: 狩獵 $325
@@ -79391,6 +79513,7 @@ npcs:
     undead: false
     agro: false
     tameable: true
+    poison_atk: 1
   - npc_id: 97348
     name: 鐮刀死神的監視者
     nameid: '$12410'
@@ -79607,6 +79730,7 @@ npcs:
     undead: false
     agro: true
     tameable: true
+    poison_atk: 1
   - npc_id: 97324
     name: 蛇女
     nameid: '$1428'
@@ -79631,6 +79755,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97345
     name: 鐮刀死神的監視者
     nameid: '$12410'
@@ -79679,6 +79804,7 @@ npcs:
     undead: false
     agro: true
     tameable: false
+    poison_atk: 1
   - npc_id: 97344
     name: 鐮刀死神的監視者
     nameid: '$12410'

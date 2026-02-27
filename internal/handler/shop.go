@@ -399,3 +399,30 @@ func sendInvList(sess *net.Session, inv *world.Inventory, items *data.ItemTable)
 
 	sess.Send(w.Bytes())
 }
+
+// --- 匯出封裝（供 system 套件使用） ---
+
+// SendAddItem 匯出 sendAddItem — 供 system 套件發送新物品到背包。
+func SendAddItem(sess *net.Session, item *world.InvItem, optInfo ...*data.ItemInfo) {
+	sendAddItem(sess, item, optInfo...)
+}
+
+// SendItemCountUpdate 匯出 sendItemCountUpdate — 供 system 套件更新物品數量。
+func SendItemCountUpdate(sess *net.Session, item *world.InvItem) {
+	sendItemCountUpdate(sess, item)
+}
+
+// SendRemoveInventoryItem 匯出 sendRemoveInventoryItem — 供 system 套件移除背包物品。
+func SendRemoveInventoryItem(sess *net.Session, objectID int32) {
+	sendRemoveInventoryItem(sess, objectID)
+}
+
+// SendServerMessage 匯出 sendServerMessage — 供 system 套件發送系統訊息。
+func SendServerMessage(sess *net.Session, msgID uint16) {
+	sendServerMessage(sess, msgID)
+}
+
+// SendServerMessageArgs 匯出 sendServerMessageArgs — 供 system 套件發送帶參數系統訊息。
+func SendServerMessageArgs(sess *net.Session, msgID uint16, args ...string) {
+	sendServerMessageArgs(sess, msgID, args...)
+}

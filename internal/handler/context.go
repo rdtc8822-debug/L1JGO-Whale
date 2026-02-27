@@ -31,9 +31,16 @@ type SkillRequest struct {
 	TargetID  int32
 }
 
-// SkillQueue accepts skill requests from handlers for deferred Phase 2 processing.
-type SkillQueue interface {
+// SkillManager 處理技能執行、buff 管理、buff 計時。由 system.SkillSystem 實作。
+type SkillManager interface {
+	// QueueSkill 將技能請求排入佇列（Phase 2 處理）。
 	QueueSkill(req SkillRequest)
+	// CancelAllBuffs 移除目標所有可取消的 buff（Cancellation 效果）。
+	CancelAllBuffs(target *world.PlayerInfo)
+	// TickPlayerBuffs 每 tick 遞減 buff 計時器並處理到期。
+	TickPlayerBuffs(p *world.PlayerInfo)
+	// RemoveBuffAndRevert 移除指定 buff 並還原屬性。
+	RemoveBuffAndRevert(target *world.PlayerInfo, skillID int32)
 }
 
 // NpcKillResult is returned by ProcessMeleeAttack/ProcessRangedAttack when an NPC
@@ -46,6 +53,123 @@ type NpcKillResult struct {
 	ExpGained       int32
 	MapID           int16
 	X, Y            int32
+}
+
+// TradeManager 處理交易邏輯。由 system.TradeSystem 實作。
+type TradeManager interface {
+	// InitiateTrade 向目標發送交易確認對話框。
+	InitiateTrade(sess *net.Session, player, target *world.PlayerInfo)
+	// HandleYesNo 處理交易確認回應。
+	HandleYesNo(sess *net.Session, player *world.PlayerInfo, partnerID int32, accepted bool)
+	// AddItem 將物品加入交易視窗。
+	AddItem(sess *net.Session, player *world.PlayerInfo, objectID, count int32)
+	// Accept 確認交易。
+	Accept(sess *net.Session, player *world.PlayerInfo)
+	// Cancel 取消交易（由主動取消方呼叫）。
+	Cancel(player *world.PlayerInfo)
+	// CancelIfActive 若正在交易則取消（傳送、移動、開商店等呼叫）。
+	CancelIfActive(player *world.PlayerInfo)
+}
+
+// PartyManager 處理隊伍邏輯（一般隊伍 + 聊天隊伍）。由 system.PartySystem 實作。
+type PartyManager interface {
+	// Invite 發送一般隊伍邀請（type 0=普通, 1=自動分配）。
+	Invite(sess *net.Session, player *world.PlayerInfo, targetID int32, partyType byte)
+	// ChatInvite 發送聊天隊伍邀請（type 2）。
+	ChatInvite(sess *net.Session, player *world.PlayerInfo, targetName string)
+	// TransferLeader 轉移隊長（type 3）。
+	TransferLeader(sess *net.Session, player *world.PlayerInfo, targetID int32)
+	// ShowPartyInfo 顯示隊伍成員 HTML 對話框。
+	ShowPartyInfo(sess *net.Session, player *world.PlayerInfo)
+	// Leave 自願離開隊伍。
+	Leave(player *world.PlayerInfo)
+	// BanishMember 踢除隊員（隊長專用，依名稱）。
+	BanishMember(sess *net.Session, player *world.PlayerInfo, targetName string)
+
+	// ChatKick 踢除聊天隊伍成員。
+	ChatKick(sess *net.Session, player *world.PlayerInfo, targetName string)
+	// ChatLeave 離開聊天隊伍。
+	ChatLeave(player *world.PlayerInfo)
+	// ShowChatPartyInfo 顯示聊天隊伍成員 HTML 對話框。
+	ShowChatPartyInfo(sess *net.Session, player *world.PlayerInfo)
+
+	// InviteResponse 處理一般隊伍邀請的 Yes/No 回應（953/954）。
+	InviteResponse(player *world.PlayerInfo, inviterID int32, accepted bool)
+	// ChatInviteResponse 處理聊天隊伍邀請的 Yes/No 回應（951）。
+	ChatInviteResponse(player *world.PlayerInfo, inviterID int32, accepted bool)
+
+	// UpdateMiniHP 廣播 HP 變化到隊伍成員。
+	UpdateMiniHP(player *world.PlayerInfo)
+	// RefreshPositions 發送位置更新到該玩家的隊伍。
+	RefreshPositions(player *world.PlayerInfo)
+}
+
+// ClanManager 處理血盟邏輯。由 system.ClanSystem 實作。
+type ClanManager interface {
+	// Create 建立新血盟。
+	Create(sess *net.Session, player *world.PlayerInfo, clanName string)
+	// JoinRequest 發送加入血盟請求（面對面機制）。
+	JoinRequest(sess *net.Session, player *world.PlayerInfo)
+	// JoinResponse 處理加入血盟的 Yes/No 回應（97）。
+	JoinResponse(sess *net.Session, responder *world.PlayerInfo, applicantCharID int32, accepted bool)
+	// Leave 離開或解散血盟。
+	Leave(sess *net.Session, player *world.PlayerInfo, clanNamePkt string)
+	// BanMember 驅逐血盟成員。
+	BanMember(sess *net.Session, player *world.PlayerInfo, targetName string)
+	// ShowClanInfo 顯示血盟資訊。
+	ShowClanInfo(sess *net.Session, player *world.PlayerInfo)
+	// UpdateSettings 更新血盟公告或成員備註。
+	UpdateSettings(sess *net.Session, player *world.PlayerInfo, dataType byte, content string)
+	// ChangeRank 變更成員階級。
+	ChangeRank(sess *net.Session, player *world.PlayerInfo, rank int16, targetName string)
+	// SetTitle 設定稱號。
+	SetTitle(sess *net.Session, player *world.PlayerInfo, charName, title string)
+	// UploadEmblem 上傳盟徽。
+	UploadEmblem(sess *net.Session, player *world.PlayerInfo, emblemData []byte)
+	// DownloadEmblem 下載盟徽。
+	DownloadEmblem(sess *net.Session, emblemID int32)
+}
+
+// EquipManager 處理裝備邏輯（穿脫武器/防具、套裝系統、屬性計算）。由 system.EquipSystem 實作。
+type EquipManager interface {
+	// EquipWeapon 裝備武器或脫下已裝備的武器。
+	EquipWeapon(sess *net.Session, player *world.PlayerInfo, item *world.InvItem, info *data.ItemInfo)
+	// EquipArmor 裝備防具或脫下已裝備的防具。
+	EquipArmor(sess *net.Session, player *world.PlayerInfo, item *world.InvItem, info *data.ItemInfo)
+	// UnequipSlot 脫下指定欄位的裝備。
+	UnequipSlot(sess *net.Session, player *world.PlayerInfo, slot world.EquipSlot)
+	// FindEquippedSlot 找到物品所在的裝備欄位。
+	FindEquippedSlot(player *world.PlayerInfo, item *world.InvItem) world.EquipSlot
+	// RecalcEquipStats 重新計算裝備屬性並發送更新封包。
+	RecalcEquipStats(sess *net.Session, player *world.PlayerInfo)
+	// InitEquipStats 進入世界時初始化裝備屬性（偵測套裝 + 設定基礎 AC + 計算裝備加成，不發送封包）。
+	InitEquipStats(player *world.PlayerInfo)
+	// SendEquipList 發送裝備欄位列表封包。
+	SendEquipList(sess *net.Session, player *world.PlayerInfo)
+}
+
+// ItemUseManager 處理物品使用邏輯（消耗品、衝裝、鑑定、技能書、傳送卷軸、掉落）。由 system.ItemUseSystem 實作。
+type ItemUseManager interface {
+	// UseConsumable 處理消耗品使用（藥水、食物）。
+	UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo)
+	// EnchantItem 處理衝裝卷軸使用。
+	EnchantItem(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, scroll *world.InvItem, scrollInfo *data.ItemInfo)
+	// IdentifyItem 處理鑑定卷軸使用。
+	IdentifyItem(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, scroll *world.InvItem)
+	// UseSpellBook 處理技能書使用。
+	UseSpellBook(sess *net.Session, player *world.PlayerInfo, item *world.InvItem, itemInfo *data.ItemInfo)
+	// UseTeleportScroll 處理傳送卷軸使用。
+	UseTeleportScroll(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, item *world.InvItem)
+	// UseHomeScroll 處理回家卷軸使用。
+	UseHomeScroll(sess *net.Session, player *world.PlayerInfo, item *world.InvItem)
+	// UseFixedTeleportScroll 處理指定傳送卷軸使用。
+	UseFixedTeleportScroll(sess *net.Session, player *world.PlayerInfo, item *world.InvItem, itemInfo *data.ItemInfo)
+	// GiveDrops 為擊殺的 NPC 擲骰掉落物品。
+	GiveDrops(killer *world.PlayerInfo, npcID int32)
+	// ApplyHaste 套用加速效果。
+	ApplyHaste(sess *net.Session, player *world.PlayerInfo, durationSec int, gfxID int32)
+	// BroadcastEffect 向自己和附近玩家廣播特效。
+	BroadcastEffect(sess *net.Session, player *world.PlayerInfo, gfxID int32)
 }
 
 // Deps holds shared dependencies injected into all packet handlers.
@@ -89,8 +213,13 @@ type Deps struct {
 	PetItems      *data.PetItemTable
 	Dolls         *data.DollTable
 	TeleportPages *data.TeleportPageTable
-	Combat        CombatQueue // filled after CombatSystem is created
-	Skill         SkillQueue  // filled after SkillSystem is created
+	Combat        CombatQueue  // filled after CombatSystem is created
+	Skill         SkillManager // filled after SkillSystem is created
+	Trade         TradeManager // filled after TradeSystem is created
+	Party         PartyManager // filled after PartySystem is created
+	Clan          ClanManager  // filled after ClanSystem is created
+	Equip         EquipManager    // filled after EquipSystem is created
+	ItemUse       ItemUseManager  // filled after ItemUseSystem is created
 	Bus           *event.Bus  // event bus for emitting game events (EntityKilled, etc.)
 	WeaponSkills  *data.WeaponSkillTable
 }

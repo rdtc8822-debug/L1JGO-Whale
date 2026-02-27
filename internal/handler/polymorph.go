@@ -226,6 +226,11 @@ func sendShowPolyList(sess *net.Session, charID int32) {
 	sess.Send(w.Bytes())
 }
 
+// SendShowPolyList 開啟變形對話框。Exported for system package usage.
+func SendShowPolyList(sess *net.Session, charID int32) {
+	sendShowPolyList(sess, charID)
+}
+
 // handlePolyScroll processes polymorph scroll/potion usage.
 // Called from HandleUseItem when the item is a polymorph scroll (40088, 40096, 49308, 140088).
 // Java: C_ItemUSe.usePolyScroll()

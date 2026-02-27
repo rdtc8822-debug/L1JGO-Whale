@@ -596,8 +596,9 @@ func liberateSummon(sum *world.SummonInfo, deps *Deps) {
 		AC:      sum.AC,
 		STR:     sum.STR,
 		DEX:     sum.DEX,
-		MR:      sum.MR,
-		Exp:     0, // liberated NPCs give no exp
+		MR:        sum.MR,
+		PoisonAtk: tmpl.PoisonAtk,
+		Exp:       0, // liberated NPCs give no exp
 		Lawful:  sum.Lawful,
 		Size:    sum.Size,
 		AtkDmg:  sum.AtkDmg,
@@ -659,4 +660,26 @@ func calcUsedPetCost(charID int32, ws *world.State) int {
 		cost += c
 	}
 	return cost
+}
+
+// --- Exported wrappers for system package usage ---
+
+// ExecuteSummonMonster 召喚怪物（技能 51）。
+func ExecuteSummonMonster(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32, deps *Deps) {
+	executeSummonMonster(sess, player, skill, targetID, deps)
+}
+
+// ExecuteTamingMonster 馴服怪物（技能 36）。
+func ExecuteTamingMonster(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32, deps *Deps) {
+	executeTamingMonster(sess, player, skill, targetID, deps)
+}
+
+// ExecuteCreateZombie 創造殭屍（技能 41）。
+func ExecuteCreateZombie(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32, deps *Deps) {
+	executeCreateZombie(sess, player, skill, targetID, deps)
+}
+
+// ExecuteReturnToNature 歸返自然（技能 145）。
+func ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, deps *Deps) {
+	executeReturnToNature(sess, player, skill, deps)
 }
