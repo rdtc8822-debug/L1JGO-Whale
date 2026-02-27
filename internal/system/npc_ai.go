@@ -327,7 +327,6 @@ func (s *NpcAISystem) guardTeleportHome(npc *world.NpcInfo) {
 	oldNearby := s.world.GetNearbyPlayersAt(oldX, oldY, npc.MapID)
 	for _, viewer := range oldNearby {
 		sendRemoveObject(viewer.Session, npc.ID)
-		handler.SendEntityTileUnblock(viewer.Session, oldX, oldY)
 	}
 
 	// Update map passability
@@ -344,7 +343,6 @@ func (s *NpcAISystem) guardTeleportHome(npc *world.NpcInfo) {
 	newNearby := s.world.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range newNearby {
 		sendNpcPack(viewer.Session, npc)
-		handler.SendEntityTileBlock(viewer.Session, npc.X, npc.Y)
 	}
 }
 
@@ -578,8 +576,6 @@ func npcExecuteMove(ws *world.State, npc *world.NpcInfo, moveX, moveY int32, hea
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
 		sendNpcMove(viewer.Session, npc.ID, oldX, oldY, npc.Heading)
-		handler.SendEntityTileUnblock(viewer.Session, oldX, oldY)
-		handler.SendEntityTileBlock(viewer.Session, moveX, moveY)
 	}
 }
 
@@ -629,8 +625,6 @@ func npcWander(ws *world.State, npc *world.NpcInfo, dir int, maps *data.MapDataT
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
 		sendNpcMove(viewer.Session, npc.ID, oldX, oldY, npc.Heading)
-		handler.SendEntityTileUnblock(viewer.Session, oldX, oldY)
-		handler.SendEntityTileBlock(viewer.Session, moveX, moveY)
 	}
 }
 

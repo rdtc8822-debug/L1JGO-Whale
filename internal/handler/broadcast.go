@@ -57,9 +57,9 @@ func sendOwnCharPackPlayer(sess *net.Session, p *world.PlayerInfo) {
 	sess.Send(w.Bytes())
 }
 
-// sendPutObject sends S_PUT_OBJECT (opcode 87) to show another player to the viewer.
+// SendPutObject sends S_PUT_OBJECT (opcode 87) to show another player to the viewer.
 // Matches Java S_OtherCharPacks format exactly.
-func sendPutObject(viewer *net.Session, p *world.PlayerInfo) {
+func SendPutObject(viewer *net.Session, p *world.PlayerInfo) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(p.X))
 	w.WriteH(uint16(p.Y))
@@ -93,8 +93,8 @@ func sendPutObject(viewer *net.Session, p *world.PlayerInfo) {
 	viewer.Send(w.Bytes())
 }
 
-// sendRemoveObject sends S_REMOVE_OBJECT (opcode 120) to remove an entity from view.
-func sendRemoveObject(viewer *net.Session, charID int32) {
+// SendRemoveObject sends S_REMOVE_OBJECT (opcode 120) to remove an entity from view.
+func SendRemoveObject(viewer *net.Session, charID int32) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_REMOVE_OBJECT)
 	w.WriteD(charID)
 	viewer.Send(w.Bytes())
@@ -144,8 +144,8 @@ func sendMagicStatus(sess *net.Session, sp byte, mr uint16) {
 	sess.Send(w.Bytes())
 }
 
-// sendNpcPack sends S_PUT_OBJECT (opcode 87) for an NPC to the viewer.
-func sendNpcPack(viewer *net.Session, npc *world.NpcInfo) {
+// SendNpcPack sends S_PUT_OBJECT (opcode 87) for an NPC to the viewer.
+func SendNpcPack(viewer *net.Session, npc *world.NpcInfo) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(npc.X))
 	w.WriteH(uint16(npc.Y))
@@ -316,10 +316,10 @@ func sendSkillEffect(viewer *net.Session, objectID int32, gfxID int32) {
 	viewer.Send(w.Bytes())
 }
 
-// sendDropItem sends S_PUT_OBJECT (opcode 87) for a ground item.
+// SendDropItem sends S_PUT_OBJECT (opcode 87) for a ground item.
 // Same opcode as S_CharPack, but client distinguishes by the status byte (0x00 = item vs 0x04 = PC).
 // Matches Java S_DropItem packet format.
-func sendDropItem(viewer *net.Session, item *world.GroundItem) {
+func SendDropItem(viewer *net.Session, item *world.GroundItem) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(item.X))
 	w.WriteH(uint16(item.Y))

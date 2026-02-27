@@ -5,7 +5,6 @@ import (
 
 	coresys "github.com/l1jgo/server/internal/core/system"
 	"github.com/l1jgo/server/internal/data"
-	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/world"
 )
 
@@ -94,6 +93,5 @@ func (s *NpcRespawnSystem) respawnNpc(npc *world.NpcInfo) {
 	nearby := s.world.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
 		sendNpcPack(viewer.Session, npc)
-		handler.SendEntityTileBlock(viewer.Session, npc.X, npc.Y)
 	}
 }

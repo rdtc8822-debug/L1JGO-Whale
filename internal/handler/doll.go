@@ -128,9 +128,9 @@ func handleUseDoll(sess *net.Session, player *world.PlayerInfo, invItem *world.I
 	masterName := player.Name
 	nearby := ws.GetNearbyPlayersAt(doll.X, doll.Y, doll.MapID)
 	for _, viewer := range nearby {
-		sendDollPack(viewer.Session, doll, masterName)
+		SendDollPack(viewer.Session, doll, masterName)
 	}
-	sendDollPack(sess, doll, masterName)
+	SendDollPack(sess, doll, masterName)
 
 	// Summon sound effect + timer UI
 	sendCompanionEffect(sess, doll.ID, 5935) // summon sound
@@ -150,7 +150,7 @@ func dismissDoll(doll *world.DollInfo, player *world.PlayerInfo, deps *Deps) {
 	// Broadcast removal
 	nearby := ws.GetNearbyPlayersAt(doll.X, doll.Y, doll.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, doll.ID)
+		SendRemoveObject(viewer.Session, doll.ID)
 	}
 
 	// Dismiss sound + clear timer

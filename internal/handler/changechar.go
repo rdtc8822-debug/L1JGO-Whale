@@ -49,7 +49,7 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 		// Broadcast removal to nearby players
 		nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
 		for _, other := range nearby {
-			sendRemoveObject(other.Session, player.CharID)
+			SendRemoveObject(other.Session, player.CharID)
 		}
 
 		// Save full character state

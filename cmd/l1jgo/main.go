@@ -426,7 +426,8 @@ func run() error {
 	eventBus := event.NewBus()
 	sessStore := gonet.NewSessionStore()
 	runner := coresys.NewRunner()
-	// Phase 0: Input
+	// Phase 0: Input — 註冊到 Runner，並由 inputPoll 以 2ms 頻率高頻驅動
+	// （透過 Runner.TickPhase 在系統 tick 之間只跑 Phase 0，消除 0~200ms 的輸入延遲）
 	inputSys := system.NewInputSystem(netServer, pktReg, sessStore, cfg.Network.MaxPacketsPerTick, accountRepo, charRepo, itemRepo, buffRepo, worldState, mapDataTable, petRepo, log)
 	runner.Register(inputSys)
 	// Phase 1: Event dispatch (double-buffer swap + deliver previous tick's events)
@@ -471,6 +472,7 @@ func run() error {
 	runner.Register(system.NewWeatherSystem(worldState))
 	runner.Register(system.NewGroundItemSystem(worldState))
 	runner.Register(system.NewPartyRefreshSystem(worldState, deps, 10)) // 10 ticks = 2 seconds
+	runner.Register(system.NewVisibilitySystem(worldState, deps))
 	// Phase 4: Output — flush buffered packets to TCP
 	runner.Register(system.NewOutputSystem(sessStore))
 	// Phase 5: Persistence (auto-save interval from config)
@@ -483,19 +485,30 @@ func run() error {
 	shutdownCh := make(chan os.Signal, 1)
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 
-	ticker := time.NewTicker(cfg.Network.TickRate)
-	defer ticker.Stop()
+	// 雙頻率遊戲迴圈（架構合規）：
+	// - systemTicker (200ms)：runner.Tick() 執行全 Phase 0-6
+	// - inputPoll (2ms)：runner.TickPhase(PhaseInput) 只執行 Phase 0
+	// Phase 0 高頻運行讓封包處理延遲從 0~200ms 降至 0~2ms（超越 Java 的 ~10ms）。
+	// Phase 1-6 維持 200ms 頻率，所有 tick 計數邏輯（Buff、回血、AI）不受影響。
+	systemTicker := time.NewTicker(cfg.Network.TickRate)
+	inputPoll := time.NewTicker(2 * time.Millisecond)
+	defer systemTicker.Stop()
+	defer inputPoll.Stop()
 
 	// Display server ready section
 	printSection("伺服器就緒")
 	printReady(fmt.Sprintf("監聽位址 %s", netServer.Addr().String()))
-	printReady(fmt.Sprintf("遊戲迴圈啟動 (tick: %s)", cfg.Network.TickRate))
+	printReady(fmt.Sprintf("遊戲迴圈啟動 (系統tick: %s, 輸入輪詢: 2ms)", cfg.Network.TickRate))
 	fmt.Println()
 
 	for {
 		select {
-		case <-ticker.C:
+		case <-systemTicker.C:
+			// 完整 tick：Phase 0-6 按順序執行（Phase 0 可能是空操作，因 inputPoll 已排空）
 			runner.Tick(cfg.Network.TickRate)
+		case <-inputPoll.C:
+			// 高頻輸入輪詢：只跑 Phase 0（透過 Runner.TickPhase 維持架構合規）
+			runner.TickPhase(coresys.PhaseInput, 0)
 		case sig := <-shutdownCh:
 			log.Info("收到關閉信號", zap.String("signal", sig.String()))
 			// Save all players before stopping

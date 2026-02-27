@@ -47,7 +47,7 @@ func HandleRestart(sess *net.Session, _ *packet.Reader, deps *Deps) {
 	// Broadcast removal from old position
 	nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
 	for _, other := range nearby {
-		sendRemoveObject(other.Session, player.CharID)
+		SendRemoveObject(other.Session, player.CharID)
 	}
 
 	// Move to respawn point
@@ -62,28 +62,87 @@ func HandleRestart(sess *net.Session, _ *packet.Reader, deps *Deps) {
 	sendMapID(sess, uint16(rmap), false)
 
 	// Send own char pack at new position
-	sendPutObject(sess, player)
+	SendPutObject(sess, player)
 
 	// Send status update
 	sendPlayerStatus(sess, player)
 
-	// Send to nearby players at new location
+	// 重置 Known 集合（重生 = 完全切換場景）
+	if player.Known == nil {
+		player.Known = world.NewKnownEntities()
+	} else {
+		player.Known.Reset()
+	}
+
+	// 發送附近玩家 + 填入 Known
 	newNearby := deps.World.GetNearbyPlayers(rx, ry, rmap, sess.ID)
 	for _, other := range newNearby {
-		sendPutObject(other.Session, player)
-		sendPutObject(sess, other)
+		SendPutObject(other.Session, player)
+		SendPutObject(sess, other)
+		player.Known.Players[other.CharID] = world.KnownPos{X: other.X, Y: other.Y}
 	}
 
-	// Send nearby NPCs
+	// 發送附近 NPC + 填入 Known
 	nearbyNpcs := deps.World.GetNearbyNpcs(rx, ry, rmap)
 	for _, npc := range nearbyNpcs {
-		sendNpcPack(sess, npc)
+		SendNpcPack(sess, npc)
+		player.Known.Npcs[npc.ID] = world.KnownPos{X: npc.X, Y: npc.Y}
 	}
 
-	// Send nearby ground items
+	// 發送附近地面物品 + 填入 Known
 	nearbyGnd := deps.World.GetNearbyGroundItems(rx, ry, rmap)
 	for _, g := range nearbyGnd {
-		sendDropItem(sess, g)
+		SendDropItem(sess, g)
+		player.Known.GroundItems[g.ID] = world.KnownPos{X: g.X, Y: g.Y}
+	}
+
+	// 發送附近召喚獸 + 填入 Known
+	nearbySums := deps.World.GetNearbySummons(rx, ry, rmap)
+	for _, sum := range nearbySums {
+		isOwner := sum.OwnerCharID == player.CharID
+		masterName := ""
+		if m := deps.World.GetByCharID(sum.OwnerCharID); m != nil {
+			masterName = m.Name
+		}
+		SendSummonPack(sess, sum, isOwner, masterName)
+		player.Known.Summons[sum.ID] = world.KnownPos{X: sum.X, Y: sum.Y}
+	}
+
+	// 發送附近魔法娃娃 + 填入 Known
+	nearbyDolls := deps.World.GetNearbyDolls(rx, ry, rmap)
+	for _, doll := range nearbyDolls {
+		masterName := ""
+		if m := deps.World.GetByCharID(doll.OwnerCharID); m != nil {
+			masterName = m.Name
+		}
+		SendDollPack(sess, doll, masterName)
+		player.Known.Dolls[doll.ID] = world.KnownPos{X: doll.X, Y: doll.Y}
+	}
+
+	// 發送附近隨從 + 填入 Known
+	nearbyFollowers := deps.World.GetNearbyFollowers(rx, ry, rmap)
+	for _, f := range nearbyFollowers {
+		SendFollowerPack(sess, f)
+		player.Known.Followers[f.ID] = world.KnownPos{X: f.X, Y: f.Y}
+	}
+
+	// 發送附近寵物 + 填入 Known
+	nearbyPets := deps.World.GetNearbyPets(rx, ry, rmap)
+	for _, pet := range nearbyPets {
+		isOwner := pet.OwnerCharID == player.CharID
+		masterName := ""
+		if m := deps.World.GetByCharID(pet.OwnerCharID); m != nil {
+			masterName = m.Name
+		}
+		SendPetPack(sess, pet, isOwner, masterName)
+		player.Known.Pets[pet.ID] = world.KnownPos{X: pet.X, Y: pet.Y}
+	}
+
+	// 發送附近門 + 填入 Known
+	nearbyDoors := deps.World.GetNearbyDoors(rx, ry, rmap)
+	for _, d := range nearbyDoors {
+		SendDoorPerceive(sess, d)
+		player.Known.Doors[d.ID] = world.KnownPos{X: d.X, Y: d.Y}
 	}
 
 	// Send weather (Java: sends current world weather, not hardcoded 0)

@@ -346,13 +346,13 @@ func resurrectPlayer(target *world.PlayerInfo, caster *world.PlayerInfo, skill *
 	sendHpUpdate(target.Session, target)
 	sendMpUpdate(target.Session, target)
 	sendPlayerStatus(target.Session, target)
-	sendPutObject(target.Session, target)
+	SendPutObject(target.Session, target)
 
 	// Notify nearby players to refresh the resurrected player's appearance
 	nearbyTarget := deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
 	for _, viewer := range nearbyTarget {
 		if viewer.SessionID != target.SessionID {
-			sendPutObject(viewer.Session, target)
+			SendPutObject(viewer.Session, target)
 		}
 	}
 

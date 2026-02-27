@@ -385,8 +385,7 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 	// 1. 舊位置附近玩家：移除我 + 解鎖我的格子
 	oldNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
 	for _, other := range oldNearby {
-		sendRemoveObject(other.Session, player.CharID)
-		SendEntityTileUnblock(other.Session, player.X, player.Y)
+		SendRemoveObject(other.Session, player.CharID)
 	}
 
 	// 2. 更新世界狀態位置（Java: moveVisibleObject + setLocation）
@@ -400,40 +399,46 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 	// 3. S_MapID（即使同地圖也要發——客戶端傳送需要）
 	sendMapID(sess, uint16(mapID), false)
 
-	// 4. 目的地附近玩家：顯示我 + 封鎖我的格子
+	// 重置 Known 集合（傳送 = 完全切換場景）
+	if player.Known == nil {
+		player.Known = world.NewKnownEntities()
+	} else {
+		player.Known.Reset()
+	}
+
+	// 4. 目的地附近玩家：顯示我 + 封鎖我的格子 + 填入 Known
 	newNearby := deps.World.GetNearbyPlayers(x, y, mapID, sess.ID)
 	for _, other := range newNearby {
-		sendPutObject(other.Session, player)
-		SendEntityTileBlock(other.Session, x, y)
+		SendPutObject(other.Session, player)
 	}
 
 	// 5. S_OwnCharPack
 	sendOwnCharPackPlayer(sess, player)
 
-	// 6. 發送附近實體給自己 + 封鎖格子
+	// 6. 發送附近實體給自己 + 封鎖格子 + 填入 Known
 	for _, other := range newNearby {
-		sendPutObject(sess, other)
-		SendEntityTileBlock(sess, other.X, other.Y)
+		SendPutObject(sess, other)
+		player.Known.Players[other.CharID] = world.KnownPos{X: other.X, Y: other.Y}
 	}
 
 	nearbyNpcs := deps.World.GetNearbyNpcs(x, y, mapID)
 	for _, npc := range nearbyNpcs {
-		sendNpcPack(sess, npc)
-		SendEntityTileBlock(sess, npc.X, npc.Y)
+		SendNpcPack(sess, npc)
+		player.Known.Npcs[npc.ID] = world.KnownPos{X: npc.X, Y: npc.Y}
 	}
 
 	nearbyGnd := deps.World.GetNearbyGroundItems(x, y, mapID)
 	for _, g := range nearbyGnd {
-		sendDropItem(sess, g)
+		SendDropItem(sess, g)
+		player.Known.GroundItems[g.ID] = world.KnownPos{X: g.X, Y: g.Y}
 	}
 
-	// 發送目的地附近的門
 	nearbyDoors := deps.World.GetNearbyDoors(x, y, mapID)
 	for _, d := range nearbyDoors {
 		SendDoorPerceive(sess, d)
+		player.Known.Doors[d.ID] = world.KnownPos{X: d.X, Y: d.Y}
 	}
 
-	// 發送目的地附近寵伴 + 封鎖格子
 	nearbySum := deps.World.GetNearbySummons(x, y, mapID)
 	for _, sum := range nearbySum {
 		isOwner := sum.OwnerCharID == player.CharID
@@ -441,8 +446,8 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		if m := deps.World.GetByCharID(sum.OwnerCharID); m != nil {
 			masterName = m.Name
 		}
-		sendSummonPack(sess, sum, isOwner, masterName)
-		SendEntityTileBlock(sess, sum.X, sum.Y)
+		SendSummonPack(sess, sum, isOwner, masterName)
+		player.Known.Summons[sum.ID] = world.KnownPos{X: sum.X, Y: sum.Y}
 	}
 	nearbyDolls := deps.World.GetNearbyDolls(x, y, mapID)
 	for _, doll := range nearbyDolls {
@@ -450,13 +455,13 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		if m := deps.World.GetByCharID(doll.OwnerCharID); m != nil {
 			masterName = m.Name
 		}
-		sendDollPack(sess, doll, masterName)
-		SendEntityTileBlock(sess, doll.X, doll.Y)
+		SendDollPack(sess, doll, masterName)
+		player.Known.Dolls[doll.ID] = world.KnownPos{X: doll.X, Y: doll.Y}
 	}
 	nearbyFollowers := deps.World.GetNearbyFollowers(x, y, mapID)
 	for _, f := range nearbyFollowers {
-		sendFollowerPack(sess, f)
-		SendEntityTileBlock(sess, f.X, f.Y)
+		SendFollowerPack(sess, f)
+		player.Known.Followers[f.ID] = world.KnownPos{X: f.X, Y: f.Y}
 	}
 	nearbyPets := deps.World.GetNearbyPets(x, y, mapID)
 	for _, pet := range nearbyPets {
@@ -465,8 +470,8 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		if m := deps.World.GetByCharID(pet.OwnerCharID); m != nil {
 			masterName = m.Name
 		}
-		sendPetPack(sess, pet, isOwner, masterName)
-		SendEntityTileBlock(sess, pet.X, pet.Y)
+		SendPetPack(sess, pet, isOwner, masterName)
+		player.Known.Pets[pet.ID] = world.KnownPos{X: pet.X, Y: pet.Y}
 	}
 
 	// Release client teleport lock (Java: S_Paralysis always sent in finally block).

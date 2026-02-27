@@ -174,25 +174,25 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		}
 	}
 
-	px, py := player.X, player.Y
+	// 初始化 Known 集合（VisibilitySystem 用於 AOI diff）
+	player.Known = world.NewKnownEntities()
 
-	// --- 發送附近玩家（AOI）+ 封鎖格子 ---
+	// --- 發送附近玩家（AOI）+ 封鎖格子 + 填入 Known ---
 	nearby := deps.World.GetNearbyPlayers(ch.X, ch.Y, ch.MapID, sess.ID)
 	for _, other := range nearby {
-		sendPutObject(sess, other)
-		SendEntityTileBlock(sess, other.X, other.Y)
-		sendPutObject(other.Session, player)
-		SendEntityTileBlock(other.Session, px, py)
+		SendPutObject(sess, other)
+		player.Known.Players[other.CharID] = world.KnownPos{X: other.X, Y: other.Y}
+		SendPutObject(other.Session, player)
 	}
 
-	// --- 發送附近 NPC + 封鎖格子 ---
+	// --- 發送附近 NPC + 封鎖格子 + 填入 Known ---
 	nearbyNpcs := deps.World.GetNearbyNpcs(ch.X, ch.Y, ch.MapID)
 	for _, npc := range nearbyNpcs {
-		sendNpcPack(sess, npc)
-		SendEntityTileBlock(sess, npc.X, npc.Y)
+		SendNpcPack(sess, npc)
+		player.Known.Npcs[npc.ID] = world.KnownPos{X: npc.X, Y: npc.Y}
 	}
 
-	// --- 發送附近寵伴 + 封鎖格子 ---
+	// --- 發送附近寵伴 + 封鎖格子 + 填入 Known ---
 	nearbySum := deps.World.GetNearbySummons(ch.X, ch.Y, ch.MapID)
 	for _, sum := range nearbySum {
 		isOwner := sum.OwnerCharID == player.CharID
@@ -200,8 +200,8 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		if master := deps.World.GetByCharID(sum.OwnerCharID); master != nil {
 			masterName = master.Name
 		}
-		sendSummonPack(sess, sum, isOwner, masterName)
-		SendEntityTileBlock(sess, sum.X, sum.Y)
+		SendSummonPack(sess, sum, isOwner, masterName)
+		player.Known.Summons[sum.ID] = world.KnownPos{X: sum.X, Y: sum.Y}
 	}
 	nearbyDolls := deps.World.GetNearbyDolls(ch.X, ch.Y, ch.MapID)
 	for _, doll := range nearbyDolls {
@@ -209,13 +209,13 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		if master := deps.World.GetByCharID(doll.OwnerCharID); master != nil {
 			masterName = master.Name
 		}
-		sendDollPack(sess, doll, masterName)
-		SendEntityTileBlock(sess, doll.X, doll.Y)
+		SendDollPack(sess, doll, masterName)
+		player.Known.Dolls[doll.ID] = world.KnownPos{X: doll.X, Y: doll.Y}
 	}
 	nearbyFollowers := deps.World.GetNearbyFollowers(ch.X, ch.Y, ch.MapID)
 	for _, f := range nearbyFollowers {
-		sendFollowerPack(sess, f)
-		SendEntityTileBlock(sess, f.X, f.Y)
+		SendFollowerPack(sess, f)
+		player.Known.Followers[f.ID] = world.KnownPos{X: f.X, Y: f.Y}
 	}
 	nearbyPets := deps.World.GetNearbyPets(ch.X, ch.Y, ch.MapID)
 	for _, pet := range nearbyPets {
@@ -224,20 +224,22 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		if master := deps.World.GetByCharID(pet.OwnerCharID); master != nil {
 			masterName = master.Name
 		}
-		sendPetPack(sess, pet, isOwner, masterName)
-		SendEntityTileBlock(sess, pet.X, pet.Y)
+		SendPetPack(sess, pet, isOwner, masterName)
+		player.Known.Pets[pet.ID] = world.KnownPos{X: pet.X, Y: pet.Y}
 	}
 
-	// --- Send nearby ground items ---
+	// --- 發送附近地面物品 + 填入 Known ---
 	nearbyGnd := deps.World.GetNearbyGroundItems(ch.X, ch.Y, ch.MapID)
 	for _, g := range nearbyGnd {
-		sendDropItem(sess, g)
+		SendDropItem(sess, g)
+		player.Known.GroundItems[g.ID] = world.KnownPos{X: g.X, Y: g.Y}
 	}
 
-	// --- Send nearby doors ---
+	// --- 發送附近門 + 填入 Known ---
 	nearbyDoors := deps.World.GetNearbyDoors(ch.X, ch.Y, ch.MapID)
 	for _, d := range nearbyDoors {
 		SendDoorPerceive(sess, d)
+		player.Known.Doors[d.ID] = world.KnownPos{X: d.X, Y: d.Y}
 	}
 
 	// Mark player tile as impassable (for NPC pathfinding, matching Java)

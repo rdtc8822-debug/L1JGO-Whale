@@ -608,7 +608,7 @@ func gmSpawn(sess *net.Session, player *world.PlayerInfo, args []string, deps *D
 		// Broadcast to nearby players
 		nearby := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 		for _, viewer := range nearby {
-			sendNpcPack(viewer.Session, npc)
+			SendNpcPack(viewer.Session, npc)
 		}
 	}
 
@@ -642,7 +642,6 @@ func gmKill(sess *net.Session, player *world.PlayerInfo, args []string, deps *De
 			viewers := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 			for _, v := range viewers {
 				sendActionGfx(v.Session, npc.ID, 8)
-				SendEntityTileUnblock(v.Session, npc.X, npc.Y)
 			}
 			npc.DeleteTimer = 50 // 10 seconds for death animation
 			if npc.RespawnDelay > 0 {
@@ -667,7 +666,6 @@ func gmKillAll(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 		viewers := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 		for _, v := range viewers {
 			sendActionGfx(v.Session, npc.ID, 8)
-			SendEntityTileUnblock(v.Session, npc.X, npc.Y)
 		}
 		npc.DeleteTimer = 50 // 10 seconds for death animation
 		if npc.RespawnDelay > 0 {
@@ -852,7 +850,7 @@ func gmClass(sess *net.Session, player *world.PlayerInfo, args []string, deps *D
 	broadcastVisualUpdate(sess, player, deps)
 
 	// Re-send own charpack to update appearance
-	sendPutObject(sess, player)
+	SendPutObject(sess, player)
 
 	names := []string{"王族", "騎士", "精靈", "法師", "黑暗精靈", "龍騎士", "幻術師"}
 	gmMsgf(sess, "職業已變更為: %s", names[classType])
@@ -930,12 +928,12 @@ func gmRez(sess *net.Session, player *world.PlayerInfo, args []string, deps *Dep
 	sendPlayerStatus(target.Session, target)
 
 	// Refresh position
-	sendPutObject(target.Session, target)
+	SendPutObject(target.Session, target)
 
 	nearby := deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
 	for _, viewer := range nearby {
 		if viewer.SessionID != target.SessionID {
-			sendPutObject(viewer.Session, target)
+			SendPutObject(viewer.Session, target)
 		}
 	}
 
@@ -1123,8 +1121,8 @@ func gmWall(sess *net.Session, player *world.PlayerInfo, args []string, deps *De
 		SendDoorPerceive(sess, door)
 		SendDoorPerceive(sess, door2)
 		// Immediately remove the visual objects — passability might persist
-		sendRemoveObject(sess, door.ID)
-		sendRemoveObject(sess, door2.ID)
+		SendRemoveObject(sess, door.ID)
+		SendRemoveObject(sess, door2.ID)
 		gmMsgf(sess, "模式1: 門+封包+移除視覺 (%d,%d)", tx, ty)
 
 	case 2:
@@ -1159,7 +1157,7 @@ func gmWall(sess *net.Session, player *world.PlayerInfo, args []string, deps *De
 		}
 		deps.World.AddDoor(door)
 		sendDoorPack(sess, door)
-		sendRemoveObject(sess, door.ID)
+		SendRemoveObject(sess, door.ID)
 		gmMsgf(sess, "模式4: 僅S_DoorPack+移除 無S_CHANGE_ATTR (%d,%d)", tx, ty)
 
 	case 5:
@@ -1207,7 +1205,7 @@ func gmClearWall(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 	for _, d := range nearbyDoors {
 		// Only remove GM-spawned doors (GfxId=0 or test doors at exact position)
 		if d.GfxID == 0 || d.GfxID == 2618 {
-			sendRemoveObject(sess, d.ID)
+			SendRemoveObject(sess, d.ID)
 			// Make passable again
 			sendDoorAttr(sess, d.EntranceX(), d.EntranceY(), d.Direction, true)
 			deps.World.RemoveDoor(d.ID)

@@ -198,7 +198,7 @@ func HandleDropItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Broadcast to nearby players (including self)
 	nearby := deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
 	for _, viewer := range nearby {
-		sendDropItem(viewer.Session, gndItem)
+		SendDropItem(viewer.Session, gndItem)
 	}
 
 	deps.Log.Debug("item dropped to ground",
@@ -272,7 +272,7 @@ func HandlePickupItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Broadcast removal to nearby players
 	nearby := deps.World.GetNearbyPlayersAt(gndItem.X, gndItem.Y, gndItem.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, gndItem.ID)
+		SendRemoveObject(viewer.Session, gndItem.ID)
 	}
 
 	// Add to player inventory

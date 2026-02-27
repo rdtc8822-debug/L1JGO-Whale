@@ -12,10 +12,10 @@ import (
 //  Summon packets — Java: S_NPCPack_Summon
 // ========================================================================
 
-// sendSummonPack sends S_PUT_OBJECT (opcode 87) for a summon to the viewer.
+// SendSummonPack sends S_PUT_OBJECT (opcode 87) for a summon to the viewer.
 // Protocol matches Java S_NPCPack_Summon exactly.
 // HP percentage is shown only to the summon's master (others see 0xFF = unknown).
-func sendSummonPack(viewer *net.Session, sum *world.SummonInfo, viewerIsOwner bool, masterName string) {
+func SendSummonPack(viewer *net.Session, sum *world.SummonInfo, viewerIsOwner bool, masterName string) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(sum.X))
 	w.WriteH(uint16(sum.Y))
@@ -112,10 +112,10 @@ func sendSummonHpMeter(sess *net.Session, summonID int32, hp, maxHP int32) {
 //  Doll packets — Java: S_NPCPack_Doll
 // ========================================================================
 
-// sendDollPack sends S_PUT_OBJECT (opcode 87) for a doll to the viewer.
+// SendDollPack sends S_PUT_OBJECT (opcode 87) for a doll to the viewer.
 // Protocol matches Java S_NPCPack_Doll exactly.
 // Dolls always show HP as 0xFF (unknown to everyone).
-func sendDollPack(viewer *net.Session, doll *world.DollInfo, masterName string) {
+func SendDollPack(viewer *net.Session, doll *world.DollInfo, masterName string) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(doll.X))
 	w.WriteH(uint16(doll.Y))
@@ -157,10 +157,10 @@ func sendDollTimer(sess *net.Session, seconds int32) {
 //  Follower packets — Java: S_FollowerPack
 // ========================================================================
 
-// sendFollowerPack sends S_PUT_OBJECT (opcode 87) for a follower to the viewer.
+// SendFollowerPack sends S_PUT_OBJECT (opcode 87) for a follower to the viewer.
 // Protocol matches Java S_FollowerPack exactly.
 // Followers show no master name and HP is always 0xFF.
-func sendFollowerPack(viewer *net.Session, f *world.FollowerInfo) {
+func SendFollowerPack(viewer *net.Session, f *world.FollowerInfo) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(f.X))
 	w.WriteH(uint16(f.Y))
@@ -195,10 +195,10 @@ func sendFollowerPack(viewer *net.Session, f *world.FollowerInfo) {
 //                       S_SelectTarget
 // ========================================================================
 
-// sendPetPack sends S_PUT_OBJECT (opcode 87) for a pet to the viewer.
+// SendPetPack sends S_PUT_OBJECT (opcode 87) for a pet to the viewer.
 // Protocol matches Java S_NPCPack_Pet — includes exp and lawful fields
 // (unlike summons which always write 0 for these).
-func sendPetPack(viewer *net.Session, pet *world.PetInfo, viewerIsOwner bool, masterName string) {
+func SendPetPack(viewer *net.Session, pet *world.PetInfo, viewerIsOwner bool, masterName string) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
 	w.WriteH(uint16(pet.X))
 	w.WriteH(uint16(pet.Y))

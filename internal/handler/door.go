@@ -189,24 +189,6 @@ func sendDoorTilesAll(door *world.DoorInfo, deps *Deps) {
 //
 // rejectMove（第二層）只是安全網，理論上不應該觸發。
 
-// SendEntityTileBlock 封鎖實體所站格子（客戶端端）。
-// 發送 4 個 S_CHANGE_ATTR 封包，封鎖目標格子的全部 4 個邊界（8 方向全擋）。
-// 視野內所有實體都會封鎖，無距離限制。
-func SendEntityTileBlock(viewer *net.Session, x, y int32) {
-	sendDoorAttr(viewer, x, y, 0, false)   // 北邊界：阻擋從北、東北進入
-	sendDoorAttr(viewer, x, y, 1, false)   // 東邊界：阻擋從東進入
-	sendDoorAttr(viewer, x, y+1, 0, false) // 南邊界：阻擋從南、東南、西南進入
-	sendDoorAttr(viewer, x-1, y, 1, false) // 西邊界：阻擋從西、西北、西南進入
-}
-
-// SendEntityTileUnblock 解除實體格子封鎖（客戶端端）。
-// 恢復目標格子 4 個邊界的通行性。
-func SendEntityTileUnblock(viewer *net.Session, x, y int32) {
-	sendDoorAttr(viewer, x, y, 0, true)   // 恢復北邊界
-	sendDoorAttr(viewer, x, y, 1, true)   // 恢復東邊界
-	sendDoorAttr(viewer, x, y+1, 0, true) // 恢復南邊界
-	sendDoorAttr(viewer, x-1, y, 1, true) // 恢復西邊界
-}
 
 // ChebyshevDist returns Chebyshev (chessboard) distance between two points.
 func ChebyshevDist(x1, y1, x2, y2 int32) int32 {

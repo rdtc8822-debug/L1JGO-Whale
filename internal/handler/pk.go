@@ -236,7 +236,7 @@ func dropOneItem(victim *world.PlayerInfo, deps *Deps) {
 	// Show ground item to nearby players
 	nearby := deps.World.GetNearbyPlayersAt(victim.X, victim.Y, victim.MapID)
 	for _, viewer := range nearby {
-		sendDropItem(viewer.Session, gndItem)
+		SendDropItem(viewer.Session, gndItem)
 	}
 
 	// Message 638: %0を失いました (你失去了%0)

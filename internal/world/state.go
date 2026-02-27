@@ -123,6 +123,9 @@ type PlayerInfo struct {
 	TradeItems      []*InvItem // items offered in trade
 	TradeGold       int32      // gold offered in trade
 
+	// AOI 可見性追蹤（VisibilitySystem 使用）
+	Known *KnownEntities
+
 	// Pending yes/no dialog (S_Message_YN response tracking)
 	PendingYesNoType int16 // 0=none, 252=trade confirm, 953=party invite, etc.
 	PendingYesNoData int32 // related charID (trade partner or party inviter)
@@ -249,6 +252,48 @@ func (p *PlayerInfo) RemoveBuff(skillID int32) *ActiveBuff {
 	old := p.ActiveBuffs[skillID]
 	delete(p.ActiveBuffs, skillID)
 	return old
+}
+
+// KnownPos 記錄已知實體的最後位置（用於離開視野時解鎖格子）。
+type KnownPos struct{ X, Y int32 }
+
+// KnownEntities 追蹤玩家目前視野中的已知實體（類似 Java knownObjects）。
+// VisibilitySystem 每 2 tick 掃描一次，與此集合做 diff。
+type KnownEntities struct {
+	Players     map[int32]KnownPos // CharID → 位置
+	Npcs        map[int32]KnownPos // NPC 實例 ID → 位置
+	Summons     map[int32]KnownPos // 召喚獸 ID → 位置
+	Dolls       map[int32]KnownPos // 魔法娃娃 ID → 位置
+	Followers   map[int32]KnownPos // 隨從 ID → 位置
+	Pets        map[int32]KnownPos // 寵物 ID → 位置
+	GroundItems map[int32]KnownPos // 地面物品 ID → 位置
+	Doors       map[int32]KnownPos // 門 ID → 位置
+}
+
+// NewKnownEntities 建立空白的已知實體集合。
+func NewKnownEntities() *KnownEntities {
+	return &KnownEntities{
+		Players:     make(map[int32]KnownPos),
+		Npcs:        make(map[int32]KnownPos),
+		Summons:     make(map[int32]KnownPos),
+		Dolls:       make(map[int32]KnownPos),
+		Followers:   make(map[int32]KnownPos),
+		Pets:        make(map[int32]KnownPos),
+		GroundItems: make(map[int32]KnownPos),
+		Doors:       make(map[int32]KnownPos),
+	}
+}
+
+// Reset 清空所有已知實體（用於傳送、rejectMove 等場景）。
+func (k *KnownEntities) Reset() {
+	clear(k.Players)
+	clear(k.Npcs)
+	clear(k.Summons)
+	clear(k.Dolls)
+	clear(k.Followers)
+	clear(k.Pets)
+	clear(k.GroundItems)
+	clear(k.Doors)
 }
 
 // Bookmark is a saved teleport location for a player.

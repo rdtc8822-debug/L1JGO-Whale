@@ -301,10 +301,10 @@ func executeSummonMonster(sess *net.Session, player *world.PlayerInfo, skill *da
 		nearby := ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 		for _, viewer := range nearby {
 			isOwner := viewer.CharID == player.CharID
-			sendSummonPack(viewer.Session, sum, isOwner, masterName)
+			SendSummonPack(viewer.Session, sum, isOwner, masterName)
 		}
 		// Also send to caster if not already in nearby list
-		sendSummonPack(sess, sum, true, masterName)
+		SendSummonPack(sess, sum, true, masterName)
 	}
 
 	// Show summon control menu for the first summon
@@ -399,8 +399,7 @@ func executeTamingMonster(sess *net.Session, player *world.PlayerInfo, skill *da
 	ws.NpcDied(npc)
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, npc.ID)
-		SendEntityTileUnblock(viewer.Session, npc.X, npc.Y)
+		SendRemoveObject(viewer.Session, npc.ID)
 	}
 
 	// Add summon to world
@@ -410,9 +409,9 @@ func executeTamingMonster(sess *net.Session, player *world.PlayerInfo, skill *da
 	nearby = ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 	for _, viewer := range nearby {
 		isOwner := viewer.CharID == player.CharID
-		sendSummonPack(viewer.Session, sum, isOwner, masterName)
+		SendSummonPack(viewer.Session, sum, isOwner, masterName)
 	}
-	sendSummonPack(sess, sum, true, masterName)
+	SendSummonPack(sess, sum, true, masterName)
 	sendSummonMenu(sess, sum)
 }
 
@@ -519,7 +518,7 @@ func executeCreateZombie(sess *net.Session, player *world.PlayerInfo, skill *dat
 	// Remove corpse NPC from view (already dead, just remove the sprite)
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, npc.ID)
+		SendRemoveObject(viewer.Session, npc.ID)
 	}
 
 	// Add summon to world
@@ -529,9 +528,9 @@ func executeCreateZombie(sess *net.Session, player *world.PlayerInfo, skill *dat
 	nearby = ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 	for _, viewer := range nearby {
 		isOwner := viewer.CharID == player.CharID
-		sendSummonPack(viewer.Session, sum, isOwner, masterName)
+		SendSummonPack(viewer.Session, sum, isOwner, masterName)
 	}
-	sendSummonPack(sess, sum, true, masterName)
+	SendSummonPack(sess, sum, true, masterName)
 	sendSummonMenu(sess, sum)
 }
 
@@ -571,7 +570,7 @@ func liberateSummon(sum *world.SummonInfo, deps *Deps) {
 	nearby := ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 	for _, viewer := range nearby {
 		sendCompanionEffect(viewer.Session, sum.ID, 2245) // return to nature sound
-		sendRemoveObject(viewer.Session, sum.ID)
+		SendRemoveObject(viewer.Session, sum.ID)
 	}
 
 	// Look up original NPC template to recreate
@@ -612,7 +611,7 @@ func liberateSummon(sum *world.SummonInfo, deps *Deps) {
 	ws.AddNpc(npc)
 	nearby = ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	for _, viewer := range nearby {
-		sendNpcPack(viewer.Session, npc)
+		SendNpcPack(viewer.Session, npc)
 	}
 }
 
@@ -623,7 +622,7 @@ func killSummon(sum *world.SummonInfo, deps *Deps) {
 	nearby := ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 	for _, viewer := range nearby {
 		sendCompanionEffect(viewer.Session, sum.ID, 169) // summon death sound
-		sendRemoveObject(viewer.Session, sum.ID)
+		SendRemoveObject(viewer.Session, sum.ID)
 	}
 }
 

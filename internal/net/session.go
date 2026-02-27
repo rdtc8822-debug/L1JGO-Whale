@@ -195,34 +195,55 @@ func (s *Session) readLoop() {
 
 // writeLoop runs in its own goroutine. It reads packets from OutQueue,
 // encrypts them, and writes them as framed data to the TCP connection.
+//
+// 模擬 Java PacketSc 的節奏控制：封包間保持 1ms 間隔，避免客戶端
+// 一次收到大量封包導致掉幀（天氣動畫變慢、NPC 停止呼吸等現象）。
 func (s *Session) writeLoop() {
 	defer s.Close()
 
 	for {
 		select {
 		case data := <-s.OutQueue:
-			// Debug: log outgoing packet opcode + size (first byte = opcode after padding)
-			if len(data) > 0 {
-				s.log.Debug("TX",
-					zap.String("op", fmt.Sprintf("0x%02X(%d)", data[0], data[0])),
-					zap.Int("len", len(data)),
-				)
-			}
-
-			// Clone before encrypt (cipher mutates in place)
-			encrypted := make([]byte, len(data))
-			copy(encrypted, data)
-			s.cipher.Encrypt(encrypted)
-
-			s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := WriteFrame(s.conn, encrypted); err != nil {
-				if !s.closed.Load() {
-					s.log.Debug("寫入錯誤", zap.Error(err))
-				}
+			if !s.writeOnePacket(data) {
 				return
+			}
+			// 批量排出：若 OutQueue 還有更多封包，以 1ms 間隔送出
+			for len(s.OutQueue) > 0 {
+				select {
+				case more := <-s.OutQueue:
+					time.Sleep(time.Millisecond)
+					if !s.writeOnePacket(more) {
+						return
+					}
+				case <-s.closeCh:
+					return
+				}
 			}
 		case <-s.closeCh:
 			return
 		}
 	}
+}
+
+// writeOnePacket 加密並寫入單一封包到 TCP socket。成功回傳 true。
+func (s *Session) writeOnePacket(data []byte) bool {
+	if len(data) > 0 {
+		s.log.Debug("TX",
+			zap.String("op", fmt.Sprintf("0x%02X(%d)", data[0], data[0])),
+			zap.Int("len", len(data)),
+		)
+	}
+
+	encrypted := make([]byte, len(data))
+	copy(encrypted, data)
+	s.cipher.Encrypt(encrypted)
+
+	s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if err := WriteFrame(s.conn, encrypted); err != nil {
+		if !s.closed.Load() {
+			s.log.Debug("寫入錯誤", zap.Error(err))
+		}
+		return false
+	}
+	return true
 }

@@ -143,7 +143,7 @@ func handleUsePetCollar(sess *net.Session, player *world.PlayerInfo, invItem *wo
 	nearby := ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
 		isOwner := viewer.CharID == player.CharID
-		sendPetPack(viewer.Session, pet, isOwner, player.Name)
+		SendPetPack(viewer.Session, pet, isOwner, player.Name)
 	}
 
 	// Send pet control panel to owner
@@ -221,7 +221,7 @@ func DismissPet(pet *world.PetInfo, player *world.PlayerInfo, deps *Deps) {
 	// Broadcast removal
 	nearby := ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, pet.ID)
+		SendRemoveObject(viewer.Session, pet.ID)
 	}
 
 	// Close pet control panel
@@ -258,7 +258,7 @@ func DismissPet(pet *world.PetInfo, player *world.PlayerInfo, deps *Deps) {
 		}
 		ws.AddNpc(npc)
 		for _, viewer := range nearby {
-			sendNpcPack(viewer.Session, npc)
+			SendNpcPack(viewer.Session, npc)
 		}
 	}
 
@@ -307,7 +307,7 @@ func CollectPet(pet *world.PetInfo, player *world.PlayerInfo, deps *Deps) {
 	// Broadcast removal
 	nearby := ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, pet.ID)
+		SendRemoveObject(viewer.Session, pet.ID)
 	}
 
 	// Close pet control panel
@@ -467,6 +467,6 @@ func handlePetNameChange(sess *net.Session, player *world.PlayerInfo, petID int3
 	nearby := deps.World.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
 		isOwner := viewer.CharID == player.CharID
-		sendPetPack(viewer.Session, pet, isOwner, player.Name)
+		SendPetPack(viewer.Session, pet, isOwner, player.Name)
 	}
 }

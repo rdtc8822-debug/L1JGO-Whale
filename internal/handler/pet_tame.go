@@ -161,7 +161,7 @@ func handleTameNpc(sess *net.Session, player *world.PlayerInfo, npc *world.NpcIn
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 	ws.RemoveNpc(npc.ID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, npc.ID)
+		SendRemoveObject(viewer.Session, npc.ID)
 	}
 
 	// Create collar item in player inventory
@@ -261,7 +261,7 @@ func evolvePet(sess *net.Session, player *world.PlayerInfo, pet *world.PetInfo, 
 	// Broadcast removal of old appearance
 	nearby := ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
-		sendRemoveObject(viewer.Session, pet.ID)
+		SendRemoveObject(viewer.Session, pet.ID)
 	}
 
 	// Transform pet stats — Java: maxHP/2, maxMP/2, level=1, exp=0
@@ -316,7 +316,7 @@ func evolvePet(sess *net.Session, player *world.PlayerInfo, pet *world.PetInfo, 
 	nearby = ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	for _, viewer := range nearby {
 		isOwner := viewer.CharID == player.CharID
-		sendPetPack(viewer.Session, pet, isOwner, player.Name)
+		SendPetPack(viewer.Session, pet, isOwner, player.Name)
 		sendCompanionEffect(viewer.Session, pet.ID, 2127) // level-up glow
 	}
 

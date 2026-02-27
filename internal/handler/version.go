@@ -29,7 +29,7 @@ func HandleVersion(sess *net.Session, r *packet.Reader, deps *Deps) {
 	w.WriteC(0x00)                    // unknown
 	w.WriteC(0x00)                    // unknown
 	w.WriteC(byte(cfg.Server.Language)) // country code
-	w.WriteDU(0x087f7dc2)             // server type
+	w.WriteDU(0x77d82)                // server type（啟用客戶端地形碰撞，匹配 Java yiwei）
 	w.WriteD(uptime)                  // uptime seconds
 	w.WriteH(0x01)                    // unknown
 

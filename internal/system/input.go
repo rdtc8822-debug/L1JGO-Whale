@@ -6,7 +6,6 @@ import (
 
 	coresys "github.com/l1jgo/server/internal/core/system"
 	"github.com/l1jgo/server/internal/data"
-	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/net"
 	"github.com/l1jgo/server/internal/net/packet"
 	"github.com/l1jgo/server/internal/persist"
@@ -137,6 +136,13 @@ doneDead:
 			}
 		}
 	}
+
+	// 提前 flush：讓 Phase 0 產生的封包（移動廣播、AOI 更新）
+	// 立即進入 OutQueue，writeLoop 可在 Phase 1-3 運行時就開始發送。
+	// Phase 4 的 OutputSystem 會再 flush Phase 1-3 產生的剩餘封包。
+	s.store.ForEach(func(sess *net.Session) {
+		sess.FlushOutput()
+	})
 }
 
 // handleDisconnect cleans up when a session closes:
@@ -281,7 +287,6 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 		removePacket := buildRemoveObjectPacket(player.CharID)
 		for _, other := range nearby {
 			other.Session.Send(removePacket)
-			handler.SendEntityTileUnblock(other.Session, player.X, player.Y)
 		}
 
 		// Save full character state to DB
