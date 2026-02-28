@@ -42,7 +42,7 @@ BUFF_DEFS = {
 
     [43] = { move_speed = 1, exclusions = {29, 76, 54} },                    -- Haste
 
-    [47] = { dmg_mod = -6, ac = 12 },                                        -- Disease (debuff)
+    [47] = { dmg_mod = -5, hit_mod = -1 },                                     -- Weakness 弱化術 (debuff)
 
     [50] = { paralyzed = true },                                              -- Ice Lance (freeze)
     [52] = { brave_speed = 4 },                                               -- Holy Walk

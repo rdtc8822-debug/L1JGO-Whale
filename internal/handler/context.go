@@ -20,8 +20,13 @@ type AttackRequest struct {
 }
 
 // CombatQueue accepts attack requests from handlers for deferred Phase 2 processing.
+// 也提供 HandleNpcDeath / AddExp 給 handler 內其他檔案呼叫（weapon_skill, gmcommand）。
 type CombatQueue interface {
 	QueueAttack(req AttackRequest)
+	// HandleNpcDeath 處理 NPC 死亡（經驗、掉落、移除）。
+	HandleNpcDeath(npc *world.NpcInfo, killer *world.PlayerInfo, nearby []*world.PlayerInfo) *NpcKillResult
+	// AddExp 增加經驗值並檢查升級。
+	AddExp(player *world.PlayerInfo, expGain int32)
 }
 
 // SkillRequest is queued by the handler and processed by SkillSystem in Phase 2.
@@ -37,10 +42,20 @@ type SkillManager interface {
 	QueueSkill(req SkillRequest)
 	// CancelAllBuffs 移除目標所有可取消的 buff（Cancellation 效果）。
 	CancelAllBuffs(target *world.PlayerInfo)
+	// ClearAllBuffsOnDeath 死亡時清除所有 buff（含不可取消的）。
+	ClearAllBuffsOnDeath(target *world.PlayerInfo)
 	// TickPlayerBuffs 每 tick 遞減 buff 計時器並處理到期。
 	TickPlayerBuffs(p *world.PlayerInfo)
 	// RemoveBuffAndRevert 移除指定 buff 並還原屬性。
 	RemoveBuffAndRevert(target *world.PlayerInfo, skillID int32)
+}
+
+// DeathManager 處理玩家死亡與重生。由 system.DeathSystem 實作。
+type DeathManager interface {
+	// KillPlayer 處理玩家死亡（動畫、經驗懲罰、清 buff）。
+	KillPlayer(player *world.PlayerInfo)
+	// ProcessRestart 處理死亡重生（回城、重建 Known）。
+	ProcessRestart(sess *net.Session, player *world.PlayerInfo)
 }
 
 // NpcKillResult is returned by ProcessMeleeAttack/ProcessRangedAttack when an NPC
@@ -130,6 +145,136 @@ type ClanManager interface {
 	DownloadEmblem(sess *net.Session, emblemID int32)
 }
 
+// SummonManager 處理召喚技能邏輯（召喚/馴服/殭屍/歸返自然）。由 system.SummonSystem 實作。
+type SummonManager interface {
+	// ExecuteSummonMonster 處理技能 51 召喚怪物。
+	ExecuteSummonMonster(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32)
+	// ExecuteTamingMonster 處理技能 36 馴服怪物。
+	ExecuteTamingMonster(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32)
+	// ExecuteCreateZombie 處理技能 41 創造殭屍。
+	ExecuteCreateZombie(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32)
+	// ExecuteReturnToNature 處理技能 145 歸返自然。
+	ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo)
+	// DismissSummon 自願解散召喚獸。
+	DismissSummon(sum *world.SummonInfo, player *world.PlayerInfo)
+}
+
+// PolymorphManager 處理變身邏輯（變身/解除、裝備相容檢查）。由 system.PolymorphSystem 實作。
+type PolymorphManager interface {
+	// DoPoly 將玩家變身為指定形態。cause: PolyCauseMagic(1)/PolyCauseGM(2)/PolyCauseNPC(4)。
+	DoPoly(player *world.PlayerInfo, polyID int32, durationSec int, cause int)
+	// UndoPoly 解除玩家變身，恢復原始外觀。
+	UndoPoly(player *world.PlayerInfo)
+	// UsePolyScroll 處理變身卷軸使用。monsterName="" 表示取消變身。
+	UsePolyScroll(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, monsterName string)
+	// UsePolySkill 處理變形術技能選擇對話框結果。
+	UsePolySkill(sess *net.Session, player *world.PlayerInfo, monsterName string)
+}
+
+// PvPManager 處理 PvP 戰鬥邏輯（PvP 攻擊、粉紅名、善惡值、PK 擊殺）。由 system.PvPSystem 實作。
+type PvPManager interface {
+	// HandlePvPAttack 處理近戰 PvP 攻擊。
+	HandlePvPAttack(attacker, target *world.PlayerInfo)
+	// HandlePvPFarAttack 處理遠程 PvP 攻擊。
+	HandlePvPFarAttack(attacker, target *world.PlayerInfo)
+	// AddLawfulFromNpc 根據 NPC 善惡值增加擊殺者善惡值。
+	AddLawfulFromNpc(killer *world.PlayerInfo, npcLawful int32)
+}
+
+// MailManager 處理信件邏輯（讀取/寫入/刪除/搬移）。由 system.MailSystem 實作。
+type MailManager interface {
+	// OpenMailbox 載入並發送信件列表。
+	OpenMailbox(sess *net.Session, player *world.PlayerInfo, mailType int16)
+	// ReadMail 讀取信件內容並標記已讀。
+	ReadMail(sess *net.Session, player *world.PlayerInfo, mailID int32, mailType int16)
+	// SendMail 寄出一封一般信件。
+	SendMail(sess *net.Session, player *world.PlayerInfo, receiverName string, rawText []byte)
+	// DeleteMail 刪除單封信件。
+	DeleteMail(sess *net.Session, player *world.PlayerInfo, mailID int32, subtype byte)
+	// MoveToStorage 搬移信件至保管箱。
+	MoveToStorage(sess *net.Session, player *world.PlayerInfo, mailID int32, subtype byte)
+	// BulkDelete 批次刪除信件。
+	BulkDelete(sess *net.Session, player *world.PlayerInfo, subtype byte, mailIDs []int32)
+}
+
+// ShopManager 處理 NPC 商店交易邏輯（購買/販賣）。由 system.ShopSystem 實作。
+type ShopManager interface {
+	// BuyFromNpc 處理玩家從 NPC 購買物品。
+	BuyFromNpc(sess *net.Session, r *packet.Reader, count int, player *world.PlayerInfo, shop *data.Shop)
+	// SellToNpc 處理玩家向 NPC 販賣物品。
+	SellToNpc(sess *net.Session, r *packet.Reader, count int, player *world.PlayerInfo, shop *data.Shop)
+}
+
+// CraftManager 處理 NPC 製作邏輯（材料驗證、消耗、生產）。由 system.CraftSystem 實作。
+type CraftManager interface {
+	// HandleCraftEntry 製作入口：檢查材料、顯示批量對話或執行製作。
+	HandleCraftEntry(sess *net.Session, player *world.PlayerInfo, npc *world.NpcInfo, recipe *data.CraftRecipe, action string)
+	// ExecuteCraft 執行製作：驗證材料、消耗、生產物品。
+	ExecuteCraft(sess *net.Session, player *world.PlayerInfo, npc *world.NpcInfo, recipe *data.CraftRecipe, amount int32)
+}
+
+// PetLifecycleManager 處理寵物生命週期邏輯（召喚/收回/解放/死亡/經驗/指令）。由 system.PetSystem 實作。
+type PetLifecycleManager interface {
+	// UsePetCollar 使用寵物項圈召喚寵物（或收回已召喚的寵物）。
+	UsePetCollar(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem)
+	// HandlePetAction 處理寵物控制指令（攻擊/防禦/待機/解放等）。
+	HandlePetAction(sess *net.Session, player *world.PlayerInfo, pet *world.PetInfo, action string)
+	// HandlePetNameChange 處理寵物改名。
+	HandlePetNameChange(sess *net.Session, player *world.PlayerInfo, petID int32, newName string)
+	// DismissPet 解放寵物（轉為野生 NPC）。
+	DismissPet(pet *world.PetInfo, player *world.PlayerInfo)
+	// CollectPet 收回寵物至項圈（儲存 DB）。
+	CollectPet(pet *world.PetInfo, player *world.PlayerInfo)
+	// PetDie 處理寵物死亡（經驗懲罰、動畫）。
+	PetDie(pet *world.PetInfo)
+	// AddPetExp 增加寵物經驗值並處理升級。
+	AddPetExp(pet *world.PetInfo, expGain int32)
+	// PetExpPercent 計算寵物經驗百分比（0-100）。
+	PetExpPercent(pet *world.PetInfo) int
+	// CalcUsedPetCost 計算玩家已使用的寵物/召喚獸 CHA 消耗。
+	CalcUsedPetCost(charID int32) int
+	// GiveToPet 處理給予寵物物品（裝備/進化）。
+	GiveToPet(sess *net.Session, player *world.PlayerInfo, pet *world.PetInfo, invItem *world.InvItem)
+	// TameNpc 處理馴服野生 NPC 為寵物。
+	TameNpc(sess *net.Session, player *world.PlayerInfo, npc *world.NpcInfo)
+	// UsePetItem 處理寵物裝備穿脫。
+	UsePetItem(sess *net.Session, pet *world.PetInfo, listNo int)
+}
+
+// DollManager 處理魔法娃娃召喚/解散/屬性加成。由 system.DollSystem 實作。
+type DollManager interface {
+	// UseDoll 處理使用魔法娃娃物品（召喚或收回）。
+	UseDoll(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, dollDef *data.DollDef)
+	// DismissDoll 解散魔法娃娃（還原加成、移除、廣播）。
+	DismissDoll(doll *world.DollInfo, player *world.PlayerInfo)
+	// RemoveDollBonuses 僅還原娃娃屬性加成（不移除世界實體）。
+	RemoveDollBonuses(player *world.PlayerInfo, doll *world.DollInfo)
+}
+
+// ItemGroundManager 處理物品地面操作（銷毀、掉落、撿取）。由 system.ItemGroundSystem 實作。
+type ItemGroundManager interface {
+	// DestroyItem 銷毀背包中的物品。
+	DestroyItem(sess *net.Session, player *world.PlayerInfo, objectID, count int32)
+	// DropItem 將物品掉落至地面。
+	DropItem(sess *net.Session, player *world.PlayerInfo, objectID, count int32)
+	// PickupItem 從地面撿取物品。
+	PickupItem(sess *net.Session, player *world.PlayerInfo, objectID int32)
+}
+
+// WarehouseManager 處理倉庫邏輯（存入/領出、DB 操作、血盟鎖定）。由 system.WarehouseSystem 實作。
+type WarehouseManager interface {
+	// OpenWarehouse 載入倉庫並發送物品列表。
+	OpenWarehouse(sess *net.Session, player *world.PlayerInfo, npcObjID int32, whType int16)
+	// OpenWarehouseDeposit 開啟倉庫存入介面（與 OpenWarehouse 相同，客戶端內建 tab）。
+	OpenWarehouseDeposit(sess *net.Session, player *world.PlayerInfo, npcObjID int32, whType int16)
+	// OpenClanWarehouse 開啟血盟倉庫（含權限驗證+單人鎖定）。
+	OpenClanWarehouse(sess *net.Session, player *world.PlayerInfo, npcObjID int32)
+	// HandleWarehouseOp 處理倉庫存入/領出操作。
+	HandleWarehouseOp(sess *net.Session, r *packet.Reader, resultType byte, count int, player *world.PlayerInfo)
+	// SendClanWarehouseHistory 發送血盟倉庫歷史記錄。
+	SendClanWarehouseHistory(sess *net.Session, clanID int32)
+}
+
 // EquipManager 處理裝備邏輯（穿脫武器/防具、套裝系統、屬性計算）。由 system.EquipSystem 實作。
 type EquipManager interface {
 	// EquipWeapon 裝備武器或脫下已裝備的武器。
@@ -215,11 +360,22 @@ type Deps struct {
 	TeleportPages *data.TeleportPageTable
 	Combat        CombatQueue  // filled after CombatSystem is created
 	Skill         SkillManager // filled after SkillSystem is created
+	Death         DeathManager // filled after DeathSystem is created
 	Trade         TradeManager // filled after TradeSystem is created
 	Party         PartyManager // filled after PartySystem is created
 	Clan          ClanManager  // filled after ClanSystem is created
-	Equip         EquipManager    // filled after EquipSystem is created
-	ItemUse       ItemUseManager  // filled after ItemUseSystem is created
+	Summon        SummonManager    // filled after SummonSystem is created
+	Polymorph     PolymorphManager // filled after PolymorphSystem is created
+	Equip         EquipManager      // filled after EquipSystem is created
+	ItemUse       ItemUseManager    // filled after ItemUseSystem is created
+	Mail          MailManager        // filled after MailSystem is created
+	Warehouse     WarehouseManager  // filled after WarehouseSystem is created
+	PvP           PvPManager        // filled after PvPSystem is created
+	Shop          ShopManager       // filled after ShopSystem is created
+	Craft         CraftManager      // filled after CraftSystem is created
+	ItemGround    ItemGroundManager    // filled after ItemGroundSystem is created
+	PetLife       PetLifecycleManager // filled after PetSystem is created
+	DollMgr       DollManager         // filled after DollSystem is created
 	Bus           *event.Bus  // event bus for emitting game events (EntityKilled, etc.)
 	WeaponSkills  *data.WeaponSkillTable
 }
@@ -272,6 +428,13 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 		[]packet.SessionState{packet.StateAuthenticated, packet.StateInWorld, packet.StateReturningToSelect},
 		func(sess any, r *packet.Reader) {
 			HandleChangeChar(sess.(*net.Session), r, deps)
+		},
+	)
+	// C_CommonClick (opcode 16) — 客戶端收到 LOGOUT 後自動發送，請求角色列表。
+	// Java: C_CommonClick.java — 回應 S_CharAmount + S_CharPacks。
+	reg.Register(packet.C_OPCODE_COMMON_CLICK, authStates,
+		func(sess any, r *packet.Reader) {
+			sendCharacterList(sess.(*net.Session), deps)
 		},
 	)
 
@@ -363,16 +526,18 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 			HandlePickupItem(sess.(*net.Session), r, deps)
 		},
 	)
-	reg.Register(packet.C_OPCODE_FIXABLE_ITEM, inWorldStates,
+	// C_FIX (118) = C_FixWeaponList in Java — 武器修理列表查詢。
+	// 注意：opcode 254 在 Java 中是 C_Windows（書籤排序、地圖計時等），不是武器修理！
+	reg.Register(packet.C_OPCODE_FIX, inWorldStates,
 		func(sess any, r *packet.Reader) {
 			HandleFixWeaponList(sess.(*net.Session), r, deps)
 		},
 	)
-	// C_FIX (118) = C_FixWeaponList in Java — same handler as C_FIXABLE_ITEM (254).
-	// Both opcodes query the damaged weapon list; the client may send either one.
-	reg.Register(packet.C_OPCODE_FIX, inWorldStates,
+	// C_WINDOWS (254) = C_Windows in Java — 書籤排序、地圖計時器等客戶端初始化請求。
+	// 客戶端登入後自動發送。目前忽略（未實作）。
+	reg.Register(packet.C_OPCODE_FIXABLE_ITEM, inWorldStates,
 		func(sess any, r *packet.Reader) {
-			HandleFixWeaponList(sess.(*net.Session), r, deps)
+			// TODO: 實作 C_Windows 處理器（書籤排序、地圖計時等）
 		},
 	)
 	reg.Register(packet.C_OPCODE_PERSONAL_SHOP, inWorldStates,

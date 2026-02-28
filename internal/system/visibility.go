@@ -92,14 +92,19 @@ func (s *VisibilitySystem) updatePlayerVisibility(p *world.PlayerInfo) {
 // --- NPC AOI ---
 
 func (s *VisibilitySystem) updateNpcVisibility(p *world.PlayerInfo) {
-	nearby := s.world.GetNearbyNpcs(p.X, p.Y, p.MapID)
+	nearby := s.world.GetNearbyNpcsForVis(p.X, p.Y, p.MapID)
 
 	currentSet := make(map[int32]struct{}, len(nearby))
 	for _, npc := range nearby {
 		currentSet[npc.ID] = struct{}{}
 
 		if _, known := p.Known.Npcs[npc.ID]; !known {
-			handler.SendNpcPack(p.Session, npc)
+			// Java onPerceive: 死亡 NPC 以 status=8 發送，活 NPC 以 status=0 發送
+			if npc.Dead {
+				handler.SendNpcDeadPack(p.Session, npc) // 屍體姿態
+			} else {
+				handler.SendNpcPack(p.Session, npc)
+			}
 			p.Known.Npcs[npc.ID] = world.KnownPos{X: npc.X, Y: npc.Y}
 		} else {
 			p.Known.Npcs[npc.ID] = world.KnownPos{X: npc.X, Y: npc.Y}

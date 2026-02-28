@@ -40,6 +40,7 @@ const (
 	S_OPCODE_TIME                   byte = 123 // S_GameTime
 	S_OPCODE_NEW_CHAR_INFO          byte = 127
 	S_OPCODE_VERSION_CHECK          byte = 139 // S_ServerVersion
+	S_OPCODE_CHANGENAME             byte = 46  // S_ChangeName
 	S_OPCODE_ACTION                 byte = 158 // S_DoActionGFX
 	S_OPCODE_ADD_SPELL              byte = 164
 	S_OPCODE_INVISIBLE              byte = 171
@@ -94,6 +95,7 @@ const (
 	C_OPCODE_DUEL                    byte = 5
 	C_OPCODE_USE_SPELL               byte = 6
 	C_OPCODE_REQUEST_ROLL            byte = 7   // C_ChangeChar
+	C_OPCODE_COMMON_CLICK            byte = 16  // C_CommonClick（回選角後客戶端請求角色列表）
 	C_OPCODE_PLATE                   byte = 10
 	C_OPCODE_HYPERTEXT_INPUT_RESULT  byte = 11
 	C_OPCODE_WAREHOUSE_CONTROL       byte = 13
@@ -177,6 +179,6 @@ const (
 	C_OPCODE_SAVEIO                  byte = 244
 	C_OPCODE_EXCHANGEABLE_SPELL      byte = 245
 	C_OPCODE_SHUTDOWN                byte = 253
-	C_OPCODE_FIXABLE_ITEM            byte = 254
+	C_OPCODE_FIXABLE_ITEM            byte = 254 // Java: C_Windows（書籤排序/地圖計時等，非武器修理）
 	C_OPCODE_BANISH_PARTY            byte = 255
 )

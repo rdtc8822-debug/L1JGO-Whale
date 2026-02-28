@@ -67,11 +67,10 @@ type PlayerInfo struct {
 	RegenHPAcc int   // HP regen accumulator: counts 1-second ticks since last HP regen
 
 	Dead       bool  // true when HP <= 0, waiting for restart
-	Invisible  bool  // true when under Invisibility
-	Paralyzed  bool  // true when frozen/stunned/bound
-	Sleeped    bool  // true when under sleep effect
-	Silenced   bool  // 沉默狀態（沉默毒 / silence 技能）— 禁止施法
-	PKMode     bool  // true when PK button is toggled on (client sends C_DUEL to toggle)
+	Invisible bool // true when under Invisibility
+	Paralyzed bool // true when frozen/stunned/bound
+	Sleeped   bool // true when under sleep effect
+	Silenced  bool // 沉默狀態（沉默毒 / silence 技能）— 禁止施法
 
 	LastMoveTime int64 // time.Now().UnixNano() of last accepted move (0 = no throttle)
 
@@ -129,6 +128,7 @@ type PlayerInfo struct {
 	PoisonType      byte
 	PoisonTicksLeft int    // 毒剩餘 ticks（傷害毒:150, 麻痺延遲:100, 麻痺:80）
 	PoisonDmgTimer  int    // 傷害毒：距下次扣血的 tick 計數（每 15 tick 扣一次）
+	PoisonDmgAmount int16  // 傷害毒每次扣血量（NPC攻擊:20, 毒咒:5）
 	PoisonAttacker  uint64 // 施毒者 SessionID（傷害毒歸屬用）
 
 	// --- 詛咒麻痺系統（Java L1CurseParalysis，與毒系統獨立）---
@@ -603,6 +603,39 @@ func (s *State) GetNearbyNpcs(x, y int32, mapID int16) []*NpcInfo {
 	return result
 }
 
+// GetNearbyNpcsForVis 回傳附近可見 NPC（含屍體）供 VisibilitySystem 使用。
+// 活著的 NPC + 死亡但 DeleteTimer > 0 的 NPC（屍體仍需顯示在客戶端）。
+func (s *State) GetNearbyNpcsForVis(x, y int32, mapID int16) []*NpcInfo {
+	nearbyIDs := s.npcAoi.GetNearby(x, y, mapID)
+	result := make([]*NpcInfo, 0, len(nearbyIDs))
+	for _, nid := range nearbyIDs {
+		npc := s.npcs[nid]
+		if npc == nil {
+			continue
+		}
+		// 跳過已完成刪除階段的死亡 NPC（DeleteTimer 已歸零）
+		if npc.Dead && npc.DeleteTimer <= 0 {
+			continue
+		}
+		dx := npc.X - x
+		dy := npc.Y - y
+		if dx < 0 {
+			dx = -dx
+		}
+		if dy < 0 {
+			dy = -dy
+		}
+		dist := dx
+		if dy > dist {
+			dist = dy
+		}
+		if dist <= 20 {
+			result = append(result, npc)
+		}
+	}
+	return result
+}
+
 // UpdateNpcPosition moves an NPC and updates NPC AOI grid + entity grid.
 // All NPC position changes MUST go through this method to keep indices consistent.
 func (s *State) UpdateNpcPosition(npcID int32, newX, newY int32, heading int16) {
@@ -641,11 +674,16 @@ func (s *State) RemoveNpc(npcID int32) *NpcInfo {
 	return npc
 }
 
-// NpcDied removes a dead NPC from the NPC AOI grid and entity grid.
-// Call this when an NPC's Dead flag is set to true.
+// NpcDied 處理 NPC 死亡：釋放格子碰撞但保留 AOI（屍體需持續可見）。
+// AOI 移除由 NpcCorpseCleanup 在 DeleteTimer 歸零後處理。
 func (s *State) NpcDied(npc *NpcInfo) {
-	s.npcAoi.Remove(npc.ID, npc.X, npc.Y, npc.MapID)
 	s.entity.Vacate(npc.MapID, npc.X, npc.Y, npc.ID)
+}
+
+// NpcCorpseCleanup 從 NPC AOI 網格移除死亡 NPC（屍體消失階段）。
+// 由 NpcRespawnSystem 在 DeleteTimer 歸零後呼叫。
+func (s *State) NpcCorpseCleanup(npc *NpcInfo) {
+	s.npcAoi.Remove(npc.ID, npc.X, npc.Y, npc.MapID)
 }
 
 // NpcRespawn re-adds a respawned NPC to the NPC AOI grid and entity grid.

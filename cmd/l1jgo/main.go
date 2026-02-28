@@ -466,6 +466,22 @@ func run() error {
 	deps.Equip = system.NewEquipSystem(deps)
 	// 物品使用系統（直接呼叫，非 Phase 系統）
 	deps.ItemUse = system.NewItemUseSystem(deps)
+	// 信件系統（直接呼叫，非 Phase 系統）
+	deps.Mail = system.NewMailSystem(deps)
+	// 商店系統（直接呼叫，非 Phase 系統）
+	deps.Shop = system.NewShopSystem(deps)
+	// 製作系統（直接呼叫，非 Phase 系統）
+	deps.Craft = system.NewCraftSystem(deps)
+	// 物品地面操作系統（銷毀、掉落、撿取）
+	deps.ItemGround = system.NewItemGroundSystem(deps)
+	// 寵物生命週期系統（召喚/收回/解放/死亡/經驗/指令）
+	deps.PetLife = system.NewPetSystem(deps)
+	// 魔法娃娃系統（召喚/解散/屬性加成）
+	deps.DollMgr = system.NewDollSystem(deps)
+	// 倉庫系統（直接呼叫，非 Phase 系統）
+	deps.Warehouse = system.NewWarehouseSystem(deps)
+	// PvP 系統（直接呼叫，非 Phase 系統）
+	deps.PvP = system.NewPvPSystem(deps)
 
 	// Phase 2: Game logic
 	combatSys := system.NewCombatSystem(deps)
@@ -474,6 +490,12 @@ func run() error {
 	skillSys := system.NewSkillSystem(deps)
 	deps.Skill = skillSys
 	runner.Register(skillSys)
+	deathSys := system.NewDeathSystem(deps)
+	deps.Death = deathSys
+	polySys := system.NewPolymorphSystem(deps)
+	deps.Polymorph = polySys
+	summonSys := system.NewSummonSystem(deps)
+	deps.Summon = summonSys
 	runner.Register(system.NewBuffTickSystem(worldState, deps))
 	runner.Register(system.NewNpcRespawnSystem(worldState, mapDataTable))
 	runner.Register(system.NewNpcAISystem(worldState, deps))

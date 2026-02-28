@@ -92,10 +92,14 @@ func (s *EquipSystem) EquipWeapon(sess *net.Session, player *world.PlayerInfo, i
 
 	// 套裝變身
 	if oldSetPoly > 0 {
-		handler.UndoPoly(player, s.deps)
+		if s.deps.Polymorph != nil {
+			s.deps.Polymorph.UndoPoly(player)
+		}
 	}
 	if newSetPoly > 0 {
-		handler.DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, s.deps)
+		if s.deps.Polymorph != nil {
+			s.deps.Polymorph.DoPoly(player, newSetPoly, 0, data.PolyCauseNPC)
+		}
 	}
 
 	s.deps.Log.Debug("武器裝備",
@@ -238,10 +242,14 @@ func (s *EquipSystem) EquipArmor(sess *net.Session, player *world.PlayerInfo, in
 
 	// 套裝變身
 	if oldSetPoly > 0 {
-		handler.UndoPoly(player, s.deps)
+		if s.deps.Polymorph != nil {
+			s.deps.Polymorph.UndoPoly(player)
+		}
 	}
 	if newSetPoly > 0 {
-		handler.DoPoly(player, newSetPoly, 0, data.PolyCauseNPC, s.deps)
+		if s.deps.Polymorph != nil {
+			s.deps.Polymorph.DoPoly(player, newSetPoly, 0, data.PolyCauseNPC)
+		}
 	}
 
 	s.deps.Log.Debug("防具裝備",
@@ -282,7 +290,9 @@ func (s *EquipSystem) UnequipSlot(sess *net.Session, player *world.PlayerInfo, s
 
 	// 套裝破壞時還原變身
 	if brokenSetPoly > 0 {
-		handler.UndoPoly(player, s.deps)
+		if s.deps.Polymorph != nil {
+			s.deps.Polymorph.UndoPoly(player)
+		}
 	}
 }
 
@@ -614,26 +624,14 @@ func sendEquipSlotUpdate(sess *net.Session, itemObjID int32, slot world.EquipSlo
 }
 
 // sendEquipSlotList 發送完整裝備欄位列表（登入時用）。
+// 使用 Java S_EquipmentWindow 格式（type 0x42）逐件發送。
 func sendEquipSlotList(sess *net.Session, player *world.PlayerInfo) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
-	w.WriteC(0x41)
-	count := byte(0)
-	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
-		if player.Equip.Get(i) != nil {
-			count++
-		}
-	}
-	w.WriteC(count)
 	for i := world.EquipSlot(1); i < world.SlotMax; i++ {
 		item := player.Equip.Get(i)
 		if item != nil {
-			w.WriteD(item.ObjectID)
-			w.WriteD(int32(world.EquipClientIndex(i)))
+			sendEquipSlotUpdate(sess, item.ObjectID, i, true)
 		}
 	}
-	w.WriteD(0)
-	w.WriteC(0)
-	sess.Send(w.Bytes())
 }
 
 // sendServerMessageS 發送帶 $xxx 參數的伺服器訊息。

@@ -300,25 +300,39 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 
 		// Save full character state to DB
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		// 儲存時必須扣除裝備加成和 buff 加成，只保存基礎值。
+		// 否則重新登入時 InitEquipStats / loadAndRestoreBuffs 會重複疊加，造成屬性膨脹。
+		eq := player.EquipBonuses
+		var bStr, bDex, bCon, bWis, bIntel, bCha, bMaxHP, bMaxMP int16
+		for _, b := range player.ActiveBuffs {
+			bStr += b.DeltaStr
+			bDex += b.DeltaDex
+			bCon += b.DeltaCon
+			bWis += b.DeltaWis
+			bIntel += b.DeltaIntel
+			bCha += b.DeltaCha
+			bMaxHP += b.DeltaMaxHP
+			bMaxMP += b.DeltaMaxMP
+		}
 		row := &persist.CharacterRow{
 			Name:       player.Name,
 			Level:      player.Level,
 			Exp:        int64(player.Exp),
 			HP:         player.HP,
 			MP:         player.MP,
-			MaxHP:      player.MaxHP,
-			MaxMP:      player.MaxMP,
+			MaxHP:      player.MaxHP - int16(eq.AddHP) - bMaxHP,
+			MaxMP:      player.MaxMP - int16(eq.AddMP) - bMaxMP,
 			X:          player.X,
 			Y:          player.Y,
 			MapID:      player.MapID,
 			Heading:    player.Heading,
 			Lawful:     player.Lawful,
-			Str:        player.Str,
-			Dex:        player.Dex,
-			Con:        player.Con,
-			Wis:        player.Wis,
-			Cha:        player.Cha,
-			Intel:      player.Intel,
+			Str:        player.Str - int16(eq.AddStr) - bStr,
+			Dex:        player.Dex - int16(eq.AddDex) - bDex,
+			Con:        player.Con - int16(eq.AddCon) - bCon,
+			Wis:        player.Wis - int16(eq.AddWis) - bWis,
+			Cha:        player.Cha - int16(eq.AddCha) - bCha,
+			Intel:      player.Intel - int16(eq.AddInt) - bIntel,
 			BonusStats: player.BonusStats,
 			ClanID:     player.ClanID,
 			ClanName:   player.ClanName,
@@ -469,16 +483,12 @@ func sendAddItemPacket(sess *net.Session, item *world.InvItem) {
 	w.WriteD(item.Count)
 	w.WriteC(0)                          // itemStatusX
 	w.WriteS(item.Name)
-	w.WriteC(0)                          // status bytes length
-	w.WriteC(0x17)
-	w.WriteC(0)
+	w.WriteC(0) // status bytes length
+	// 尾部固定 11 bytes（Java: S_AddItem 格式）
+	w.WriteC(10) // 固定值 0x0A
 	w.WriteH(0)
-	w.WriteH(0)
-	w.WriteC(byte(item.EnchantLvl))
-	w.WriteD(item.ObjectID)              // world serial
 	w.WriteD(0)
 	w.WriteD(0)
-	w.WriteD(7)                          // flags: 7=deletable
 	sess.Send(w.Bytes())
 }
 

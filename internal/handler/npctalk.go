@@ -23,8 +23,8 @@ func HandleNpcTalk(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Check if target is a pet — show pet control menu ("anicom")
 	if pet := deps.World.GetPet(objID); pet != nil {
 		player := deps.World.GetBySession(sess.ID)
-		if player != nil && pet.OwnerCharID == player.CharID {
-			sendPetMenu(sess, pet, petExpPercent(pet, deps))
+		if player != nil && pet.OwnerCharID == player.CharID && deps.PetLife != nil {
+			sendPetMenu(sess, pet, deps.PetLife.PetExpPercent(pet))
 		}
 		return
 	}

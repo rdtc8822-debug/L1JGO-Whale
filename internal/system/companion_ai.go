@@ -273,6 +273,7 @@ func (s *CompanionAISystem) summonAttackTarget(sum *world.SummonInfo) {
 		// Broadcast death (no exp/drops from summon kills)
 		for _, viewer := range nearby {
 			sendNpcDeath(viewer.Session, targetNpc.ID)
+			handler.SendNpcDeadPack(viewer.Session, targetNpc)
 		}
 	}
 }
@@ -332,7 +333,9 @@ func (s *CompanionAISystem) tickDolls() {
 		// Revert bonuses on the master
 		master := ws.GetByCharID(doll.OwnerCharID)
 		if master != nil {
-			removeDollBonuses(master, doll)
+			if s.deps.DollMgr != nil {
+				s.deps.DollMgr.RemoveDollBonuses(master, doll)
+			}
 			sendCompanionSoundEffect(master.Session, doll.ID, 5936) // dismiss sound
 			sendDollTimerClear(master.Session)
 			handler.SendPlayerStatus(master.Session, master)
@@ -341,39 +344,6 @@ func (s *CompanionAISystem) tickDolls() {
 		for _, viewer := range nearby {
 			sendCompanionRemove(viewer.Session, doll.ID)
 		}
-	}
-}
-
-// removeDollBonuses reverses all stat bonuses from a doll on a player.
-func removeDollBonuses(player *world.PlayerInfo, doll *world.DollInfo) {
-	player.AC -= int16(doll.BonusAC)
-	player.DmgMod -= int16(doll.BonusDmg)
-	player.HitMod -= int16(doll.BonusHit)
-	player.BowDmgMod -= int16(doll.BonusBowDmg)
-	player.BowHitMod -= int16(doll.BonusBowHit)
-	player.SP -= int16(doll.BonusSP)
-	player.MR -= int16(doll.BonusMR)
-	player.MaxHP -= int16(doll.BonusHP)
-	player.MaxMP -= int16(doll.BonusMP)
-	player.HPR -= int16(doll.BonusHPR)
-	player.MPR -= int16(doll.BonusMPR)
-	player.FireRes -= int16(doll.BonusFireRes)
-	player.WaterRes -= int16(doll.BonusWaterRes)
-	player.WindRes -= int16(doll.BonusWindRes)
-	player.EarthRes -= int16(doll.BonusEarthRes)
-	player.Dodge -= int16(doll.BonusDodge)
-	player.Str -= int16(doll.BonusSTR)
-	player.Dex -= int16(doll.BonusDEX)
-	player.Con -= int16(doll.BonusCON)
-	player.Wis -= int16(doll.BonusWIS)
-	player.Intel -= int16(doll.BonusINT)
-	player.Cha -= int16(doll.BonusCHA)
-	// Clamp HP/MP
-	if player.HP > player.MaxHP {
-		player.HP = player.MaxHP
-	}
-	if player.MP > player.MaxMP {
-		player.MP = player.MaxMP
 	}
 }
 
@@ -682,7 +652,9 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 		}
 		pet.HP -= retalDmg
 		if pet.HP <= 0 {
-			handler.PetDie(pet, ws)
+			if s.deps.PetLife != nil {
+				s.deps.PetLife.PetDie(pet)
+			}
 			master := ws.GetByCharID(pet.OwnerCharID)
 			if master != nil {
 				sendCompanionHpMeter(master.Session, pet.ID, 0, pet.MaxHP)
@@ -720,6 +692,7 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 
 		for _, viewer := range nearby {
 			sendNpcDeath(viewer.Session, targetNpc.ID)
+			handler.SendNpcDeadPack(viewer.Session, targetNpc)
 		}
 
 		// Give EXP to pet for the kill
@@ -727,8 +700,8 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 		if s.deps.Config.Rates.PetExpRate > 0 {
 			petExp = int32(float64(petExp) * s.deps.Config.Rates.PetExpRate)
 		}
-		if petExp > 0 {
-			handler.AddPetExp(pet, petExp, s.deps)
+		if petExp > 0 && s.deps.PetLife != nil {
+			s.deps.PetLife.AddPetExp(pet, petExp)
 			if master != nil {
 				sendCompanionHpMeter(master.Session, pet.ID, pet.HP, pet.MaxHP)
 			}

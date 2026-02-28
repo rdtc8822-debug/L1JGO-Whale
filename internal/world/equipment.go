@@ -147,38 +147,39 @@ func IsAccessorySlot(slot EquipSlot) bool {
 	return false
 }
 
-// EquipClientIndex maps a Go EquipSlot to the client's equipment index byte.
-// Used in S_EquipmentSlot packet (opcode 64). Matches Java L1PcInventory.setEquipmentOnOff().
+// EquipClientIndex 將 Go EquipSlot 映射為 3.80C 客戶端裝備欄索引。
+// 值來自 Java L1Inventory.toSlotPacket()（已修改版「新增欄位顯示 琮善」）。
+// 注意：此映射與 S_EquipmentWindow 常數定義不同——以 toSlotPacket 為準。
 func EquipClientIndex(slot EquipSlot) byte {
 	switch slot {
 	case SlotHelm:
-		return 1
+		return 1 // Java: type 1 (頭盔) → idx = type = 1
 	case SlotArmor:
-		return 2
+		return 11 // Java: type 2 (盔甲) → idx = 11
 	case SlotTShirt:
-		return 3
+		return 2 // Java: type 3 (內衣) → idx = 2
 	case SlotCloak:
-		return 4
+		return 4 // Java: type 4 (斗篷) → idx = 4
 	case SlotGlove:
-		return 6 // Java: type 5 (glove) → index 6
+		return 3 // Java: type 5 (手套) → idx = 3
 	case SlotBoots:
-		return 5 // Java: type 6 (boots) → index 5
+		return 22 // Java: type 6 (靴子) → idx = 22
 	case SlotShield:
-		return 7
+		return 7 // Java: type 7 (盾牌) → idx = 7
 	case SlotBelt:
-		return 11 // Java: type 10 (belt) → index 11
+		return 8 // Java: type 10 (腰帶) → idx = 8
 	case SlotWeapon:
-		return 8
+		return 6 // Java: EQUIPMENT_INDEX_WEAPON = 6（預設8 已改為6）
 	case SlotAmulet:
-		return 10
+		return 10 // Java: type 8 (項鍊) → idx = 10
 	case SlotGuarder:
-		return 7 // Java: type 13 (guarder) → index 7, mutually exclusive with shield
+		return 7 // Java: type 13 (臂甲) → idx = 7，與盾牌共用欄位
 	case SlotEarring:
-		return 12
+		return 12 // Java: type 12 (耳環) → idx = 12
 	case SlotRing1:
-		return 18
+		return 18 // Java: EQUIPMENT_INDEX_RING1 = 18
 	case SlotRing2:
-		return 19 // Java: type 11 (ring2) → index 19
+		return 19 // Java: EQUIPMENT_INDEX_RING2 = 19
 	}
 	return 0
 }

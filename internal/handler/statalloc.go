@@ -136,11 +136,20 @@ func SendAbilityScores(sess *net.Session, p *world.PlayerInfo) {
 	sendAbilityScores(sess, p)
 }
 
+// SendRaiseAttrDialog 匯出 sendRaiseAttrDialog — 供 system 套件觸發屬性對話框。
+func SendRaiseAttrDialog(sess *net.Session, charID int32) {
+	sendRaiseAttrDialog(sess, charID)
+}
+
 // sendRaiseAttrDialog sends the "RaiseAttr" HTML dialog for bonus stat allocation.
-// Matches Java S_bonusstats: S_OPCODE_SHOWHTML + charID + "RaiseAttr".
+// 格式對齊 S_NPCTalkReturn（Java）：3.80C 客戶端的 opcode 39 handler 一律讀取
+// htmlID 之後的 writeH(flag) + writeH(count) 欄位。若缺少會讀到 padding 或
+// 下一封包的 bytes，造成客戶端串流解析錯亂。
 func sendRaiseAttrDialog(sess *net.Session, charID int32) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_HYPERTEXT)
 	w.WriteD(charID)
 	w.WriteS("RaiseAttr")
+	w.WriteH(0) // data flag: 0 = 無額外資料（對齊 S_NPCTalkReturn 格式）
+	w.WriteH(0) // data count: 0
 	sess.Send(w.Bytes())
 }

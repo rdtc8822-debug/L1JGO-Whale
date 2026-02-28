@@ -1,7 +1,7 @@
-package handler
+package system
 
 import (
-	"github.com/l1jgo/server/internal/net"
+	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/world"
 )
 
@@ -23,7 +23,7 @@ import (
 
 // TickPlayerPoison 每 tick 處理玩家的中毒狀態計時。
 // 由 BuffTickSystem (Phase 2) 呼叫。
-func TickPlayerPoison(p *world.PlayerInfo, deps *Deps) {
+func TickPlayerPoison(p *world.PlayerInfo, deps *handler.Deps) {
 	if p.PoisonType == 0 || p.Dead {
 		return
 	}
@@ -35,19 +35,23 @@ func TickPlayerPoison(p *world.PlayerInfo, deps *Deps) {
 			CurePoison(p, deps)
 			return
 		}
-		// 每 15 tick（3 秒）扣 20 HP
+		// 每 15 tick（3 秒）扣血（NPC攻擊:20, 毒咒:5）
 		p.PoisonDmgTimer++
 		if p.PoisonDmgTimer >= 15 {
 			p.PoisonDmgTimer = 0
-			p.HP -= 20
+			dmg := int16(20)
+			if p.PoisonDmgAmount > 0 {
+				dmg = p.PoisonDmgAmount
+			}
+			p.HP -= dmg
 			p.Dirty = true
 			if p.HP <= 0 {
 				p.HP = 0
 				CurePoison(p, deps)
-				KillPlayer(p, deps)
+				deps.Death.KillPlayer(p)
 				return
 			}
-			sendHpUpdate(p.Session, p)
+			handler.SendHpUpdate(p.Session, p)
 		}
 
 	case 2: // 沉默毒 — 無計時，永久直到解毒
@@ -63,7 +67,7 @@ func TickPlayerPoison(p *world.PlayerInfo, deps *Deps) {
 			// 視覺：綠色→灰色
 			broadcastPlayerPoison(p, 2, deps) // 灰色
 			// S_Paralysis: 怪物麻痺毒施加（Java TYPE_PARALYSIS2, true → 0x04）
-			sendParalysis(p.Session, ParalysisMobApply)
+			handler.SendParalysis(p.Session, handler.ParalysisMobApply)
 		}
 
 	case 4: // 麻痺毒已麻痺（灰色，不可動）
@@ -76,7 +80,7 @@ func TickPlayerPoison(p *world.PlayerInfo, deps *Deps) {
 
 // TickPlayerCurse 每 tick 處理玩家的詛咒麻痺狀態計時。
 // 由 BuffTickSystem (Phase 2) 呼叫。
-func TickPlayerCurse(p *world.PlayerInfo, deps *Deps) {
+func TickPlayerCurse(p *world.PlayerInfo, deps *handler.Deps) {
 	if p.CurseType == 0 || p.Dead {
 		return
 	}
@@ -88,7 +92,7 @@ func TickPlayerCurse(p *world.PlayerInfo, deps *Deps) {
 			p.CurseType = 2
 			p.CurseTicksLeft = 20 // 4 秒 = 20 ticks
 			p.Paralyzed = true
-			sendParalysis(p.Session, ParalysisApply) // 0x02
+			handler.SendParalysis(p.Session, handler.ParalysisApply) // 0x02
 
 		case 2: // 麻痺階段到期 → 完全解除
 			CureCurseParalysis(p, deps)
@@ -98,7 +102,7 @@ func TickPlayerCurse(p *world.PlayerInfo, deps *Deps) {
 
 // CurePoison 解除玩家的毒狀態（Java L1Character.curePoison）。
 // 技能 9（解毒術）、技能 37（聖潔之光）、技能 44（魔法相消術）、死亡時呼叫。
-func CurePoison(p *world.PlayerInfo, deps *Deps) {
+func CurePoison(p *world.PlayerInfo, deps *handler.Deps) {
 	if p.PoisonType == 0 {
 		return
 	}
@@ -108,18 +112,19 @@ func CurePoison(p *world.PlayerInfo, deps *Deps) {
 		if !shouldStayParalyzed(p, true, false) {
 			p.Paralyzed = false
 		}
-		sendParalysis(p.Session, ParalysisMobRemove) // 0x05
+		handler.SendParalysis(p.Session, handler.ParalysisMobRemove) // 0x05
 	}
 
 	// 沉默毒 → 解除沉默
 	if p.PoisonType == 2 {
 		p.Silenced = false
-		sendServerMessage(p.Session, 311) // "毒的效果已經消退了。"
+		handler.SendServerMessage(p.Session, 311) // "毒的效果已經消退了。"
 	}
 
 	p.PoisonType = 0
 	p.PoisonTicksLeft = 0
 	p.PoisonDmgTimer = 0
+	p.PoisonDmgAmount = 0
 	p.PoisonAttacker = 0
 
 	// 清除色調
@@ -128,7 +133,7 @@ func CurePoison(p *world.PlayerInfo, deps *Deps) {
 
 // CureCurseParalysis 解除玩家的詛咒麻痺（Java L1Character.cureParalaysis）。
 // 技能 37（聖潔之光）、技能 44（魔法相消術）、死亡時呼叫。
-func CureCurseParalysis(p *world.PlayerInfo, deps *Deps) {
+func CureCurseParalysis(p *world.PlayerInfo, deps *handler.Deps) {
 	if p.CurseType == 0 {
 		return
 	}
@@ -138,7 +143,7 @@ func CureCurseParalysis(p *world.PlayerInfo, deps *Deps) {
 		if !shouldStayParalyzed(p, false, true) {
 			p.Paralyzed = false
 		}
-		sendParalysis(p.Session, ParalysisRemove) // 0x03
+		handler.SendParalysis(p.Session, handler.ParalysisRemove) // 0x03
 	}
 
 	p.CurseType = 0
@@ -167,7 +172,7 @@ func shouldStayParalyzed(p *world.PlayerInfo, skipPoison, skipCurse bool) bool {
 
 // ApplyNpcPoisonAttack 怪物攻擊後的施毒判定（Java L1AttackNpc.addNpcPoisonAttack）。
 // 15% 機率觸發，單毒限制（已中毒不可再次中毒）。
-func ApplyNpcPoisonAttack(npc *world.NpcInfo, target *world.PlayerInfo, ws *world.State, deps *Deps) {
+func ApplyNpcPoisonAttack(npc *world.NpcInfo, target *world.PlayerInfo, ws *world.State, deps *handler.Deps) {
 	// 已中毒 → 不可再次中毒（Java: getPoison() != null → 拒絕）
 	if target.PoisonType != 0 {
 		return
@@ -186,7 +191,8 @@ func ApplyNpcPoisonAttack(npc *world.NpcInfo, target *world.PlayerInfo, ws *worl
 		target.PoisonType = 1
 		target.PoisonTicksLeft = 150 // 30 秒 = 150 ticks
 		target.PoisonDmgTimer = 0
-		target.PoisonAttacker = 0 // NPC 攻擊暫不追蹤歸屬
+		target.PoisonDmgAmount = 20 // NPC 攻擊型傷害毒：每次 20
+		target.PoisonAttacker = 0   // NPC 攻擊暫不追蹤歸屬
 		broadcastPlayerPoison(target, 1, deps) // 綠色
 
 	case 2: // 沉默毒（Java: L1SilencePoison.doInfection(target)）
@@ -194,35 +200,30 @@ func ApplyNpcPoisonAttack(npc *world.NpcInfo, target *world.PlayerInfo, ws *worl
 		target.PoisonTicksLeft = 0 // 永久（直到解毒）
 		target.Silenced = true
 		broadcastPlayerPoison(target, 1, deps) // 綠色
-		sendServerMessage(target.Session, 310) // "喉嚨受到乾燥，無法發動魔法。"
+		handler.SendServerMessage(target.Session, 310) // "喉嚨受到乾燥，無法發動魔法。"
 
 	case 4: // 麻痺毒延遲（Java: L1ParalysisPoison.doInfection(target, 20000, 16000)）
 		target.PoisonType = 3 // 階段一：延遲中
 		target.PoisonTicksLeft = 100 // 20 秒 = 100 ticks
 		broadcastPlayerPoison(target, 1, deps) // 綠色
-		sendServerMessage(target.Session, 212) // "你的身體漸漸麻痺。"
+		handler.SendServerMessage(target.Session, 212) // "你的身體漸漸麻痺。"
 	}
 }
 
 // broadcastPlayerPoison 廣播 S_Poison 到附近所有玩家（含自己）。
 // Java: setPoisonEffect → broadcastPacketX8(S_Poison)。
 // poisonType: 0=治癒, 1=綠色, 2=灰色
-func broadcastPlayerPoison(target *world.PlayerInfo, poisonType byte, deps *Deps) {
+func broadcastPlayerPoison(target *world.PlayerInfo, poisonType byte, deps *handler.Deps) {
 	// 發給自己
-	sendPoison(target.Session, target.CharID, poisonType)
+	handler.SendPoison(target.Session, target.CharID, poisonType)
 	// 發給附近觀察者
 	nearby := deps.World.GetNearbyPlayers(target.X, target.Y, target.MapID, target.SessionID)
 	for _, viewer := range nearby {
-		sendPoison(viewer.Session, target.CharID, poisonType)
+		handler.SendPoison(viewer.Session, target.CharID, poisonType)
 	}
 }
 
-// SendPoison 匯出版本的 sendPoison，供 system/visibility.go 使用。
-func SendPoison(sess *net.Session, objectID int32, poisonType byte) {
-	sendPoison(sess, objectID, poisonType)
-}
-
-// BroadcastPlayerPoison 廣播毒素色調到附近所有玩家。Exported for system package usage.
-func BroadcastPlayerPoison(target *world.PlayerInfo, poisonType byte, deps *Deps) {
+// BroadcastPlayerPoison 廣播毒素色調到附近所有玩家。Exported for other system packages.
+func BroadcastPlayerPoison(target *world.PlayerInfo, poisonType byte, deps *handler.Deps) {
 	broadcastPlayerPoison(target, poisonType, deps)
 }

@@ -122,6 +122,11 @@ func sendChangeHeading(viewer *net.Session, charID int32, heading int16) {
 	viewer.Send(w.Bytes())
 }
 
+// SendWeather 匯出 sendWeather — 供 system 套件發送天氣封包。
+func SendWeather(sess *net.Session, weather byte) {
+	sendWeather(sess, weather)
+}
+
 // sendWeather sends S_WEATHER (opcode 115).
 func sendWeather(sess *net.Session, weather byte) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_WEATHER)
@@ -165,6 +170,37 @@ func SendNpcPack(viewer *net.Session, npc *world.NpcInfo) {
 	w.WriteS("")                  // no master
 	w.WriteC(0x00)                // hidden = 0 (normal)
 	w.WriteC(0xFF)                // HP% (0xFF = full for initial)
+	w.WriteC(0x00)                // reserved
+	w.WriteC(byte(npc.Level))     // level
+	w.WriteC(0xFF)                // reserved
+	w.WriteC(0xFF)                // reserved
+	w.WriteC(0x00)                // reserved
+	viewer.Send(w.Bytes())
+}
+
+// SendNpcDeadPack 發送 S_PUT_OBJECT（status=8）讓客戶端以屍體姿態顯示死亡 NPC。
+// 只發給「之後進入視野」的新玩家（Java onPerceive 邏輯）。
+// 已在場玩家靠 S_DoActionGFX(8) 維持屍體互動性。
+func SendNpcDeadPack(viewer *net.Session, npc *world.NpcInfo) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_PUT_OBJECT)
+	w.WriteH(uint16(npc.X))
+	w.WriteH(uint16(npc.Y))
+	w.WriteD(npc.ID)
+	w.WriteH(uint16(npc.GfxID))
+	w.WriteC(8)                   // status = ACTION_Die（屍體姿態）
+	w.WriteC(byte(npc.Heading))
+	w.WriteC(0)                   // light
+	w.WriteC(0)                   // move speed
+	w.WriteD(npc.Exp)             // exp（Java: 死亡 NPC 仍發 exp）
+	w.WriteH(0)                   // lawful
+	w.WriteS(npc.NameID)
+	w.WriteS("")                  // title
+	w.WriteC(0x00)                // ext status
+	w.WriteD(0)                   // reserved
+	w.WriteS("")                  // no clan
+	w.WriteS("")                  // no master
+	w.WriteC(0x00)                // object type
+	w.WriteC(0xFF)                // HP%（Java: NPC 永遠 0xFF，即使死亡）
 	w.WriteC(0x00)                // reserved
 	w.WriteC(byte(npc.Level))     // level
 	w.WriteC(0xFF)                // reserved
@@ -530,6 +566,11 @@ func sendPoison(viewer *net.Session, objectID int32, poisonType byte) {
 	viewer.Send(w.Bytes())
 }
 
+// SendPoison 匯出 sendPoison — 供 system 套件發送中毒色調封包。
+func SendPoison(viewer *net.Session, objectID int32, poisonType byte) {
+	sendPoison(viewer, objectID, poisonType)
+}
+
 // SendWeightUpdate 匯出 sendWeightUpdate — 供 system 套件發送負重更新。
 func SendWeightUpdate(sess *net.Session, p *world.PlayerInfo) {
 	sendWeightUpdate(sess, p)
@@ -581,6 +622,15 @@ func SendUseAttackSkill(viewer *net.Session, casterID, targetID int32, damage in
 	sendUseAttackSkill(viewer, casterID, targetID, damage, heading, gfxID, useType, cx, cy, tx, ty)
 }
 
+// SendNpcChatPacket 發送 NPC 對話封包（S_SAY opcode 81）。供 system 套件使用。
+func SendNpcChatPacket(sess *net.Session, npcID int32, msg string) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_SAY)
+	w.WriteD(npcID)
+	w.WriteC(0x02) // type: NPC say
+	w.WriteS(msg)
+	sess.Send(w.Bytes())
+}
+
 // SendParalysis 發送麻痺/凍結/睡眠狀態封包。
 func SendParalysis(sess *net.Session, subtype byte) {
 	sendParalysis(sess, subtype)
@@ -614,4 +664,9 @@ func SendIconAura(sess *net.Session, iconID byte, durationSec uint16) {
 // SendInvisible 發送隱身狀態封包。
 func SendInvisible(sess *net.Session, objectID int32, invisible bool) {
 	sendInvisible(sess, objectID, invisible)
+}
+
+// SendArrowAttackPacket 廣播遠程箭矢攻擊封包。
+func SendArrowAttackPacket(viewer *net.Session, attackerID, targetID, damage int32, heading int16, ax, ay, tx, ty int32) {
+	sendArrowAttackPacket(viewer, attackerID, targetID, damage, heading, ax, ay, tx, ty)
 }

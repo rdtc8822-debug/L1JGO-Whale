@@ -643,6 +643,7 @@ func gmKill(sess *net.Session, player *world.PlayerInfo, args []string, deps *De
 			viewers := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 			for _, v := range viewers {
 				sendActionGfx(v.Session, npc.ID, 8)
+				SendNpcDeadPack(v.Session, npc)
 			}
 			npc.DeleteTimer = 50 // 10 seconds for death animation
 			if npc.RespawnDelay > 0 {
@@ -667,6 +668,7 @@ func gmKillAll(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 		viewers := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 		for _, v := range viewers {
 			sendActionGfx(v.Session, npc.ID, 8)
+			SendNpcDeadPack(v.Session, npc)
 		}
 		npc.DeleteTimer = 50 // 10 seconds for death animation
 		if npc.RespawnDelay > 0 {
@@ -783,7 +785,7 @@ func gmExp(sess *net.Session, player *world.PlayerInfo, args []string, deps *Dep
 		return
 	}
 
-	addExp(player, int32(val), deps)
+	deps.Combat.AddExp(player, int32(val))
 	gmMsgf(sess, "已獲得 %d 經驗值 (Lv.%d Exp:%d)", val, player.Level, player.Exp)
 }
 
@@ -1006,7 +1008,9 @@ func gmPoly(sess *net.Session, player *world.PlayerInfo, args []string, deps *De
 		return
 	}
 
-	DoPoly(target, int32(polyID), 7200, data.PolyCauseGM, deps)
+	if deps.Polymorph != nil {
+		deps.Polymorph.DoPoly(target, int32(polyID), 7200, data.PolyCauseGM)
+	}
 	gmMsgf(sess, "已將 %s 變身為 %s (GFX:%d)", target.Name, poly.Name, polyID)
 }
 
@@ -1034,8 +1038,8 @@ func gmPolyGfx(sess *net.Session, player *world.PlayerInfo, args []string, deps 
 	}
 
 	// If already polymorphed, revert first
-	if target.TempCharGfx > 0 {
-		UndoPoly(target, deps)
+	if target.TempCharGfx > 0 && deps.Polymorph != nil {
+		deps.Polymorph.UndoPoly(target)
 	}
 
 	target.TempCharGfx = int32(gfxID)
@@ -1065,7 +1069,9 @@ func gmUndoPoly(sess *net.Session, player *world.PlayerInfo, args []string, deps
 		return
 	}
 
-	UndoPoly(target, deps)
+	if deps.Polymorph != nil {
+		deps.Polymorph.UndoPoly(target)
+	}
 	if target == player {
 		gmMsg(sess, "已解除變身")
 	} else {

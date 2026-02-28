@@ -47,6 +47,9 @@ func (s *NpcAISystem) Update(_ time.Duration) {
 // ---------- Monster AI (Lua-driven) ----------
 
 func (s *NpcAISystem) tickMonsterAI(npc *world.NpcInfo) {
+	// NPC 法術中毒 tick（每 3 秒扣血）
+	tickNpcPoison(npc, s.world, s.deps)
+
 	// 負面狀態：麻痺/暈眩/凍結/睡眠時跳過所有行動
 	if npc.Paralyzed || npc.Sleeped {
 		tickNpcDebuffs(npc, s.world, s.deps)
@@ -197,7 +200,7 @@ func (s *NpcAISystem) tickMonsterAI(npc *world.NpcInfo) {
 		case "move_toward":
 			if target != nil {
 				npcMoveToward(s.world, npc, target.X, target.Y, s.deps.MapData)
-				npc.MoveTimer = 3
+				npc.MoveTimer = calcNpcMoveTicks(npc)
 			}
 		case "wander":
 			npcWander(s.world, npc, cmd.Dir, s.deps.MapData)
@@ -212,6 +215,9 @@ func (s *NpcAISystem) tickMonsterAI(npc *world.NpcInfo) {
 // tickGuardAI processes a single guard NPC's AI each tick.
 // Guards hunt wanted players (isWanted), counter-attack when hit, and return home when idle.
 func (s *NpcAISystem) tickGuardAI(npc *world.NpcInfo) {
+	// NPC 法術中毒 tick（每 3 秒扣血）
+	tickNpcPoison(npc, s.world, s.deps)
+
 	// 負面狀態：麻痺/暈眩/凍結/睡眠時跳過所有行動
 	if npc.Paralyzed || npc.Sleeped {
 		tickNpcDebuffs(npc, s.world, s.deps)
@@ -285,13 +291,7 @@ func (s *NpcAISystem) tickGuardAI(npc *world.NpcInfo) {
 		} else {
 			if npc.MoveTimer <= 0 {
 				npcMoveToward(s.world, npc, target.X, target.Y, s.deps.MapData)
-				moveTicks := 4
-				if npc.MoveSpeed > 0 {
-					moveTicks = int(npc.MoveSpeed) / 200
-					if moveTicks < 2 {
-						moveTicks = 2
-					}
-				}
+				moveTicks := calcNpcMoveTicks(npc)
 				npc.MoveTimer = moveTicks
 			}
 		}
@@ -307,13 +307,7 @@ func (s *NpcAISystem) tickGuardAI(npc *world.NpcInfo) {
 		}
 		if npc.MoveTimer <= 0 {
 			npcMoveToward(s.world, npc, npc.SpawnX, npc.SpawnY, s.deps.MapData)
-			moveTicks := 4
-			if npc.MoveSpeed > 0 {
-				moveTicks = int(npc.MoveSpeed) / 200
-				if moveTicks < 2 {
-					moveTicks = 2
-				}
-			}
+			moveTicks := calcNpcMoveTicks(npc)
 			npc.MoveTimer = moveTicks
 		}
 	}
@@ -378,7 +372,7 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 	target.Dirty = true
 	if target.HP <= 0 {
 		target.HP = 0
-		handler.KillPlayer(target, s.deps)
+		s.deps.Death.KillPlayer(target)
 		npc.AggroTarget = 0
 		return
 	}
@@ -386,7 +380,7 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 
 	// 怪物施毒判定（Java L1AttackNpc.addNpcPoisonAttack）
 	if npc.PoisonAtk > 0 {
-		handler.ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
+		ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
 	}
 }
 
@@ -421,7 +415,7 @@ func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerIn
 	target.Dirty = true
 	if target.HP <= 0 {
 		target.HP = 0
-		handler.KillPlayer(target, s.deps)
+		s.deps.Death.KillPlayer(target)
 		npc.AggroTarget = 0
 		return
 	}
@@ -429,7 +423,7 @@ func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerIn
 
 	// 怪物施毒判定（Java L1AttackNpc.addNpcPoisonAttack）
 	if npc.PoisonAtk > 0 {
-		handler.ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
+		ApplyNpcPoisonAttack(npc, target, s.world, s.deps)
 	}
 }
 
@@ -496,7 +490,7 @@ func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerIn
 		target.Dirty = true
 		if target.HP <= 0 {
 			target.HP = 0
-			handler.KillPlayer(target, s.deps)
+			s.deps.Death.KillPlayer(target)
 			npc.AggroTarget = 0
 			return
 		}
@@ -591,13 +585,7 @@ func npcExecuteMove(ws *world.State, npc *world.NpcInfo, moveX, moveY int32, hea
 
 // npcWander handles idle wandering. dir: 0-7=new direction, -1=continue, -2=toward spawn.
 func npcWander(ws *world.State, npc *world.NpcInfo, dir int, maps *data.MapDataTable) {
-	wanderTicks := 4
-	if npc.MoveSpeed > 0 {
-		wanderTicks = int(npc.MoveSpeed) / 200
-		if wanderTicks < 2 {
-			wanderTicks = 2
-		}
-	}
+	wanderTicks := calcNpcMoveTicks(npc)
 
 	if dir == -1 {
 		// Continue current direction
@@ -855,7 +843,18 @@ func removeNpcDebuffEffect(npc *world.NpcInfo, skillID int32, ws *world.State) {
 	case 20, 40: // 闇盲咒術 — 致盲（NPC 無視覺，僅計時）
 		// NPC 致盲不影響行動旗標
 	case 29, 76, 152: // 緩速系列 — NPC debuff 到期
-		// NPC 速度恢復（無需特殊處理，NPC 無獨立速度欄位）
+		// 速度恢復由 calcNpcMoveTicks 自動處理（不再有 slow debuff → 不翻倍）
+	case 11: // 毒咒 — 清除傷害毒
+		npc.PoisonDmgAmt = 0
+		npc.PoisonDmgTimer = 0
+		for _, viewer := range nearby {
+			sendNpcPoison(viewer.Session, npc.ID, 0) // 清除綠色色調
+		}
+	case 80: // 冰雪颶風 — 解除凍結
+		npc.Paralyzed = false
+		for _, viewer := range nearby {
+			sendNpcPoison(viewer.Session, npc.ID, 0) // 清除灰色色調
+		}
 	}
 }
 
@@ -875,4 +874,67 @@ func sendNpcPoison(sess *gonet.Session, objectID int32, poisonType byte) {
 		w.WriteC(0x00)
 	}
 	sess.Send(w.Bytes())
+}
+
+// calcNpcMoveTicks 計算 NPC 移動間隔 tick 數。
+// 緩速 debuff（29/76/152）時移動間隔翻倍。
+func calcNpcMoveTicks(npc *world.NpcInfo) int {
+	moveTicks := 4
+	if npc.MoveSpeed > 0 {
+		moveTicks = int(npc.MoveSpeed) / 200
+		if moveTicks < 2 {
+			moveTicks = 2
+		}
+	}
+	// 緩速術效果：移動間隔翻倍（Java: moveSpeed 設為 2 = slow）
+	if npc.HasDebuff(29) || npc.HasDebuff(76) || npc.HasDebuff(152) {
+		moveTicks *= 2
+	}
+	return moveTicks
+}
+
+// tickNpcPoison 處理 NPC 的法術中毒效果（Java L1DamagePoison 對 NPC）。
+// 每 15 tick（3 秒）造成 PoisonDmgAmt 傷害。毒傷害不會殺死 NPC（HP 最低 1）。
+func tickNpcPoison(npc *world.NpcInfo, ws *world.State, deps *handler.Deps) {
+	if npc.PoisonDmgAmt <= 0 || npc.Dead {
+		return
+	}
+
+	// 計時（與 debuff 11 綁定）
+	if !npc.HasDebuff(11) {
+		// debuff 到期 → 清除中毒
+		npc.PoisonDmgAmt = 0
+		npc.PoisonDmgTimer = 0
+		npc.PoisonAttackerSID = 0
+		// 清除綠色色調
+		nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+		for _, viewer := range nearby {
+			sendNpcPoison(viewer.Session, npc.ID, 0)
+		}
+		return
+	}
+
+	// 仇恨歸屬：毒傷害觸發仇恨（Java: NPC 會追擊施毒者）
+	if npc.AggroTarget == 0 && npc.PoisonAttackerSID != 0 {
+		npc.AggroTarget = npc.PoisonAttackerSID
+	}
+
+	npc.PoisonDmgTimer++
+	if npc.PoisonDmgTimer >= 15 {
+		npc.PoisonDmgTimer = 0
+		npc.HP -= npc.PoisonDmgAmt
+		// 毒傷害不可殺死 NPC — HP 最低 1
+		if npc.HP <= 1 {
+			npc.HP = 1
+		}
+		// 廣播 HP 條給所有附近玩家
+		nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+		hpRatio := int16(0)
+		if npc.MaxHP > 0 {
+			hpRatio = int16((npc.HP * 100) / npc.MaxHP)
+		}
+		for _, viewer := range nearby {
+			handler.SendHpMeter(viewer.Session, npc.ID, hpRatio)
+		}
+	}
 }

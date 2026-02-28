@@ -32,13 +32,14 @@ func (s *NpcRespawnSystem) Update(_ time.Duration) {
 		if npc.DeleteTimer > 0 {
 			npc.DeleteTimer--
 			if npc.DeleteTimer <= 0 {
-				// Death animation done — remove NPC from client view
+				// 屍體消失 — 從 AOI 網格移除 + 通知客戶端
+				s.world.NpcCorpseCleanup(npc)
 				nearby := s.world.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 				for _, viewer := range nearby {
 					sendRemoveObject(viewer.Session, npc.ID)
 				}
 			}
-			continue // don't start respawn timer until delete phase is done
+			continue // 等刪除階段完成才開始重生計時
 		}
 
 		// Phase 2: Respawn timer
@@ -83,6 +84,9 @@ func (s *NpcRespawnSystem) respawnNpc(npc *world.NpcInfo) {
 	npc.Paralyzed = false
 	npc.Sleeped = false
 	npc.ActiveDebuffs = nil
+	npc.PoisonDmgAmt = 0
+	npc.PoisonDmgTimer = 0
+	npc.PoisonAttackerSID = 0
 
 	// Set tile as blocked (map passability for NPC pathfinding)
 	if s.maps != nil {

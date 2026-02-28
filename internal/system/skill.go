@@ -53,6 +53,32 @@ func (s *SkillSystem) CancelAllBuffs(target *world.PlayerInfo) {
 	s.cancelAllBuffs(target)
 }
 
+// ClearAllBuffsOnDeath implements handler.SkillManager — 死亡時清除所有 buff（含不可取消的）。
+func (s *SkillSystem) ClearAllBuffsOnDeath(target *world.PlayerInfo) {
+	if target.ActiveBuffs == nil {
+		return
+	}
+	for skillID, buff := range target.ActiveBuffs {
+		s.revertBuffStats(target, buff)
+		delete(target.ActiveBuffs, skillID)
+		s.cancelBuffIcon(target, skillID)
+
+		if skillID == handler.SkillShapeChange && s.deps.Polymorph != nil {
+			s.deps.Polymorph.UndoPoly(target)
+		}
+		if buff.SetMoveSpeed > 0 {
+			target.MoveSpeed = 0
+			target.HasteTicks = 0
+			s.sendSpeedToAll(target, 0, 0)
+		}
+		if buff.SetBraveSpeed > 0 {
+			target.BraveSpeed = 0
+			s.sendBraveToAll(target, 0, 0)
+		}
+	}
+	handler.SendPlayerStatus(target.Session, target)
+}
+
 // RemoveBuffAndRevert implements handler.SkillManager.
 func (s *SkillSystem) RemoveBuffAndRevert(target *world.PlayerInfo, skillID int32) {
 	s.removeBuffAndRevert(target, skillID)
@@ -165,20 +191,22 @@ func (s *SkillSystem) processSkill(sessID uint64, skillID, targetID int32) {
 		return
 	}
 
-	// --- 召喚技能：特殊路由（資源消耗在內部驗證後處理）---
-	switch skillID {
-	case 51:
-		handler.ExecuteSummonMonster(sess, player, skill, targetID, s.deps)
-		return
-	case 36:
-		handler.ExecuteTamingMonster(sess, player, skill, targetID, s.deps)
-		return
-	case 41:
-		handler.ExecuteCreateZombie(sess, player, skill, targetID, s.deps)
-		return
-	case 145:
-		handler.ExecuteReturnToNature(sess, player, skill, s.deps)
-		return
+	// --- 召喚技能：委派 SummonSystem（資源消耗在內部驗證後處理）---
+	if s.deps.Summon != nil {
+		switch skillID {
+		case 51:
+			s.deps.Summon.ExecuteSummonMonster(sess, player, skill, targetID)
+			return
+		case 36:
+			s.deps.Summon.ExecuteTamingMonster(sess, player, skill, targetID)
+			return
+		case 41:
+			s.deps.Summon.ExecuteCreateZombie(sess, player, skill, targetID)
+			return
+		case 145:
+			s.deps.Summon.ExecuteReturnToNature(sess, player, skill)
+			return
+		}
 	}
 
 	// --- 消耗資源（MP、HP、材料）---
@@ -395,11 +423,11 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 		return
 	}
 
-	player.Heading = handler.CalcHeading(player.X, player.Y, npc.X, npc.Y)
+	player.Heading = CalcHeading(player.X, player.Y, npc.X, npc.Y)
 
 	// Triple Arrow (132)：消耗 1 箭矢
 	if skill.SkillID == 132 {
-		arrow := handler.FindArrow(player, s.deps)
+		arrow := FindArrow(player, s.deps)
 		if arrow == nil {
 			handler.SendServerMessage(sess, skillMsgCastFail)
 			return
@@ -523,7 +551,7 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 
 			// 受傷時解除睡眠
 			if t.npc.Sleeped {
-				handler.BreakNpcSleep(t.npc, ws)
+				BreakNpcSleep(t.npc, ws)
 			}
 
 			// Mind Break: 吸收 MP
@@ -544,8 +572,43 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 			}
 
 			if t.npc.HP <= 0 {
-				handler.HandleNpcDeath(t.npc, player, nearby, s.deps)
+				handleNpcDeath(t.npc, player, nearby, s.deps)
 				break
+			}
+		}
+	}
+
+	// 吸血鬼之吻：傷害轉為治療（Java: heal = this._dmg）
+	if skill.SkillID == 28 {
+		totalDmg := int16(0)
+		for _, t := range hits {
+			totalDmg += int16(t.dmg)
+		}
+		if totalDmg > 0 {
+			player.HP += totalDmg
+			if player.HP > player.MaxHP {
+				player.HP = player.MaxHP
+			}
+			sendHpUpdate(sess, player)
+		}
+	}
+
+	// 冰雪颶風：攻擊型路徑也可能對 NPC 施加凍結
+	if skill.SkillID == 80 {
+		for _, t := range hits {
+			if t.npc.Dead || t.npc.Paralyzed || t.npc.HasDebuff(50) || t.npc.HasDebuff(80) {
+				continue
+			}
+			if s.checkNpcMRResist(player, t.npc, skill.SkillID) {
+				dur := skill.BuffDuration
+				if dur <= 0 {
+					dur = 16
+				}
+				t.npc.Paralyzed = true
+				t.npc.AddDebuff(80, (dur+1)*5)
+				for _, viewer := range nearby {
+					handler.SendPoison(viewer.Session, t.npc.ID, 2) // 灰色
+				}
 			}
 		}
 	}
@@ -596,7 +659,17 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 	// 即時效果技能
 	switch skill.SkillID {
 	case 9: // 解毒術
-		handler.CurePoison(target, s.deps)
+		CurePoison(target, s.deps)
+
+	case 11: // 毒咒 — 對玩家施加傷害毒（Java: L1DamagePoison.doInfection(attacker, target, 3000, 5)）
+		if target.CharID != player.CharID && target.PoisonType == 0 {
+			target.PoisonType = 1
+			target.PoisonTicksLeft = 150 // 30 秒 = 150 ticks
+			target.PoisonDmgTimer = 0
+			target.PoisonDmgAmount = 5 // 毒咒：每 3 秒扣 5 HP
+			target.PoisonAttacker = sess.ID
+			BroadcastPlayerPoison(target, 1, s.deps) // 綠色
+		}
 
 	case 23: // 能量感測
 		// TODO: 發送目標屬性給施法者
@@ -609,14 +682,14 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 			!target.HasBuff(157) && !target.HasBuff(50) && !target.HasBuff(80) {
 			target.CurseType = 1
 			target.CurseTicksLeft = 25
-			handler.BroadcastPlayerPoison(target, 2, s.deps)
+			BroadcastPlayerPoison(target, 2, s.deps)
 			handler.SendServerMessage(target.Session, 212)
 		}
 
 	case 37: // 聖潔之光 — 解毒 + 解詛咒 + 解麻痺/睡眠/致盲
-		handler.CurePoison(target, s.deps)
+		CurePoison(target, s.deps)
 		if target.CurseType > 0 {
-			handler.CureCurseParalysis(target, s.deps)
+			CureCurseParalysis(target, s.deps)
 		}
 		if target.Paralyzed {
 			target.Paralyzed = false
@@ -642,8 +715,8 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 
 	case 44: // 魔法相消術 — 解除目標所有 buff + 毒 + 詛咒
 		if targetID != 0 && targetID != player.CharID {
-			handler.CurePoison(target, s.deps)
-			handler.CureCurseParalysis(target, s.deps)
+			CurePoison(target, s.deps)
+			CureCurseParalysis(target, s.deps)
 			s.cancelAllBuffs(target)
 		}
 
@@ -712,7 +785,12 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 		return
 	}
 
-	player.Heading = handler.CalcHeading(player.X, player.Y, npc.X, npc.Y)
+	player.Heading = CalcHeading(player.X, player.Y, npc.X, npc.Y)
+
+	// 對 NPC 施放 debuff 技能 → 設定仇恨（讓 NPC 追擊施法者）
+	if npc.AggroTarget == 0 {
+		npc.AggroTarget = sess.ID
+	}
 
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 
@@ -818,6 +896,28 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 		}
 		s.deps.Log.Info(fmt.Sprintf("木乃伊詛咒(階段一)  施法者=%s  NPC=%s  延遲=5秒", player.Name, npc.Name))
 
+	case 11: // 毒咒 — 對 NPC 施加傷害毒（Java: L1DamagePoison.doInfection, 3000ms, 5dmg）
+		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
+			handler.SendServerMessage(sess, skillMsgCastFail)
+			return
+		}
+		npc.PoisonDmgAmt = 5
+		npc.PoisonDmgTimer = 0
+		npc.PoisonAttackerSID = sess.ID // 仇恨歸屬
+		if npc.AggroTarget == 0 {
+			npc.AggroTarget = sess.ID
+		}
+		npc.AddDebuff(11, 150) // 30 秒 = 150 ticks
+		for _, viewer := range nearby {
+			handler.SendPoison(viewer.Session, npc.ID, 1) // 綠色
+		}
+		if skill.CastGfx > 0 {
+			for _, viewer := range nearby {
+				handler.SendSkillEffect(viewer.Session, npc.ID, skill.CastGfx)
+			}
+		}
+		s.deps.Log.Info(fmt.Sprintf("毒咒  施法者=%s  NPC=%s  持續=30秒  每次=5傷害", player.Name, npc.Name))
+
 	case 29, 76, 152: // 緩速系列
 		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
 			handler.SendServerMessage(sess, skillMsgCastFail)
@@ -834,6 +934,29 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 			}
 		}
 		s.deps.Log.Info(fmt.Sprintf("緩速術  施法者=%s  NPC=%s  技能=%d  持續=%d秒", player.Name, npc.Name, skill.SkillID, dur))
+
+	case 80: // 冰雪颶風 — 對 NPC 施加凍結（Java: setFrozen + S_Poison 灰色）
+		if npc.Paralyzed || npc.HasDebuff(50) || npc.HasDebuff(80) {
+			break // 已被凍結/冰矛
+		}
+		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
+			break // 抗性判定失敗不阻止傷害，只是不凍結
+		}
+		dur := skill.BuffDuration
+		if dur <= 0 {
+			dur = 16
+		}
+		npc.Paralyzed = true
+		npc.AddDebuff(80, (dur+1)*5) // Java: buffDuration + 1
+		for _, viewer := range nearby {
+			handler.SendPoison(viewer.Session, npc.ID, 2) // 灰色
+		}
+		if skill.CastGfx > 0 {
+			for _, viewer := range nearby {
+				handler.SendSkillEffect(viewer.Session, npc.ID, skill.CastGfx)
+			}
+		}
+		s.deps.Log.Info(fmt.Sprintf("冰雪颶風凍結  施法者=%s  NPC=%s  持續=%d秒", player.Name, npc.Name, dur+1))
 
 	default:
 		if skill.CastGfx > 0 {
@@ -1017,7 +1140,23 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 				handler.SendHpMeter(viewer.Session, npc.ID, hpRatio)
 			}
 			if npc.HP <= 0 {
-				handler.HandleNpcDeath(npc, player, nearby, s.deps)
+				handleNpcDeath(npc, player, nearby, s.deps)
+				continue
+			}
+
+			// 冰雪颶風：傷害後凍結判定（Java: calcProbabilityMagic → setFrozen + S_Poison 灰色）
+			if skill.SkillID == 80 && !npc.Paralyzed && !npc.HasDebuff(50) && !npc.HasDebuff(80) {
+				if s.checkNpcMRResist(player, npc, skill.SkillID) {
+					dur := skill.BuffDuration
+					if dur <= 0 {
+						dur = 16
+					}
+					npc.Paralyzed = true
+					npc.AddDebuff(80, (dur+1)*5)
+					for _, viewer := range nearby {
+						handler.SendPoison(viewer.Session, npc.ID, 2) // 灰色
+					}
+				}
 			}
 		}
 	}
@@ -1307,7 +1446,8 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 	// 屬性變化時發送更新
 	if buff.DeltaStr != 0 || buff.DeltaDex != 0 || buff.DeltaCon != 0 ||
 		buff.DeltaWis != 0 || buff.DeltaIntel != 0 || buff.DeltaCha != 0 ||
-		buff.DeltaMaxHP != 0 || buff.DeltaMaxMP != 0 || buff.DeltaAC != 0 {
+		buff.DeltaMaxHP != 0 || buff.DeltaMaxMP != 0 || buff.DeltaAC != 0 ||
+		buff.DeltaDmgMod != 0 || buff.DeltaHitMod != 0 {
 		handler.SendPlayerStatus(target.Session, target)
 	}
 
@@ -1413,8 +1553,8 @@ func (s *SkillSystem) cancelAllBuffs(target *world.PlayerInfo) {
 		delete(target.ActiveBuffs, skillID)
 		s.cancelBuffIcon(target, skillID)
 
-		if skillID == handler.SkillShapeChange {
-			handler.UndoPoly(target, s.deps)
+		if skillID == handler.SkillShapeChange && s.deps.Polymorph != nil {
+			s.deps.Polymorph.UndoPoly(target)
 		}
 
 		if buff.SetMoveSpeed > 0 {
@@ -1450,8 +1590,8 @@ func (s *SkillSystem) tickPlayerBuffs(p *world.PlayerInfo) {
 
 			s.cancelBuffIcon(p, skillID)
 
-			if skillID == handler.SkillShapeChange {
-				handler.UndoPoly(p, s.deps)
+			if skillID == handler.SkillShapeChange && s.deps.Polymorph != nil {
+				s.deps.Polymorph.UndoPoly(p)
 			}
 
 			if buff.SetMoveSpeed > 0 {

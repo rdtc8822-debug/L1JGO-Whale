@@ -193,31 +193,19 @@ func (s *Session) readLoop() {
 	}
 }
 
-// writeLoop runs in its own goroutine. It reads packets from OutQueue,
-// encrypts them, and writes them as framed data to the TCP connection.
+// writeLoop 在獨立 goroutine 中運行，從 OutQueue 讀取封包、加密並寫入 TCP。
 //
-// 模擬 Java PacketSc 的節奏控制：封包間保持 1ms 間隔，避免客戶端
-// 一次收到大量封包導致掉幀（天氣動畫變慢、NPC 停止呼吸等現象）。
+// 採用批量寫入策略：收集 OutQueue 中所有已佇列的封包，個別加密後合併為
+// 一次 conn.Write。這避免了 per-packet sleep 在 Phase 4 batch flush 時
+// 造成的累積延遲（50 個封包 × 1ms = 50ms），同時減少 TCP syscall 次數。
 func (s *Session) writeLoop() {
 	defer s.Close()
 
 	for {
 		select {
 		case data := <-s.OutQueue:
-			if !s.writeOnePacket(data) {
+			if !s.writeBatch(data) {
 				return
-			}
-			// 批量排出：若 OutQueue 還有更多封包，以 1ms 間隔送出
-			for len(s.OutQueue) > 0 {
-				select {
-				case more := <-s.OutQueue:
-					time.Sleep(time.Millisecond)
-					if !s.writeOnePacket(more) {
-						return
-					}
-				case <-s.closeCh:
-					return
-				}
 			}
 		case <-s.closeCh:
 			return
@@ -225,8 +213,34 @@ func (s *Session) writeLoop() {
 	}
 }
 
-// writeOnePacket 加密並寫入單一封包到 TCP socket。成功回傳 true。
-func (s *Session) writeOnePacket(data []byte) bool {
+// writeBatch 將第一個封包與 OutQueue 中所有剩餘封包加密後，合併為單次 TCP 寫入。
+// 每個封包個別加密（維持 XOR cipher 狀態序列），但只執行一次 conn.Write。
+func (s *Session) writeBatch(first []byte) bool {
+	batch := s.encryptFrame(first)
+
+	// 排空 OutQueue 中所有剩餘封包
+drain:
+	for {
+		select {
+		case more := <-s.OutQueue:
+			batch = append(batch, s.encryptFrame(more)...)
+		default:
+			break drain
+		}
+	}
+
+	s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if _, err := s.conn.Write(batch); err != nil {
+		if !s.closed.Load() {
+			s.log.Debug("寫入錯誤", zap.Error(err))
+		}
+		return false
+	}
+	return true
+}
+
+// encryptFrame 加密單一封包並回傳含長度標頭的完整 frame [2B LE length][encrypted payload]。
+func (s *Session) encryptFrame(data []byte) []byte {
 	if len(data) > 0 {
 		s.log.Debug("TX",
 			zap.String("op", fmt.Sprintf("0x%02X(%d)", data[0], data[0])),
@@ -238,12 +252,9 @@ func (s *Session) writeOnePacket(data []byte) bool {
 	copy(encrypted, data)
 	s.cipher.Encrypt(encrypted)
 
-	s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if err := WriteFrame(s.conn, encrypted); err != nil {
-		if !s.closed.Load() {
-			s.log.Debug("寫入錯誤", zap.Error(err))
-		}
-		return false
-	}
-	return true
+	totalLen := len(encrypted) + 2
+	frame := make([]byte, totalLen)
+	binary.LittleEndian.PutUint16(frame[0:2], uint16(totalLen))
+	copy(frame[2:], encrypted)
+	return frame
 }

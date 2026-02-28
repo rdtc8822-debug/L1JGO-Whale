@@ -101,42 +101,33 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Restore persisted buffs (including polymorph state)
 	loadAndRestoreBuffs(player, deps)
 
-	// --- Send initialization packets (order matches Java) ---
+	// --- 發送初始化封包（順序參考 Java C_LoginToServer）---
 
 	// 1. S_ENTER_WORLD_CHECK (opcode 223) — LoginToGame
 	sendLoginGame(sess, ch.ClanID, ch.ID)
 
-	// 2. S_ADD_INVENTORY_BATCH (opcode 5) — inventory list
+	// 2. S_ADD_INVENTORY_BATCH (opcode 5) — 背包列表
 	sendInvList(sess, player.Inv, deps.Items)
 
-	// 2b. S_EquipmentSlot (opcode 64, TYPE_EQUIPONLOGIN 0x41) — tell client which slots are occupied
-	if deps.Equip != nil {
-		deps.Equip.SendEquipList(sess, player)
-	}
-
-	// 3. S_STATUS (opcode 8) — OwnCharStatus (use PlayerInfo for live stats)
+	// 3. S_STATUS (opcode 8) — 角色狀態（使用 PlayerInfo 即時數據）
 	sendPlayerStatus(sess, player)
 
-	// 4. S_WORLD (opcode 206) — MapID
+	// 4. S_WORLD (opcode 206) — 地圖 ID
 	sendMapID(sess, uint16(ch.MapID), false)
 
-	// 5. S_PUT_OBJECT (opcode 87) — OwnCharPack (use PlayerGfx for polymorph-aware GFX)
+	// 5. S_PUT_OBJECT (opcode 87) — 自己角色外觀（支援變身 GFX）
 	sendOwnCharPack(sess, ch, player.CurrentWeapon, PlayerGfx(player))
 
-	// 6. S_MAGIC_STATUS (opcode 37) — SPMR (real values from equipment + buffs)
+	// 6. S_MAGIC_STATUS (opcode 37) — SP/MR（含裝備 + buff）
 	sendMagicStatus(sess, byte(player.SP), uint16(player.MR))
 
-	// 7. S_WEATHER (opcode 115) — weather
+	// 7. S_WEATHER (opcode 115)
 	sendWeather(sess, deps.World.Weather)
 
-	// 7b. S_GameTime (opcode 123) — current game time
-	// NOTE: Moved to AFTER all initialization packets to avoid client desync.
-	// Some 3.80C clients don't expect S_GameTime mid-initialization.
-
-	// 8. S_ABILITY_SCORES (opcode 174) — AC + resistances
+	// 8. S_ABILITY_SCORES (opcode 174) — AC + 屬性抗性
 	sendAbilityScores(sess, player)
 
-	// 9. Send known spells (always send — client needs this to initialize the spell window)
+	// 9. S_SkillList (opcode 164) — 已學魔法
 	if deps.Skills != nil {
 		var spells []*data.SkillInfo
 		for _, sid := range player.KnownSpells {
@@ -144,16 +135,24 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 				spells = append(spells, sk)
 			}
 		}
-		sendSkillList(sess, spells) // sends all-zero bitmask if no spells known
+		sendSkillList(sess, spells)
 	}
 
-	// 10. Send saved bookmarks
+	// 9b. S_EquipmentSlot (opcode 64, sub-type 0x42) — 已裝備欄位
+	if deps.Equip != nil {
+		deps.Equip.SendEquipList(sess, player)
+	}
+
+	// 10. 已儲存書籤
 	SendAllBookmarks(sess, player.Bookmarks)
 
-	// 11. Send saved character config (F5-F12 hotkeys, UI positions)
+	// 11. 角色設定（F5-F12 快捷鍵、UI 位置）
 	loadAndSendCharConfig(sess, ch.ID, deps)
 
-	// 12. Send clan info on login
+	// 11b. S_CharResetInfo (opcode 64, sub-type 0x04) — 角色屬性配點資訊
+	sendCharResetInfo(sess, ch, player, deps)
+
+	// 12. 血盟資訊
 	if player.ClanID > 0 {
 		sendClanName(sess, player.CharID, player.ClanName, player.ClanID, true)
 		clan := deps.World.Clans.GetClan(player.ClanID)
@@ -163,7 +162,7 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		sendClanAttention(sess)
 	}
 
-	// 10. RaiseAttr dialog if bonus stat points available (level 51+)
+	// 13. 屬性配點對話框（等級 51+）
 	if player.Level >= bonusStatMinLevel {
 		available := player.Level - 50 - player.BonusStats
 		totalStats := player.Str + player.Dex + player.Con + player.Wis + player.Intel + player.Cha
@@ -245,10 +244,10 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		deps.MapData.SetImpassable(player.MapID, player.X, player.Y, true)
 	}
 
-	// --- Send restored buff icons (AFTER all init packets) ---
+	// --- 恢復 buff 圖示（必須在所有初始化封包之後）---
 	sendRestoredBuffIcons(player, deps)
 
-	// S_GameTime — sent LAST to avoid interfering with client init parser
+	// S_GameTime — 最後發送，避免干擾客戶端初始化
 	sendGameTime(sess, world.GameTimeNow().Seconds())
 }
 
@@ -347,6 +346,11 @@ func loadKnownSpellsFromDB(player *world.PlayerInfo, deps *Deps) {
 		return
 	}
 	player.KnownSpells = spells
+}
+
+// SendMapID 匯出 sendMapID — 供 system 套件發送地圖切換封包。
+func SendMapID(sess *net.Session, mapID uint16, underwater bool) {
+	sendMapID(sess, mapID, underwater)
 }
 
 func sendMapID(sess *net.Session, mapID uint16, underwater bool) {
@@ -571,6 +575,45 @@ func loadAndSendCharConfig(sess *net.Session, charID int32, deps *Deps) {
 	if len(data) > 0 {
 		sendCharConfig(sess, data)
 	}
+}
+
+// sendCharResetInfo 發送 S_CharResetInfo（opcode 64, sub-type 0x04）。
+// Java: C_LoginToServer line 303，告知客戶端角色屬性配點增加量。
+// 格式：nibble-packed，每 byte 高 4 位 + 低 4 位各一項屬性增加值。
+func sendCharResetInfo(sess *net.Session, ch *persist.CharacterRow, player *world.PlayerInfo, deps *Deps) {
+	if deps.Scripting == nil {
+		return
+	}
+	classData := deps.Scripting.GetCharCreateData(int(ch.ClassType))
+	if classData == nil {
+		return
+	}
+
+	// ch.Str 等是 DB 中的基礎值（不含裝備/buff），減去職業最低值得出配點增量
+	clamp := func(v int) byte {
+		if v < 0 {
+			return 0
+		}
+		if v > 15 {
+			return 15
+		}
+		return byte(v)
+	}
+	upStr := clamp(int(ch.Str) - classData.BaseSTR)
+	upInt := clamp(int(ch.Intel) - classData.BaseINT)
+	upWis := clamp(int(ch.Wis) - classData.BaseWIS)
+	upDex := clamp(int(ch.Dex) - classData.BaseDEX)
+	upCon := clamp(int(ch.Con) - classData.BaseCON)
+	upCha := clamp(int(ch.Cha) - classData.BaseCHA)
+
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT) // opcode 64
+	w.WriteC(0x04)                                               // sub-type: 屬性增加資訊
+	w.WriteC((upInt << 4) | upStr)
+	w.WriteC((upDex << 4) | upWis)
+	w.WriteC((upCha << 4) | upCon)
+	w.WriteC(0x00) // Java: S_CharResetInfo 尾部填充
+	w.WriteH(0x00) // Java: S_CharResetInfo 尾部填充
+	sess.Send(w.Bytes())
 }
 
 // loadBuddiesFromDB loads the buddy list from the character_buddys table.

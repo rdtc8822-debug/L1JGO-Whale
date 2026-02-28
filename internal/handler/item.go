@@ -9,6 +9,7 @@ import (
 	"github.com/l1jgo/server/internal/net/packet"
 	"github.com/l1jgo/server/internal/world"
 	"go.uber.org/zap"
+	"golang.org/x/text/encoding/traditionalchinese"
 )
 
 // Message IDs for item validation
@@ -86,36 +87,9 @@ func HandleDestroyItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
-	item := player.Inv.FindByObjectID(objectID)
-	if item == nil {
-		return
+	if deps.ItemGround != nil {
+		deps.ItemGround.DestroyItem(sess, player, objectID, count)
 	}
-
-	// Cannot destroy equipped items
-	if item.Equipped {
-		return
-	}
-
-	if count <= 0 {
-		count = item.Count
-	}
-	if count > item.Count {
-		count = item.Count
-	}
-
-	removed := player.Inv.RemoveItem(objectID, count)
-	if removed {
-		sendRemoveInventoryItem(sess, objectID)
-	} else {
-		sendItemCountUpdate(sess, item)
-	}
-	sendWeightUpdate(sess, player)
-
-	deps.Log.Debug("item destroyed",
-		zap.String("player", player.Name),
-		zap.Int32("item_id", item.ItemID),
-		zap.Int32("count", count),
-	)
 }
 
 // HandleDropItem processes C_DROP (opcode 25) — player drops item to ground.
@@ -129,198 +103,27 @@ func HandleDropItem(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
-	item := player.Inv.FindByObjectID(objectID)
-	if item == nil {
-		return
+	if deps.ItemGround != nil {
+		deps.ItemGround.DropItem(sess, player, objectID, count)
 	}
-
-	// Cannot drop equipped items
-	if item.Equipped {
-		return
-	}
-
-	if count <= 0 {
-		count = item.Count
-	}
-	if count > item.Count {
-		count = item.Count
-	}
-
-	// Remember item info before removing from inventory
-	itemID := item.ItemID
-	itemName := item.Name
-	enchantLvl := item.EnchantLvl
-
-	removed := player.Inv.RemoveItem(objectID, count)
-	if removed {
-		sendRemoveInventoryItem(sess, objectID)
-	} else {
-		sendItemCountUpdate(sess, item)
-	}
-	sendWeightUpdate(sess, player)
-
-	// Look up ground GFX
-	grdGfx := int32(0)
-	itemInfo := deps.Items.Get(itemID)
-	if itemInfo != nil {
-		grdGfx = itemInfo.GrdGfx
-	}
-
-	// Build display name
-	displayName := itemName
-	if enchantLvl > 0 {
-		displayName = fmt.Sprintf("+%d %s", enchantLvl, displayName)
-	} else if enchantLvl < 0 {
-		displayName = fmt.Sprintf("%d %s", enchantLvl, displayName)
-	}
-	if count > 1 {
-		displayName = fmt.Sprintf("%s (%d)", displayName, count)
-	}
-
-	// Create ground item at player's position
-	gndItem := &world.GroundItem{
-		ID:         world.NextGroundItemID(),
-		ItemID:     itemID,
-		Count:      count,
-		EnchantLvl: enchantLvl,
-		Name:       displayName,
-		GrdGfx:     grdGfx,
-		X:          player.X,
-		Y:          player.Y,
-		MapID:      player.MapID,
-		OwnerID:    player.CharID,
-		TTL:        5 * 60 * 5, // 5 minutes at 200ms ticks
-	}
-	deps.World.AddGroundItem(gndItem)
-
-	// Broadcast to nearby players (including self)
-	nearby := deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
-	for _, viewer := range nearby {
-		SendDropItem(viewer.Session, gndItem)
-	}
-
-	deps.Log.Debug("item dropped to ground",
-		zap.String("player", player.Name),
-		zap.Int32("item_id", itemID),
-		zap.Int32("count", count),
-		zap.Int32("ground_id", gndItem.ID),
-	)
 }
 
 // HandlePickupItem processes C_GET (opcode 112) — player picks up ground item.
 // Format: [H x][H y][D objectID][D count]
 func HandlePickupItem(sess *net.Session, r *packet.Reader, deps *Deps) {
-	_ = r.ReadH()          // x (unused, use server pos)
-	_ = r.ReadH()          // y (unused)
-	objectID := r.ReadD()  // ground item object ID
-	_ = r.ReadD()          // count (pick up all)
+	_ = r.ReadH() // x（未使用，取伺服器座標）
+	_ = r.ReadH() // y（未使用）
+	objectID := r.ReadD()
+	_ = r.ReadD() // count（全撿）
 
 	player := deps.World.GetBySession(sess.ID)
-	if player == nil || player.Dead {
+	if player == nil {
 		return
 	}
 
-	gndItem := deps.World.GetGroundItem(objectID)
-	if gndItem == nil {
-		return
+	if deps.ItemGround != nil {
+		deps.ItemGround.PickupItem(sess, player, objectID)
 	}
-
-	// Distance check (Chebyshev <= 3)
-	dx := player.X - gndItem.X
-	dy := player.Y - gndItem.Y
-	if dx < 0 {
-		dx = -dx
-	}
-	if dy < 0 {
-		dy = -dy
-	}
-	dist := dx
-	if dy > dist {
-		dist = dy
-	}
-	if dist > 3 {
-		return
-	}
-
-	// Map check
-	if player.MapID != gndItem.MapID {
-		return
-	}
-
-	// Check inventory space
-	if player.Inv.IsFull() {
-		sendServerMessage(sess, 263) // "Inventory full"
-		return
-	}
-
-	// Check weight capacity
-	pickupInfo := deps.Items.Get(gndItem.ItemID)
-	if pickupInfo != nil {
-		addWeight := pickupInfo.Weight * gndItem.Count
-		maxW := world.MaxWeight(player.Str, player.Con)
-		if player.Inv.IsOverWeight(addWeight, maxW) {
-			sendServerMessage(sess, 82) // "此物品太重了，所以你無法攜帶。"
-			return
-		}
-	}
-
-	// Remove from world
-	deps.World.RemoveGroundItem(objectID)
-
-	// Broadcast removal to nearby players
-	nearby := deps.World.GetNearbyPlayersAt(gndItem.X, gndItem.Y, gndItem.MapID)
-	for _, viewer := range nearby {
-		SendRemoveObject(viewer.Session, gndItem.ID)
-	}
-
-	// Add to player inventory
-	itemInfo := deps.Items.Get(gndItem.ItemID)
-	itemName := gndItem.Name
-	invGfx := int32(0)
-	weight := int32(0)
-	stackable := false
-	if itemInfo != nil {
-		itemName = itemInfo.Name
-		invGfx = itemInfo.InvGfx
-		weight = itemInfo.Weight
-		stackable = itemInfo.Stackable || gndItem.ItemID == world.AdenaItemID
-	}
-
-	existing := player.Inv.FindByItemID(gndItem.ItemID)
-	wasExisting := existing != nil && stackable
-
-	bless := byte(0)
-	if itemInfo != nil {
-		bless = byte(itemInfo.Bless)
-	}
-	invItem := player.Inv.AddItem(
-		gndItem.ItemID,
-		gndItem.Count,
-		itemName,
-		invGfx,
-		weight,
-		stackable,
-		bless,
-	)
-	invItem.EnchantLvl = gndItem.EnchantLvl
-	if itemInfo != nil {
-		invItem.UseType = itemInfo.UseTypeID
-	}
-
-	if wasExisting {
-		sendItemCountUpdate(sess, invItem)
-	} else {
-		sendAddItem(sess, invItem)
-	}
-
-	// Update weight bar (Java: S_PacketBox.WEIGHT after insertItem)
-	sendWeightUpdate(sess, player)
-
-	deps.Log.Debug("item picked up",
-		zap.String("player", player.Name),
-		zap.Int32("item_id", gndItem.ItemID),
-		zap.Int32("count", gndItem.Count),
-	)
 }
 
 // HandleUseItem processes C_USE_ITEM (opcode 164) — player uses an item.
@@ -525,14 +328,18 @@ func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerI
 
 	// Pet collar items: summon/collect pet
 	if isPetCollar(invItem.ItemID) {
-		handleUsePetCollar(sess, player, invItem, deps)
+		if deps.PetLife != nil {
+			deps.PetLife.UsePetCollar(sess, player, invItem)
+		}
 		return
 	}
 
 	// Magic doll items: check doll table before potions/consumables
 	if deps.Dolls != nil {
 		if dd := deps.Dolls.Get(invItem.ItemID); dd != nil {
-			handleUseDoll(sess, player, invItem, dd, deps)
+			if deps.DollMgr != nil {
+				deps.DollMgr.UseDoll(sess, player, invItem, dd)
+			}
 			return
 		}
 	}
@@ -729,15 +536,23 @@ func buildStatusBytes(item *world.InvItem, info *data.ItemInfo) []byte {
 }
 
 // appendEquipSuffix appends the shared weapon/armor TLV suffix (enchant, hit, dmg, class, stats).
+// Java: L1ItemStatus.weapon() / armor() — 武器和防具的 hitMod 使用不同格式。
 func appendEquipSuffix(buf []byte, item *world.InvItem, info *data.ItemInfo) []byte {
 	if item.EnchantLvl != 0 {
 		buf = append(buf, 2, byte(item.EnchantLvl))
 	}
 	if info.Category == data.CategoryWeapon && world.IsTwoHanded(info.Type) {
-		buf = append(buf, 4) // two-handed flag (no value byte)
+		buf = append(buf, 4) // 雙手武器旗標（無值位元組）
 	}
+	// hitMod：武器和防具格式不同
+	// 武器：Java weapon() → tag 39 + writeS("武器命中 :N")（Big5 null-terminated）
+	// 防具：Java armor()  → tag 5 + writeC(N)
 	if info.HitMod != 0 {
-		buf = append(buf, 5, byte(int8(info.HitMod)))
+		if info.Category == data.CategoryWeapon {
+			buf = appendStatusString(buf, fmt.Sprintf("武器命中 :%d", info.HitMod))
+		} else {
+			buf = append(buf, 5, byte(int8(info.HitMod)))
+		}
 	}
 	if info.DmgMod != 0 {
 		buf = append(buf, 6, byte(int8(info.DmgMod)))
@@ -779,9 +594,24 @@ func appendEquipSuffix(buf []byte, item *world.InvItem, info *data.ItemInfo) []b
 	if info.AddHPR != 0 {
 		buf = append(buf, 37, byte(int8(info.AddHPR)))
 	}
+	// MPR：Java weapon() 和 armor() 皆用 tag 38（非 tag 26）
 	if info.AddMPR != 0 {
-		buf = append(buf, 26, byte(int8(info.AddMPR)))
+		buf = append(buf, 38, byte(int8(info.AddMPR)))
 	}
+	return buf
+}
+
+
+// appendStatusString 將 tag 39 + Big5 null-terminated 字串附加到 status bytes 緩衝區。
+// Java weapon() 中命中率等欄位使用此格式：writeC(39) + writeS("武器命中 :N")。
+func appendStatusString(buf []byte, text string) []byte {
+	buf = append(buf, 39) // tag 39
+	encoded, err := traditionalchinese.Big5.NewEncoder().Bytes([]byte(text))
+	if err != nil {
+		encoded = []byte(text)
+	}
+	buf = append(buf, encoded...)
+	buf = append(buf, 0) // null terminator
 	return buf
 }
 
@@ -816,6 +646,11 @@ func sendHpUpdate(sess *net.Session, player *world.PlayerInfo) {
 	w.WriteH(uint16(player.HP))
 	w.WriteH(uint16(player.MaxHP))
 	sess.Send(w.Bytes())
+}
+
+// SendHpUpdate 匯出 sendHpUpdate — 供 system 套件發送 HP 更新。
+func SendHpUpdate(sess *net.Session, player *world.PlayerInfo) {
+	sendHpUpdate(sess, player)
 }
 
 func sendMpUpdate(sess *net.Session, player *world.PlayerInfo) {

@@ -12,18 +12,24 @@ import (
 
 // HandleChangeChar processes C_REQUEST_ROLL (opcode 7).
 // Returns the player to the character select screen and resends the character list.
+// Java: C_NewCharSelect — 先發送 UI 清理封包，再登出，最後發送 LOGOUT 封包。
 func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
-	// Send S_EVENT (S_PacketBox) subcode 42 = LOGOUT first.
-	// This tells the client to transition to the character select UI.
-	sendPacketBoxLogout(sess)
+	player := deps.World.GetBySession(sess.ID)
+	// Java C_NewCharSelect: 先發送 UI 清理封包再登出
+	if player != nil {
+		sendChangeName(sess, player.CharID, player.Name)
+		sendUpdateER(sess, 0)
+		sendDodgeIcon(sess, byte(player.Dodge))
+	}
 
+	// Java: quitGame() 先清理 + 儲存，最後才發送 LOGOUT
 	// Clear player tile before removal (for NPC pathfinding)
-	if pre := deps.World.GetBySession(sess.ID); pre != nil && deps.MapData != nil {
-		deps.MapData.SetImpassable(pre.MapID, pre.X, pre.Y, false)
+	if player != nil && deps.MapData != nil {
+		deps.MapData.SetImpassable(player.MapID, player.X, player.Y, false)
 	}
 
 	// Remove from world if in-world
-	player := deps.World.RemovePlayer(sess.ID)
+	player = deps.World.RemovePlayer(sess.ID)
 	if player != nil {
 		// 清理進行中的交易
 		cancelTradeIfActive(player, deps)
@@ -41,25 +47,39 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 
 		// Save full character state
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		// 儲存時必須扣除裝備加成和 buff 加成，只保存基礎值。
+		// 否則重新登入時 InitEquipStats / loadAndRestoreBuffs 會重複疊加，造成屬性膨脹。
+		eq := player.EquipBonuses
+		var bStr, bDex, bCon, bWis, bIntel, bCha, bMaxHP, bMaxMP int16
+		for _, b := range player.ActiveBuffs {
+			bStr += b.DeltaStr
+			bDex += b.DeltaDex
+			bCon += b.DeltaCon
+			bWis += b.DeltaWis
+			bIntel += b.DeltaIntel
+			bCha += b.DeltaCha
+			bMaxHP += b.DeltaMaxHP
+			bMaxMP += b.DeltaMaxMP
+		}
 		row := &persist.CharacterRow{
 			Name:       player.Name,
 			Level:      player.Level,
 			Exp:        int64(player.Exp),
 			HP:         player.HP,
 			MP:         player.MP,
-			MaxHP:      player.MaxHP,
-			MaxMP:      player.MaxMP,
+			MaxHP:      player.MaxHP - int16(eq.AddHP) - bMaxHP,
+			MaxMP:      player.MaxMP - int16(eq.AddMP) - bMaxMP,
 			X:          player.X,
 			Y:          player.Y,
 			MapID:      player.MapID,
 			Heading:    player.Heading,
 			Lawful:     player.Lawful,
-			Str:        player.Str,
-			Dex:        player.Dex,
-			Con:        player.Con,
-			Wis:        player.Wis,
-			Cha:        player.Cha,
-			Intel:      player.Intel,
+			Str:        player.Str - int16(eq.AddStr) - bStr,
+			Dex:        player.Dex - int16(eq.AddDex) - bDex,
+			Con:        player.Con - int16(eq.AddCon) - bCon,
+			Wis:        player.Wis - int16(eq.AddWis) - bWis,
+			Cha:        player.Cha - int16(eq.AddCha) - bCha,
+			Intel:      player.Intel - int16(eq.AddInt) - bIntel,
 			BonusStats: player.BonusStats,
 			ClanID:     player.ClanID,
 			ClanName:   player.ClanName,
@@ -116,14 +136,53 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 		}
 	}
 
+	// Java: quitGame() 完成後才發送 LOGOUT 封包（S_PacketBoxSelect）
+	sendPacketBoxLogout(sess)
+
 	sess.CharName = ""
 	sess.SetState(packet.StateAuthenticated)
-	sendCharacterList(sess, deps)
+	// 注意：不主動推送角色列表。
+	// Java 在此等待客戶端收到 LOGOUT 後自動發送 C_CommonClick (opcode 16)，
+	// 再由 HandleCommonClick 回應角色列表。
 }
 
-// sendPacketBoxLogout sends S_EVENT (opcode 250) subcode 42 — tells client to return to char select.
+// sendPacketBoxLogout sends S_PacketBoxSelect (opcode 250) subcode 42 — 告知客戶端返回選角畫面。
+// Java: S_PacketBoxSelect — writeC(opcode) + writeC(42) + 6×writeC(0)。
 func sendPacketBoxLogout(sess *net.Session) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
-	w.WriteH(42) // subcode: LOGOUT
+	w.WriteC(42) // subcode: LOGOUT
+	w.WriteC(0)
+	w.WriteC(0)
+	w.WriteC(0)
+	w.WriteC(0)
+	w.WriteC(0)
+	w.WriteC(0)
+	sess.Send(w.Bytes())
+}
+
+// sendChangeName sends S_ChangeName (opcode 46) — 重設角色名稱顯示。
+// Java C_NewCharSelect: S_ChangeName(pc, false) — 清理 UI 狀態。
+func sendChangeName(sess *net.Session, charID int32, name string) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHANGENAME)
+	w.WriteD(charID)
+	w.WriteS(name)
+	sess.Send(w.Bytes())
+}
+
+// sendUpdateER sends S_PacketBox(UPDATE_ER) (opcode 250, subcode 132) — 更新迴避率。
+// Java C_NewCharSelect: S_PacketBox(UPDATE_ER, pc.getEr())。
+func sendUpdateER(sess *net.Session, er int16) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+	w.WriteC(132) // UPDATE_ER
+	w.WriteH(uint16(er))
+	sess.Send(w.Bytes())
+}
+
+// sendDodgeIcon sends S_PacketBoxIcon1(true, dodge) (opcode 250, subcode 0x58) — 閃避率圖示。
+// Java C_NewCharSelect: S_PacketBoxIcon1(true, pc.get_dodge())。
+func sendDodgeIcon(sess *net.Session, dodge byte) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+	w.WriteC(0x58) // _dodge_up
+	w.WriteC(dodge)
 	sess.Send(w.Bytes())
 }

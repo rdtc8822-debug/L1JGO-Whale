@@ -48,8 +48,8 @@ func HandleNpcAction(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 	if pet := deps.World.GetPet(objID); pet != nil {
-		if pet.OwnerCharID == player.CharID {
-			handlePetAction(sess, player, pet, strings.ToLower(action), deps)
+		if pet.OwnerCharID == player.CharID && deps.PetLife != nil {
+			deps.PetLife.HandlePetAction(sess, player, pet, strings.ToLower(action))
 		}
 		return
 	}
@@ -95,29 +95,29 @@ func HandleNpcAction(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	// Warehouse — 個人帳號倉庫
 	case "retrieve":
-		OpenWarehouse(sess, player, objID, WhTypePersonal, deps)
+		deps.Warehouse.OpenWarehouse(sess, player, objID, WhTypePersonal)
 	case "deposit":
-		OpenWarehouseDeposit(sess, player, objID, WhTypePersonal, deps)
+		deps.Warehouse.OpenWarehouseDeposit(sess, player, objID, WhTypePersonal)
 
 	// Warehouse — 角色專屬倉庫（Java: retrieve-char → S_RetrieveChaList type=18）
 	case "retrieve-char":
-		OpenWarehouse(sess, player, objID, WhTypeCharacter, deps)
+		deps.Warehouse.OpenWarehouse(sess, player, objID, WhTypeCharacter)
 
 	// Warehouse — 精靈倉庫
 	case "retrieve-elven":
-		OpenWarehouse(sess, player, objID, WhTypeElf, deps)
+		deps.Warehouse.OpenWarehouse(sess, player, objID, WhTypeElf)
 	case "deposit-elven":
-		OpenWarehouseDeposit(sess, player, objID, WhTypeElf, deps)
+		deps.Warehouse.OpenWarehouseDeposit(sess, player, objID, WhTypeElf)
 
 	// Warehouse — 血盟倉庫（含權限驗證 + 單人鎖定）
 	case "retrieve-pledge":
-		OpenClanWarehouse(sess, player, objID, deps)
+		deps.Warehouse.OpenClanWarehouse(sess, player, objID)
 	case "deposit-pledge":
-		OpenClanWarehouse(sess, player, objID, deps) // 同 retrieve，客戶端內建 tab 處理
+		deps.Warehouse.OpenClanWarehouse(sess, player, objID) // 同 retrieve，客戶端內建 tab 處理
 	case "history":
 		// 血盟倉庫歷史記錄（Java: S_PledgeWarehouseHistory）
 		if player.ClanID > 0 {
-			SendClanWarehouseHistory(sess, player.ClanID, deps)
+			deps.Warehouse.SendClanWarehouseHistory(sess, player.ClanID)
 		}
 
 	// EXP recovery / PK redemption (stub)
@@ -158,9 +158,9 @@ func HandleNpcAction(sess *net.Session, r *packet.Reader, deps *Deps) {
 		}
 
 		// Check if this is a crafting recipe
-		if deps.ItemMaking != nil {
+		if deps.ItemMaking != nil && deps.Craft != nil {
 			if recipe := deps.ItemMaking.Get(action); recipe != nil {
-				handleCraftItem(sess, player, npc, recipe, action, deps)
+				deps.Craft.HandleCraftEntry(sess, player, npc, recipe, action)
 				return
 			}
 		}
@@ -311,6 +311,11 @@ func sendHypertext(sess *net.Session, objID int32, htmlID string) {
 	w.WriteH(0x00)
 	w.WriteH(0)
 	sess.Send(w.Bytes())
+}
+
+// SendHypertext 開啟 HTML 對話框。Exported for system package usage.
+func SendHypertext(sess *net.Session, objID int32, htmlID string) {
+	sendHypertext(sess, objID, htmlID)
 }
 
 // sendHypertextWithData sends S_HYPERTEXT with data values injected into the HTML template.
@@ -668,7 +673,9 @@ func handleNpcPoly(sess *net.Session, player *world.PlayerInfo, polyID int32, de
 		return
 	}
 	sendAdenaUpdate(sess, player)
-	DoPoly(player, polyID, poly.DurationSec, data.PolyCauseNPC, deps)
+	if deps.Polymorph != nil {
+		deps.Polymorph.DoPoly(player, polyID, poly.DurationSec, data.PolyCauseNPC)
+	}
 }
 
 // consumeAdena deducts adena from player inventory. Returns false if insufficient.
@@ -692,93 +699,20 @@ func sendAdenaUpdate(sess *net.Session, player *world.PlayerInfo) {
 	sendWeightUpdate(sess, player)
 }
 
+// ConsumeAdena 匯出 consumeAdena — 供 system 套件扣除金幣。
+func ConsumeAdena(player *world.PlayerInfo, amount int32) bool {
+	return consumeAdena(player, amount)
+}
+
+// SendAdenaUpdate 匯出 sendAdenaUpdate — 供 system 套件更新金幣顯示。
+func SendAdenaUpdate(sess *net.Session, player *world.PlayerInfo) {
+	sendAdenaUpdate(sess, player)
+}
+
 // ========================================================================
 //  Crafting System (NPC Item Making)
 // ========================================================================
 
-// handleCraftItem is the main crafting entry point when a recipe is found.
-// Checks NPC restriction, counts material sets, shows batch dialog or executes.
-// Java: L1NpcMakeItemAction.execute()
-func handleCraftItem(sess *net.Session, player *world.PlayerInfo, npc *world.NpcInfo, recipe *data.CraftRecipe, action string, deps *Deps) {
-	// NPC restriction: recipe.NpcID == 0 means any NPC
-	if recipe.NpcID != 0 && recipe.NpcID != npc.NpcID {
-		return
-	}
-
-	// Count available material sets
-	sets := countMaterialSets(player.Inv, recipe.Materials)
-	if sets <= 0 {
-		// Report first missing material (Java: msg 337 with item name + shortage)
-		for _, mat := range recipe.Materials {
-			have := countUnequippedByID(player.Inv, mat.ItemID)
-			if have < mat.Amount {
-				shortage := mat.Amount - have
-				itemInfo := deps.Items.Get(mat.ItemID)
-				name := fmt.Sprintf("item#%d", mat.ItemID)
-				if itemInfo != nil {
-					name = itemInfo.Name
-				}
-				sendServerMessageArgs(sess, 337, name, fmt.Sprintf("%d", shortage))
-				return
-			}
-		}
-		return
-	}
-
-	// If multiple sets available and recipe supports batch input, show spinner dialog
-	if sets > 1 && recipe.AmountInputable {
-		sendInputAmount(sess, npc.ID, sets, action)
-		player.PendingCraftAction = action
-		return
-	}
-
-	// Single craft
-	executeCraft(sess, player, npc, recipe, 1, deps)
-}
-
-// countMaterialSets returns how many complete material sets the player can provide.
-// Only counts non-equipped items. Returns 0 if any material is insufficient.
-func countMaterialSets(inv *world.Inventory, materials []data.CraftMaterial) int32 {
-	if len(materials) == 0 {
-		return 0
-	}
-	var minSets int32 = math.MaxInt32
-	for _, mat := range materials {
-		have := countUnequippedByID(inv, mat.ItemID)
-		if mat.Amount <= 0 {
-			continue
-		}
-		sets := have / mat.Amount
-		if sets < minSets {
-			minSets = sets
-		}
-	}
-	if minSets == math.MaxInt32 {
-		return 0
-	}
-	return minSets
-}
-
-// countUnequippedByID counts the total quantity of an item that is NOT equipped.
-func countUnequippedByID(inv *world.Inventory, itemID int32) int32 {
-	var total int32
-	for _, it := range inv.Items {
-		if it.ItemID == itemID && !it.Equipped {
-			total += it.Count
-		}
-	}
-	return total
-}
-
-// findUnequippedByID returns the first non-equipped item matching the given template ID.
-func findUnequippedByID(inv *world.Inventory, itemID int32) *world.InvItem {
-	for _, it := range inv.Items {
-		if it.ItemID == itemID && !it.Equipped {
-			return it
-		}
-	}
-	return nil
-}
 
 // sendInputAmount sends S_OPCODE_INPUTAMOUNT (136) — S_HowManyMake crafting batch dialog.
 // Java: S_HowManyMake(npcObjectId, maxAmount, actionName)
@@ -804,129 +738,11 @@ func sendInputAmount(sess *net.Session, npcObjID int32, maxSets int32, action st
 	sess.Send(w.Bytes())
 }
 
-// executeCraft performs the actual crafting: verify materials, consume them, produce output items.
-// Java: L1NpcMakeItemAction.makeItems()
-func executeCraft(sess *net.Session, player *world.PlayerInfo, npc *world.NpcInfo, recipe *data.CraftRecipe, amount int32, deps *Deps) {
-	if amount <= 0 {
-		return
-	}
-
-	// 1. Material check — verify all materials sufficient (non-equipped only)
-	for _, mat := range recipe.Materials {
-		have := countUnequippedByID(player.Inv, mat.ItemID)
-		need := mat.Amount * amount
-		if have < need {
-			shortage := need - have
-			itemInfo := deps.Items.Get(mat.ItemID)
-			name := fmt.Sprintf("item#%d", mat.ItemID)
-			if itemInfo != nil {
-				name = itemInfo.Name
-			}
-			// msg 337: "%0が%1個不足しています" (Insufficient: need %1 more %0)
-			sendServerMessageArgs(sess, 337, name, fmt.Sprintf("%d", shortage))
-			return
-		}
-	}
-
-	// 2. Inventory space check (max 180 slots)
-	newSlots := 0
-	for _, out := range recipe.Items {
-		outInfo := deps.Items.Get(out.ItemID)
-		if outInfo != nil && outInfo.Stackable {
-			existing := player.Inv.FindByItemID(out.ItemID)
-			if existing == nil {
-				newSlots++ // new stack
-			}
-			// else: existing stack, no new slot needed
-		} else {
-			// Non-stackable: each item takes a slot
-			newSlots += int(out.Amount) * int(amount)
-		}
-	}
-	if player.Inv.Size()+newSlots > world.MaxInventorySize {
-		// msg 263: "持有物品過多" (Carrying too many items)
-		sendServerMessage(sess, 263)
-		return
-	}
-
-	// 3. Weight check
-	var addWeight int32
-	for _, out := range recipe.Items {
-		outInfo := deps.Items.Get(out.ItemID)
-		if outInfo != nil {
-			addWeight += outInfo.Weight * out.Amount * amount
-		}
-	}
-	maxW := world.MaxWeight(player.Str, player.Con)
-	if player.Inv.IsOverWeight(addWeight, maxW) {
-		// msg 82: "一つのキャラクターが持てるアイテム重量を超過しています" (Overweight)
-		sendServerMessage(sess, 82)
-		return
-	}
-
-	// 4. Consume materials
-	for _, mat := range recipe.Materials {
-		remaining := mat.Amount * amount
-		for remaining > 0 {
-			slot := findUnequippedByID(player.Inv, mat.ItemID)
-			if slot == nil {
-				break // should not happen — checked above
-			}
-			take := remaining
-			if take > slot.Count {
-				take = slot.Count
-			}
-			removed := player.Inv.RemoveItem(slot.ObjectID, take)
-			if removed {
-				sendRemoveInventoryItem(sess, slot.ObjectID)
-			} else {
-				sendItemCountUpdate(sess, slot)
-			}
-			remaining -= take
-		}
-	}
-
-	// 5. Produce output items
-	npcName := ""
-	if npc != nil {
-		npcInfo := deps.Npcs.Get(npc.NpcID)
-		if npcInfo != nil {
-			npcName = npcInfo.Name
-		}
-	}
-
-	for _, out := range recipe.Items {
-		outInfo := deps.Items.Get(out.ItemID)
-		if outInfo == nil {
-			continue
-		}
-		totalCount := out.Amount * amount
-
-		if outInfo.Stackable {
-			item := player.Inv.AddItem(out.ItemID, totalCount, outInfo.Name,
-				outInfo.InvGfx, outInfo.Weight, true, byte(outInfo.Bless))
-			item.UseType = data.UseTypeToID(outInfo.UseType)
-			sendAddItem(sess, item, outInfo)
-		} else {
-			for i := int32(0); i < totalCount; i++ {
-				item := player.Inv.AddItem(out.ItemID, 1, outInfo.Name,
-					outInfo.InvGfx, outInfo.Weight, false, byte(outInfo.Bless))
-				item.UseType = data.UseTypeToID(outInfo.UseType)
-				sendAddItem(sess, item, outInfo)
-			}
-		}
-
-		// msg 143: "%0が%1をくれました" ([NPC] gave you [item])
-		if npcName != "" {
-			sendServerMessageArgs(sess, 143, npcName, outInfo.Name)
-		}
-	}
-
-	sendWeightUpdate(sess, player)
-
-	deps.Log.Info(fmt.Sprintf("製作完成  角色=%s  配方=%s  數量=%d",
-		player.Name, recipe.Action, amount))
+// SendInputAmount 匯出 sendInputAmount — 供 system/craft.go 發送批量製作對話框。
+func SendInputAmount(sess *net.Session, npcObjID int32, maxSets int32, action string) {
+	sendInputAmount(sess, npcObjID, maxSets, action)
 }
+
 
 // HandleCraftAmount processes C_Amount (opcode 11) when a crafting batch response is pending.
 // Called from HandleHypertextInputResult when player.PendingCraftAction is set.
@@ -965,39 +781,8 @@ func HandleCraftAmount(sess *net.Session, r *packet.Reader, player *world.Player
 		return
 	}
 
-	executeCraft(sess, player, npc, recipe, amount, deps)
-}
-
-// TickItemMagicEnchants decrements item-level magic enchant timers for a player.
-// Called once per game tick for each online player.
-// When an enchant expires, the stat is reverted and equipment recalculated.
-func TickItemMagicEnchants(player *world.PlayerInfo, deps *Deps) {
-	changed := false
-
-	// Check weapon enchant
-	weapon := player.Equip.Weapon()
-	if weapon != nil && weapon.DmgMagicExpiry > 0 {
-		weapon.DmgMagicExpiry--
-		if weapon.DmgMagicExpiry <= 0 {
-			weapon.DmgByMagic = 0
-			weapon.DmgMagicExpiry = 0
-			changed = true
-		}
-	}
-
-	// Check armor enchant
-	armor := player.Equip.Get(world.SlotArmor)
-	if armor != nil && armor.AcMagicExpiry > 0 {
-		armor.AcMagicExpiry--
-		if armor.AcMagicExpiry <= 0 {
-			armor.AcByMagic = 0
-			armor.AcMagicExpiry = 0
-			changed = true
-		}
-	}
-
-	if changed && player.Session != nil {
-		recalcEquipStats(player.Session, player, deps)
+	if deps.Craft != nil {
+		deps.Craft.ExecuteCraft(sess, player, npc, recipe, amount)
 	}
 }
 

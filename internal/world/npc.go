@@ -74,6 +74,11 @@ type NpcInfo struct {
 	Paralyzed     bool           // 麻痺/凍結/暈眩 — 跳過所有 AI 行為
 	Sleeped       bool           // 睡眠 — 跳過所有 AI 行為，受傷時解除
 	ActiveDebuffs map[int32]int  // skillID → 剩餘 ticks（NPC 不需 stat delta，只需計時）
+
+	// 法術中毒系統（Java L1DamagePoison 對 NPC）
+	PoisonDmgAmt      int32  // 每次扣血量（0=無毒）
+	PoisonDmgTimer    int    // 距下次扣血的 tick 計數（每 15 tick 扣一次）
+	PoisonAttackerSID uint64 // 施毒者 SessionID（仇恨歸屬用）
 }
 
 // HasDebuff 檢查 NPC 是否有指定 debuff。

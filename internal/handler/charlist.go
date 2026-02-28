@@ -10,7 +10,9 @@ import (
 	"go.uber.org/zap"
 )
 
-// sendCharacterList sends S_CharAmount + S_CharSynAck(SYN) + S_CharPacks + S_CharSynAck(ACK).
+// sendCharacterList sends S_CharAmount + S_CharPacks.
+// Java: L1CharList / C_CommonClick — 只發送 S_CharAmount + S_CharPacks，
+// 不發送 S_CharSynAck（opcode 64 SYN/ACK）。
 func sendCharacterList(sess *net.Session, deps *Deps) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -39,42 +41,16 @@ func sendCharacterList(sess *net.Session, deps *Deps) {
 	// S_CharAmount (opcode 178)
 	sendCharAmount(sess, len(chars), maxSlots)
 
-	// S_CharSynAck SYN (opcode 64)
-	sendCharSynAck(sess, true)
-
 	// S_CharPacks for each character (opcode 93)
 	for i := range chars {
 		sendCharPack(sess, &chars[i])
 	}
-
-	// S_CharSynAck ACK (opcode 64)
-	sendCharSynAck(sess, false)
 }
 
 func sendCharAmount(sess *net.Session, count, maxSlots int) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_NUM_CHARACTER)
 	w.WriteC(byte(count))
 	w.WriteC(byte(maxSlots))
-	sess.Send(w.Bytes())
-}
-
-func sendCharSynAck(sess *net.Session, isSyn bool) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
-	if isSyn {
-		// SYN packet
-		w.WriteC(0x0a)
-		w.WriteC(0x02)
-		w.WriteC(0x00)
-		w.WriteC(0x00)
-		w.WriteC(0x00)
-		w.WriteC(0x08)
-		w.WriteC(0x00)
-	} else {
-		// ACK packet
-		w.WriteC(0x40)
-		w.WriteD(0)
-		w.WriteH(0)
-	}
 	sess.Send(w.Bytes())
 }
 

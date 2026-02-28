@@ -92,6 +92,11 @@ func sendSummonMenu(sess *net.Session, sum *world.SummonInfo) {
 	sess.Send(w.Bytes())
 }
 
+// SendSummonMenu 發送召喚獸控制選單。Exported for system package usage.
+func SendSummonMenu(sess *net.Session, sum *world.SummonInfo) {
+	sendSummonMenu(sess, sum)
+}
+
 // sendSummonHpMeter sends S_HP_METER (opcode 237) for a summon — only to master.
 // Java: S_HPMeter only sent to the summon's owner.
 func sendSummonHpMeter(sess *net.Session, summonID int32, hp, maxHP int32) {
@@ -288,6 +293,11 @@ func sendPetMenu(sess *net.Session, pet *world.PetInfo, expPercent int) {
 	sess.Send(w.Bytes())
 }
 
+// SendPetHpMeter 匯出 sendPetHpMeter — 供 system 套件發送寵物 HP 條更新。
+func SendPetHpMeter(sess *net.Session, petID int32, hp, maxHP int32) {
+	sendPetHpMeter(sess, petID, hp, maxHP)
+}
+
 // sendPetHpMeter sends S_HP_METER (opcode 237) for a pet — only to master.
 func sendPetHpMeter(sess *net.Session, petID int32, hp, maxHP int32) {
 	ratio := byte(0xFF)
@@ -414,4 +424,34 @@ func sendCompanionEffect(viewer *net.Session, objID int32, gfxID int32) {
 	w.WriteD(objID)
 	w.WriteH(uint16(gfxID))
 	viewer.Send(w.Bytes())
+}
+
+// SendCompanionEffect 廣播伴侶特效。Exported for system package usage.
+func SendCompanionEffect(viewer *net.Session, objID int32, gfxID int32) {
+	sendCompanionEffect(viewer, objID, gfxID)
+}
+
+// SendPetCtrlMenu 匯出 sendPetCtrlMenu — 供 system 套件開啟/關閉寵物控制面板。
+func SendPetCtrlMenu(sess *net.Session, pet *world.PetInfo, open bool) {
+	sendPetCtrlMenu(sess, pet, open)
+}
+
+// SendPetInventory 匯出 sendPetInventory — 供 system 套件發送寵物背包列表。
+func SendPetInventory(sess *net.Session, pet *world.PetInfo) {
+	sendPetInventory(sess, pet)
+}
+
+// SendSelectTarget 匯出 sendSelectTarget — 供 system 套件發送目標選擇游標。
+func SendSelectTarget(sess *net.Session, petID int32) {
+	sendSelectTarget(sess, petID)
+}
+
+// SendPetEquipUpdate 匯出 sendPetEquipUpdate — 供 system 套件發送寵物裝備狀態更新。
+func SendPetEquipUpdate(sess *net.Session, pet *world.PetInfo, equipMode byte, equipStatus byte) {
+	sendPetEquipUpdate(sess, pet, equipMode, equipStatus)
+}
+
+// SendDollTimer 匯出 sendDollTimer — 供 system 套件發送魔法娃娃計時器。
+func SendDollTimer(sess *net.Session, seconds int32) {
+	sendDollTimer(sess, seconds)
 }

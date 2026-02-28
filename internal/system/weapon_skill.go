@@ -1,8 +1,9 @@
-package handler
+package system
 
 import (
 	"math"
 
+	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/world"
 )
 
@@ -15,10 +16,10 @@ const (
 	attrWind  = 8
 )
 
-// ProcessWeaponSkillProc 處理武器技能觸發。
+// processWeaponSkillProc 處理武器技能觸發。
 // 在攻擊命中後呼叫，回傳額外傷害（加到物理攻擊傷害上）。
 // Java: L1WeaponSkill.getWeaponSkillDamage()
-func ProcessWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *Deps) int32 {
+func processWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	if deps.WeaponSkills == nil {
 		return 0
 	}
@@ -67,14 +68,14 @@ func ProcessWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 		if ws.ArrowType {
 			// 投射物類型 → S_UseAttackSkill
 			for _, viewer := range nearby {
-				sendUseAttackSkill(viewer.Session, player.CharID, npc.ID, 0,
+				handler.SendUseAttackSkill(viewer.Session, player.CharID, npc.ID, 0,
 					player.Heading, ws.EffectID, 6,
 					player.X, player.Y, npc.X, npc.Y)
 			}
 		} else {
 			// 普通特效 → S_SkillSound
 			for _, viewer := range nearby {
-				sendSkillEffect(viewer.Session, effectTargetID, ws.EffectID)
+				handler.SendSkillEffect(viewer.Session, effectTargetID, ws.EffectID)
 			}
 		}
 	}
@@ -103,7 +104,7 @@ func ProcessWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 // processWeaponSkillAoE 處理武器技能的範圍傷害。
 // 以主目標為中心，對範圍內其他 NPC 造成傷害。
 // Java: L1WeaponSkill 的 area 迴圈邏輯。
-func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInfo, baseDmg float64, area int, attr int, nearby []*world.PlayerInfo, deps *Deps) {
+func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInfo, baseDmg float64, area int, attr int, nearby []*world.PlayerInfo, deps *handler.Deps) {
 	ws := deps.World
 	// 以主目標為中心，取範圍內的 NPC
 	npcs := ws.GetNearbyNpcs(primaryTarget.X, primaryTarget.Y, primaryTarget.MapID)
@@ -143,7 +144,7 @@ func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInf
 
 		// 廣播受傷動畫
 		for _, viewer := range nearby {
-			sendActionGfx(viewer.Session, target.ID, 2) // ACTION_Damage = 2
+			handler.SendActionGfx(viewer.Session, target.ID, 2) // ACTION_Damage = 2
 		}
 
 		// 血量更新
@@ -152,12 +153,12 @@ func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInf
 			hpRatio = int16((target.HP * 100) / target.MaxHP)
 		}
 		for _, viewer := range nearby {
-			sendHpMeter(viewer.Session, target.ID, hpRatio)
+			handler.SendHpMeter(viewer.Session, target.ID, hpRatio)
 		}
 
 		// 死亡檢查
 		if target.HP <= 0 {
-			handleNpcDeath(target, player, nearby, deps)
+			deps.Combat.HandleNpcDeath(target, player, nearby)
 		}
 	}
 }
@@ -219,7 +220,7 @@ func isNpcFrozen(npc *world.NpcInfo) bool {
 
 // processBaphometStaff 乙乙乙巫師杖（item 121）：14% 觸發，(INT+SP)*1.8 傷害，地屬性。
 // Java: L1WeaponSkill.getBaphometStaffDamage()
-func processBaphometStaff(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *Deps) int32 {
+func processBaphometStaff(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	if world.RandInt(100)+1 > 14 {
 		return 0
 	}
@@ -237,7 +238,7 @@ func processBaphometStaff(player *world.PlayerInfo, npc *world.NpcInfo, nearby [
 
 	// GFX: 129 播在目標位置
 	for _, viewer := range nearby {
-		sendSkillEffect(viewer.Session, npc.ID, 129)
+		handler.SendSkillEffect(viewer.Session, npc.ID, 129)
 	}
 
 	dmg = calcWeaponSkillDmgReduction(player, npc, dmg, attrEarth)
@@ -249,7 +250,7 @@ func processBaphometStaff(player *world.PlayerInfo, npc *world.NpcInfo, nearby [
 
 // processDiceDagger 骰子匕首（item 2）：2% 觸發，目標 HP*2/3 傷害，消耗武器。
 // Java: L1WeaponSkill.getDiceDaggerDamage()
-func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *Deps) int32 {
+func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	if world.RandInt(100)+1 > 2 {
 		return 0
 	}
@@ -263,9 +264,9 @@ func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*w
 	wpn := player.Equip.Weapon()
 	if wpn != nil {
 		player.Inv.RemoveItem(wpn.ObjectID, 1)
-		sendRemoveInventoryItem(player.Session, wpn.ObjectID)
+		handler.SendRemoveInventoryItem(player.Session, wpn.ObjectID)
 		player.Equip.Set(world.SlotWeapon, nil)
-		sendServerMessage(player.Session, 158) // "%0 消失了。"
+		handler.SendServerMessage(player.Session, 158) // "%0 消失了。"
 	}
 
 	return dmg
@@ -273,7 +274,7 @@ func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*w
 
 // processKiringku 奇鍛古（item 270/290）：固定觸發，2D5+value * INT 係數。
 // Java: L1WeaponSkill.getKiringkuDamage()
-func processKiringku(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *Deps) int32 {
+func processKiringku(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	if isNpcFrozen(npc) {
 		return 0
 	}
@@ -314,7 +315,7 @@ func processKiringku(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID 
 
 	// GFX
 	for _, viewer := range nearby {
-		sendSkillEffect(viewer.Session, player.CharID, gfx)
+		handler.SendSkillEffect(viewer.Session, player.CharID, gfx)
 	}
 
 	dmg = calcWeaponSkillDmgReduction(player, npc, dmg, attrNone)
@@ -326,7 +327,7 @@ func processKiringku(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID 
 
 // processAreaSkillWeapon 冰矛/狂風之劍等特殊 AoE 武器。
 // Java: L1WeaponSkill.getAreaSkillWeaponDamage()
-func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *Deps) int32 {
+func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	var probability int
 	var attr int
 	var area int
@@ -371,7 +372,7 @@ func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 		effectTargetID = player.CharID
 	}
 	for _, viewer := range nearby {
-		sendSkillEffect(viewer.Session, effectTargetID, effectID)
+		handler.SendSkillEffect(viewer.Session, effectTargetID, effectID)
 	}
 
 	// AoE 傷害

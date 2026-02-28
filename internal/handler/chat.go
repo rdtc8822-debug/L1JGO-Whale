@@ -160,7 +160,7 @@ func HandleWhisper(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	// Exclude check: target has blocked sender
 	if IsExcluded(target, player.Name) {
-		sendServerMessageStr(sess, 117, target.Name) // "%0 斷絕你的密語。"
+		SendServerMessageStr(sess, 117, target.Name) // "%0 斷絕你的密語。"
 		return
 	}
 

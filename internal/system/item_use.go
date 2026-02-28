@@ -693,8 +693,9 @@ func (s *ItemUseSystem) GiveDrops(killer *world.PlayerInfo, npcID int32) {
 			itemInfo.InvGfx,
 			itemInfo.Weight,
 			stackable,
-			byte(drop.EnchantLevel),
+			byte(itemInfo.Bless),
 		)
+		item.EnchantLvl = int8(drop.EnchantLevel)
 		item.UseType = itemInfo.UseTypeID
 		// 怪物掉落的裝備預設未鑑定（暗名、無屬性）
 		if itemInfo.Category == data.CategoryWeapon || itemInfo.Category == data.CategoryArmor {

@@ -148,6 +148,11 @@ func consumeSkillResources(sess *net.Session, player *world.PlayerInfo, skill *d
 	player.SkillDelayUntil = time.Now().Add(time.Duration(delay) * time.Millisecond)
 }
 
+// ConsumeSkillResources 扣除 MP/HP/材料並設定冷卻。Exported for system package usage.
+func ConsumeSkillResources(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo) {
+	consumeSkillResources(sess, player, skill)
+}
+
 // revertBuffStats 還原 buff 屬性。供 death.go, polymorph.go 等 handler 內部使用。
 func revertBuffStats(target *world.PlayerInfo, buff *world.ActiveBuff) {
 	RevertBuffStats(target, buff)
