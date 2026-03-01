@@ -237,6 +237,12 @@ func run() error {
 	}
 	printStat("傳送門", portalTable.Count())
 
+	randomPortalTable, err := data.LoadRandomPortalTable("data/yaml/portal_random_list.yaml")
+	if err != nil {
+		return fmt.Errorf("load random portal table: %w", err)
+	}
+	printStat("隨機傳送門", randomPortalTable.Count())
+
 	skillTable, err := data.LoadSkillTable("data/yaml/skill_list.yaml")
 	if err != nil {
 		return fmt.Errorf("load skill table: %w", err)
@@ -376,6 +382,7 @@ func run() error {
 		Teleports:    teleportTable,
 		TeleportHtml: teleportHtmlTable,
 		Portals:      portalTable,
+		RandomPortals: randomPortalTable,
 		Skills:       skillTable,
 		Npcs:         npcTable,
 		MobSkills:      mobSkillTable,
@@ -503,6 +510,7 @@ func run() error {
 	// Phase 3: Post-update
 	runner.Register(system.NewRegenSystem(worldState, luaEngine))
 	runner.Register(system.NewWeatherSystem(worldState))
+	runner.Register(system.NewMapTimerSystem(worldState, deps))
 	runner.Register(system.NewGroundItemSystem(worldState))
 	runner.Register(system.NewPartyRefreshSystem(worldState, deps, 10)) // 10 ticks = 2 seconds
 	rankingSys := system.NewRankingSystem(worldState, deps)

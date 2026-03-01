@@ -376,6 +376,18 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 		}
 		cancel3()
 
+		// 存檔限時地圖已使用時間（JSONB）
+		if len(player.MapTimeUsed) > 0 {
+			ctx3b, cancel3b := context.WithTimeout(context.Background(), 3*time.Second)
+			if err := s.charRepo.SaveMapTimes(ctx3b, player.Name, player.MapTimeUsed); err != nil {
+				s.log.Error("斷線存檔限時地圖時間失敗",
+					zap.String("name", player.Name),
+					zap.Error(err),
+				)
+			}
+			cancel3b()
+		}
+
 		// Save active buffs to DB (including polymorph state)
 		if s.buffRepo != nil && len(player.ActiveBuffs) > 0 {
 			buffRows := buffRowsFromPlayer(player)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -291,6 +292,60 @@ func (r *CharacterRepo) SaveCharConfig(ctx context.Context, charID int32, data [
 		`UPDATE characters SET char_config = $1 WHERE id = $2`,
 		data, charID,
 	)
+	return err
+}
+
+// LoadMapTimes 載入角色的限時地圖已使用時間（JSONB）。
+// key = 組別 OrderID, value = 已使用秒數。
+func (r *CharacterRepo) LoadMapTimes(ctx context.Context, name string) (map[int]int, error) {
+	var raw []byte
+	err := r.db.Pool.QueryRow(ctx,
+		`SELECT COALESCE(map_times, '{}'::jsonb) FROM characters WHERE name = $1 AND deleted_at IS NULL`, name,
+	).Scan(&raw)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]int
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return nil, err
+	}
+	// JSON key 只能是字串，轉為 int key
+	result := make(map[int]int, len(m))
+	for k, v := range m {
+		var oid int
+		if _, err := fmt.Sscanf(k, "%d", &oid); err == nil {
+			result[oid] = v
+		}
+	}
+	return result, nil
+}
+
+// SaveMapTimes 儲存角色的限時地圖已使用時間（JSONB）。
+func (r *CharacterRepo) SaveMapTimes(ctx context.Context, name string, mapTimes map[int]int) error {
+	// 轉為 string key（JSON 要求）
+	m := make(map[string]int, len(mapTimes))
+	for k, v := range mapTimes {
+		m[fmt.Sprintf("%d", k)] = v
+	}
+	data, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Pool.Exec(ctx,
+		`UPDATE characters SET map_times = $1 WHERE name = $2`,
+		data, name,
+	)
+	return err
+}
+
+// ResetAllMapTimes 每日重置所有角色的限時地圖時間。
+// Java: ServerResetMapTimer.ResetTimingMap() 的 DB 部分。
+func (r *CharacterRepo) ResetAllMapTimes(ctx context.Context) error {
+	_, err := r.db.Pool.Exec(ctx,
+		`UPDATE characters SET map_times = '{}' WHERE deleted_at IS NULL AND map_times != '{}'`)
 	return err
 }
 

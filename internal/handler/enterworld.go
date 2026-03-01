@@ -97,6 +97,9 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Load known spells from DB (JSONB column)
 	loadKnownSpellsFromDB(player, deps)
 
+	// 從 DB 載入限時地圖已使用時間（JSONB column）
+	loadMapTimesFromDB(player, deps)
+
 	// Load buddy list from DB
 	loadBuddiesFromDB(player, deps)
 
@@ -186,6 +189,14 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	// 初始化 Known 集合（VisibilitySystem 用於 AOI diff）
 	player.Known = world.NewKnownEntities()
+
+	// 初始化限時地圖計時器
+	if player.MapTimeUsed == nil {
+		player.MapTimeUsed = make(map[int]int)
+	}
+
+	// 檢查是否在限時地圖中（斷線重連場景）
+	OnEnterTimedMap(sess, player, player.MapID)
 
 	// --- 發送附近玩家（AOI）+ 封鎖格子 + 填入 Known ---
 	nearby := deps.World.GetNearbyPlayers(ch.X, ch.Y, ch.MapID, sess.ID)
@@ -359,6 +370,21 @@ func loadKnownSpellsFromDB(player *world.PlayerInfo, deps *Deps) {
 		return
 	}
 	player.KnownSpells = spells
+}
+
+// loadMapTimesFromDB 從 JSONB 欄位載入限時地圖已使用時間。
+func loadMapTimesFromDB(player *world.PlayerInfo, deps *Deps) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	mt, err := deps.CharRepo.LoadMapTimes(ctx, player.Name)
+	if err != nil {
+		deps.Log.Error("載入限時地圖時間失敗", zap.String("name", player.Name), zap.Error(err))
+		return
+	}
+	if mt != nil {
+		player.MapTimeUsed = mt
+	}
 }
 
 // SendMapID 匯出 sendMapID — 供 system 套件發送地圖切換封包。

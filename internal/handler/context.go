@@ -347,6 +347,7 @@ type Deps struct {
 	Teleports     *data.TeleportTable
 	TeleportHtml  *data.TeleportHtmlTable
 	Portals       *data.PortalTable
+	RandomPortals *data.RandomPortalTable
 	Skills        *data.SkillTable
 	Npcs          *data.NpcTable
 	MobSkills      *data.MobSkillTable
@@ -559,11 +560,10 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 			HandleFixWeaponList(sess.(*net.Session), r, deps)
 		},
 	)
-	// C_WINDOWS (254) = C_Windows in Java — 書籤排序、地圖計時器等客戶端初始化請求。
-	// 客戶端登入後自動發送。目前忽略（未實作）。
-	reg.Register(packet.C_OPCODE_FIXABLE_ITEM, inWorldStates,
+	// C_WINDOWS (254) = C_Windows in Java — 書籤排序、地圖計時器、龍門等。
+	reg.Register(packet.C_OPCODE_WINDOWS, inWorldStates,
 		func(sess any, r *packet.Reader) {
-			// TODO: 實作 C_Windows 處理器（書籤排序、地圖計時等）
+			HandleWindows(sess.(*net.Session), r, deps)
 		},
 	)
 	reg.Register(packet.C_OPCODE_PERSONAL_SHOP, inWorldStates,

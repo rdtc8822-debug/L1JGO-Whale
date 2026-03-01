@@ -52,6 +52,14 @@ func HandleEnterPortal(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
+	// 船舶碼頭驗證（Java: DungeonTable.dg() 船舶判定）
+	// 碼頭傳送門需要航線時間窗口 + 持有船票才允許通過
+	isDock, allowed := CheckShipDock(srcX, srcY, player.MapID, player)
+	if isDock && !allowed {
+		// 不在航線時間或沒有船票 → 靜默拒絕（匹配 Java 行為）
+		return
+	}
+
 	// Auto-cancel trade when entering portal
 	cancelTradeIfActive(player, deps)
 

@@ -125,6 +125,16 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 		}
 		cancel4()
 
+		// 存檔限時地圖已使用時間（JSONB）
+		if len(player.MapTimeUsed) > 0 {
+			ctx4b, cancel4b := context.WithTimeout(context.Background(), 3*time.Second)
+			if err := deps.CharRepo.SaveMapTimes(ctx4b, player.Name, player.MapTimeUsed); err != nil {
+				deps.Log.Error("切換角色時存檔限時地圖時間失敗",
+					zap.String("name", player.Name), zap.Error(err))
+			}
+			cancel4b()
+		}
+
 		// Save active buffs (including polymorph state)
 		if deps.BuffRepo != nil && len(player.ActiveBuffs) > 0 {
 			buffRows := BuffRowsFromPlayer(player)

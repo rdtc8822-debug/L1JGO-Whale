@@ -612,6 +612,9 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		}
 	}
 
+	// 限時地圖偵測（Java: Teleportation.teleportation() 中的 isTimingMap 檢查）
+	OnEnterTimedMap(sess, player, mapID)
+
 	// Release client teleport lock (Java: S_Paralysis always sent in finally block).
 	sendTeleportUnlock(sess)
 }

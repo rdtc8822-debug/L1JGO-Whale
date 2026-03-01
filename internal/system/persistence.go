@@ -124,6 +124,11 @@ func (s *PersistenceSystem) savePlayers(dirtyOnly bool) {
 		if err := s.charRepo.SaveKnownSpells(ctx, p.Name, p.KnownSpells); err != nil {
 			s.log.Error("自動存檔魔法書失敗", zap.String("name", p.Name), zap.Error(err))
 		}
+		if len(p.MapTimeUsed) > 0 {
+			if err := s.charRepo.SaveMapTimes(ctx, p.Name, p.MapTimeUsed); err != nil {
+				s.log.Error("自動存檔限時地圖時間失敗", zap.String("name", p.Name), zap.Error(err))
+			}
+		}
 		// Save active buffs (including polymorph state)
 		if s.buffRepo != nil && len(p.ActiveBuffs) > 0 {
 			buffRows := handler.BuffRowsFromPlayer(p)

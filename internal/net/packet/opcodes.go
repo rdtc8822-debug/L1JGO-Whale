@@ -179,6 +179,6 @@ const (
 	C_OPCODE_SAVEIO                  byte = 244
 	C_OPCODE_EXCHANGEABLE_SPELL      byte = 245
 	C_OPCODE_SHUTDOWN                byte = 253
-	C_OPCODE_FIXABLE_ITEM            byte = 254 // Java: C_Windows（書籤排序/地圖計時等，非武器修理）
+	C_OPCODE_WINDOWS                 byte = 254 // Java: C_Windows（書籤排序/地圖計時等）
 	C_OPCODE_BANISH_PARTY            byte = 255
 )

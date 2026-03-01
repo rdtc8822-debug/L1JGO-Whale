@@ -1,0 +1,117 @@
+# 隨機傳送門（多目標）— 來源：dungeon_random 表
+# Java: DungeonRTable.java — 踩到源座標時隨機傳送到其中一個目標
+# 目前僅鬼屋副本（地圖 5140）使用
+
+# 鬼屋：起始區 → 中間區
+- src_x: 32769
+  src_y: 32869
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:起始區→中間區'
+  destinations:
+    - {x: 32774, y: 32797, map_id: 5140}
+    - {x: 32773, y: 32817, map_id: 5140}
+    - {x: 32784, y: 32831, map_id: 5140}
+    - {x: 32776, y: 32857, map_id: 5140}
+    - {x: 32783, y: 32874, map_id: 5140}
+- src_x: 32770
+  src_y: 32788
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:起始區→中間區'
+  destinations:
+    - {x: 32774, y: 32797, map_id: 5140}
+    - {x: 32773, y: 32817, map_id: 5140}
+    - {x: 32784, y: 32831, map_id: 5140}
+    - {x: 32776, y: 32857, map_id: 5140}
+    - {x: 32783, y: 32874, map_id: 5140}
+- src_x: 32770
+  src_y: 32807
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:起始區→中間區'
+  destinations:
+    - {x: 32774, y: 32797, map_id: 5140}
+    - {x: 32773, y: 32817, map_id: 5140}
+    - {x: 32784, y: 32831, map_id: 5140}
+    - {x: 32776, y: 32857, map_id: 5140}
+    - {x: 32783, y: 32874, map_id: 5140}
+- src_x: 32772
+  src_y: 32846
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:起始區→中間區'
+  destinations:
+    - {x: 32774, y: 32797, map_id: 5140}
+    - {x: 32773, y: 32817, map_id: 5140}
+    - {x: 32784, y: 32831, map_id: 5140}
+    - {x: 32776, y: 32857, map_id: 5140}
+    - {x: 32783, y: 32874, map_id: 5140}
+- src_x: 32774
+  src_y: 32830
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:起始區→中間區'
+  destinations:
+    - {x: 32774, y: 32797, map_id: 5140}
+    - {x: 32773, y: 32817, map_id: 5140}
+    - {x: 32784, y: 32831, map_id: 5140}
+    - {x: 32776, y: 32857, map_id: 5140}
+    - {x: 32783, y: 32874, map_id: 5140}
+
+# 鬼屋：中間區 → 終點區
+- src_x: 32815
+  src_y: 32873
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:中間區→終點區'
+  destinations:
+    - {x: 32835, y: 32788, map_id: 5140}
+    - {x: 32834, y: 32807, map_id: 5140}
+    - {x: 32827, y: 32828, map_id: 5140}
+    - {x: 32823, y: 32849, map_id: 5140}
+    - {x: 32828, y: 32875, map_id: 5140}
+- src_x: 32816
+  src_y: 32859
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:中間區→終點區'
+  destinations:
+    - {x: 32835, y: 32788, map_id: 5140}
+    - {x: 32834, y: 32807, map_id: 5140}
+    - {x: 32827, y: 32828, map_id: 5140}
+    - {x: 32823, y: 32849, map_id: 5140}
+    - {x: 32828, y: 32875, map_id: 5140}
+- src_x: 32821
+  src_y: 32819
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:中間區→終點區'
+  destinations:
+    - {x: 32835, y: 32788, map_id: 5140}
+    - {x: 32834, y: 32807, map_id: 5140}
+    - {x: 32827, y: 32828, map_id: 5140}
+    - {x: 32823, y: 32849, map_id: 5140}
+    - {x: 32828, y: 32875, map_id: 5140}
+- src_x: 32822
+  src_y: 32840
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:中間區→終點區'
+  destinations:
+    - {x: 32835, y: 32788, map_id: 5140}
+    - {x: 32834, y: 32807, map_id: 5140}
+    - {x: 32827, y: 32828, map_id: 5140}
+    - {x: 32823, y: 32849, map_id: 5140}
+    - {x: 32828, y: 32875, map_id: 5140}
+- src_x: 32824
+  src_y: 32796
+  src_map_id: 5140
+  dst_heading: 2
+  note: '鬼屋:中間區→終點區'
+  destinations:
+    - {x: 32835, y: 32788, map_id: 5140}
+    - {x: 32834, y: 32807, map_id: 5140}
+    - {x: 32827, y: 32828, map_id: 5140}
+    - {x: 32823, y: 32849, map_id: 5140}
+    - {x: 32828, y: 32875, map_id: 5140}

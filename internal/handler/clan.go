@@ -103,15 +103,12 @@ func HandlePledgeWatch(sess *net.Session, r *packet.Reader, deps *Deps) {
 	}
 }
 
-// HandleRankControl 處理 C_RANK_CONTROL (opcode 63) — 變更成員階級。
-// 封包：[C data][C rank][S name]
+// HandleRankControl 處理 C_RANK_CONTROL (opcode 63)。
+// 封包：[C data][C giverank][S name]
+// Java: C_Rank.java — 多用途封包：data=1 血盟階級, data=9 地圖計時器(Ctrl+Q) 等。
 func HandleRankControl(sess *net.Session, r *packet.Reader, deps *Deps) {
 	data := r.ReadC()
-	if data != 1 {
-		return // 只處理 rank control sub-type (data=1)
-	}
-
-	rank := int16(r.ReadC())
+	giveRank := int16(r.ReadC())
 	targetName := r.ReadS()
 
 	player := deps.World.GetBySession(sess.ID)
@@ -119,8 +116,16 @@ func HandleRankControl(sess *net.Session, r *packet.Reader, deps *Deps) {
 		return
 	}
 
-	if deps.Clan != nil {
-		deps.Clan.ChangeRank(sess, player, rank, targetName)
+	switch data {
+	case 1:
+		// 血盟階級變更
+		if deps.Clan != nil {
+			deps.Clan.ChangeRank(sess, player, giveRank, targetName)
+		}
+	case 9:
+		// Ctrl+Q 查詢限時地圖剩餘時間
+		// Java: pc.sendPackets(new S_PacketBoxMapTimer(pc))
+		SendMapTimerOut(sess, player)
 	}
 }
 

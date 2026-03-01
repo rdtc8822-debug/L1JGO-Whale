@@ -182,6 +182,12 @@ type PlayerInfo struct {
 	// key=DelayID (如 502=道具共用), value=到期時間
 	ItemDelays map[int]time.Time
 
+	// 限時地圖定時器（Java: MapTimerThread / character_maps_time）
+	MapTimeUsed       map[int]int // key=組別 OrderID, value=已使用秒數
+	MapTimerGroupIdx  int         // 當前所在限時地圖組 OrderID（-1 或 0 = 不在限時地圖）
+	MapTimerRemaining int         // 剩餘秒數（runtime 快取）
+	MapTimerTickAcc   int         // tick 累加器（每 5 tick = 1 秒）
+
 	// Dirty flag for batch persistence. Set to true when any persisted state
 	// changes (position, HP/MP, exp, inventory, buffs). PersistenceSystem only
 	// saves dirty players and resets this flag after each successful save.

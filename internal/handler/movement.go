@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/l1jgo/server/internal/net"
@@ -64,6 +65,36 @@ func HandleMove(sess *net.Session, r *packet.Reader, deps *Deps) {
 	// Java C_MoveChar 流程（第 130 行）：先清除舊座標 0x80，再做通行性判定。
 	if deps.MapData != nil {
 		deps.MapData.SetImpassable(player.MapID, curX, curY, false)
+	}
+
+	// ── 地圖切換點檢查（Java: C_MoveChar → DungeonTable.dg() / DungeonRTable.dg()）──
+	// 玩家走入傳送座標時，直接觸發傳送，不移動到該格。
+
+	// 1. 固定傳送門（DungeonTable）
+	if deps.Portals != nil {
+		if portal := deps.Portals.Get(destX, destY, player.MapID); portal != nil {
+			// 船舶碼頭需額外驗證航線時間和船票
+			isDock, allowed := CheckShipDock(destX, destY, player.MapID, player)
+			if !isDock || allowed {
+				// 一般傳送門或碼頭驗證通過 → 傳送（不移動到 destX/destY）
+				cancelTradeIfActive(player, deps)
+				teleportPlayer(sess, player, portal.DstX, portal.DstY, portal.DstMapID, portal.DstHeading, deps)
+				return
+			}
+			// 碼頭驗證失敗 → 繼續正常移動（Java: dg() returns false）
+		}
+	}
+
+	// 2. 隨機傳送門（DungeonRTable）— 多目標隨機選一個
+	// Java: C_MoveChar → DungeonRTable.dg() 在 DungeonTable 之後檢查
+	if deps.RandomPortals != nil {
+		if rp := deps.RandomPortals.Get(destX, destY, player.MapID); rp != nil && len(rp.Destinations) > 0 {
+			idx := rand.Intn(len(rp.Destinations))
+			dst := rp.Destinations[idx]
+			cancelTradeIfActive(player, deps)
+			teleportPlayer(sess, player, dst.X, dst.Y, dst.MapID, rp.DstHeading, deps)
+			return
+		}
 	}
 
 	// 地形通行性檢查 + Java fallback（第 160-174 行）：
