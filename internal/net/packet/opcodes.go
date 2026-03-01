@@ -20,7 +20,7 @@ const (
 	S_OPCODE_CHANGE_LIGHT           byte = 40
 	S_OPCODE_EFFECT                 byte = 55  // S_SkillSoundGFX
 	S_OPCODE_REMOVE_INVENTORY       byte = 57
-	S_OPCODE_VOICE_CHAT             byte = 64  // Also CharSynAck
+	S_OPCODE_CHARSYNACK             byte = 64  // 多用途: 裝備欄/盟徽/角色重置/角色資訊同步
 	S_OPCODE_SHOP_SELL_LIST         byte = 65  // Items NPC buys from player
 	S_OPCODE_SKILLBRAVE             byte = 67  // S_SkillBrave — brave/elf brave buff (2段加速效果)
 	S_OPCODE_TELL                   byte = 73  // S_WhisperChat — whisper message
@@ -134,7 +134,7 @@ const (
 	C_OPCODE_MAIL                    byte = 87
 	C_OPCODE_TITLE                   byte = 90
 	C_OPCODE_ALIVE                   byte = 95
-	C_OPCODE_VOICE_CHAT              byte = 98
+	C_OPCODE_CHAR_RESET              byte = 98  // 角色重置（洗點）
 	C_OPCODE_CHECK_INVENTORY         byte = 103
 	C_OPCODE_NPC_ITEM_CONTROL        byte = 104
 	C_OPCODE_GET                     byte = 112

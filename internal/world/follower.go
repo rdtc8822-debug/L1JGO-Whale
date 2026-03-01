@@ -90,6 +90,24 @@ func (s *State) UpdateFollowerPosition(followerID int32, newX, newY int32, headi
 	s.entity.Move(f.MapID, oldX, oldY, newX, newY, followerID)
 }
 
+// TeleportFollower moves a follower to a new location (possibly different map).
+// Updates AOI grid + entity grid for cross-map movement.
+func (s *State) TeleportFollower(followerID int32, newX, newY int32, newMapID, heading int16) {
+	f := s.followers[followerID]
+	if f == nil {
+		return
+	}
+	oldX, oldY, oldMap := f.X, f.Y, f.MapID
+	s.npcAoi.Remove(followerID, oldX, oldY, oldMap)
+	s.entity.Vacate(oldMap, oldX, oldY, followerID)
+	f.X = newX
+	f.Y = newY
+	f.MapID = newMapID
+	f.Heading = heading
+	s.npcAoi.Add(followerID, newX, newY, newMapID)
+	s.entity.Occupy(newMapID, newX, newY, followerID)
+}
+
 // AllFollowers iterates all in-world followers.
 func (s *State) AllFollowers(fn func(*FollowerInfo)) {
 	for _, f := range s.followers {

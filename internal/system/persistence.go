@@ -68,30 +68,47 @@ func (s *PersistenceSystem) savePlayers(dirtyOnly bool) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
+		// 儲存時必須扣除裝備加成和 buff 加成，只保存基礎值。
+		// 否則重新登入時 InitEquipStats / loadAndRestoreBuffs 會重複疊加，造成屬性膨脹。
+		eq := p.EquipBonuses
+		var bStr, bDex, bCon, bWis, bIntel, bCha, bMaxHP, bMaxMP int16
+		for _, b := range p.ActiveBuffs {
+			bStr += b.DeltaStr
+			bDex += b.DeltaDex
+			bCon += b.DeltaCon
+			bWis += b.DeltaWis
+			bIntel += b.DeltaIntel
+			bCha += b.DeltaCha
+			bMaxHP += b.DeltaMaxHP
+			bMaxMP += b.DeltaMaxMP
+		}
 		row := &persist.CharacterRow{
 			Name:       p.Name,
 			Level:      p.Level,
 			Exp:        int64(p.Exp),
 			HP:         p.HP,
 			MP:         p.MP,
-			MaxHP:      p.MaxHP,
-			MaxMP:      p.MaxMP,
+			MaxHP:      p.MaxHP - int16(eq.AddHP) - bMaxHP,
+			MaxMP:      p.MaxMP - int16(eq.AddMP) - bMaxMP,
 			X:          p.X,
 			Y:          p.Y,
 			MapID:      p.MapID,
 			Heading:    p.Heading,
 			Lawful:     p.Lawful,
-			Str:        p.Str,
-			Dex:        p.Dex,
-			Con:        p.Con,
-			Wis:        p.Wis,
-			Cha:        p.Cha,
-			Intel:      p.Intel,
-			BonusStats: p.BonusStats,
-			ClanID:     p.ClanID,
+			Str:        p.Str - int16(eq.AddStr) - bStr,
+			Dex:        p.Dex - int16(eq.AddDex) - bDex,
+			Con:        p.Con - int16(eq.AddCon) - bCon,
+			Wis:        p.Wis - int16(eq.AddWis) - bWis,
+			Cha:        p.Cha - int16(eq.AddCha) - bCha,
+			Intel:      p.Intel - int16(eq.AddInt) - bIntel,
+			BonusStats:  p.BonusStats,
+			ElixirStats: p.ElixirStats,
+			ClanID:      p.ClanID,
 			ClanName:   p.ClanName,
 			ClanRank:   p.ClanRank,
 			Title:      p.Title,
+			Karma:      p.Karma,
+			PKCount:    p.PKCount,
 		}
 		if err := s.charRepo.SaveCharacter(ctx, row); err != nil {
 			s.log.Error("自動存檔角色失敗", zap.String("name", p.Name), zap.Error(err))

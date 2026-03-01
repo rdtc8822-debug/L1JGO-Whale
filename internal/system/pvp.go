@@ -370,7 +370,11 @@ func (s *PvPSystem) processPKKill(killer, victim *world.PlayerInfo) {
 			handler.SendRedMessage(killer.Session, 551, fmt.Sprintf("%d", killer.PKCount), fmt.Sprintf("%d", pkThresh.Punish))
 		}
 
-		s.deps.Log.Info(fmt.Sprintf("PK 擊殺  擊殺者=%s  受害者=%s  PK次數=%d  正義值=%d", killer.Name, victim.Name, killer.PKCount, killer.Lawful))
+		// Karma 修改（Java: PK 藍名玩家 → karma 下降）
+		killer.Karma -= 100
+		handler.SendKarma(killer.Session, killer.Karma)
+
+		s.deps.Log.Info(fmt.Sprintf("PK 擊殺  擊殺者=%s  受害者=%s  PK次數=%d  正義值=%d  善惡值=%d", killer.Name, victim.Name, killer.PKCount, killer.Lawful, killer.Karma))
 	}
 
 	// 發出 PlayerKilled 事件

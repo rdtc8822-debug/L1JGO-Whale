@@ -50,6 +50,14 @@ function calc_magic_damage(ctx)
         end
     end
 
+    -- Stage 1b: 職業魔法等級額外骰數（Java: diceCount2 = getMagicBonus() + getMagicLevel()）
+    local magic_level = atk.magic_level or 0
+    if magic_level > 0 and sk.damage_dice > 0 then
+        for i = 1, magic_level do
+            damage = damage + math.random(1, sk.damage_dice)
+        end
+    end
+
     -- Stage 2: INT + SP coefficient (Java: charaIntelligence)
     local char_intel = atk.intel + atk.sp - 12
     if char_intel < 1 then char_intel = 1 end

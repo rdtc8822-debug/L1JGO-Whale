@@ -44,6 +44,13 @@ function calc_melee_attack(ctx)
         local str_dmg = table_lookup(STR_DMG, str)
         damage = base + str_dmg + dmg_mod
 
+        -- 職業 AC 防禦減傷（Java: L1AttackMode.java — 僅對玩家目標生效）
+        local target_class = tgt.class_type or -1
+        if target_class >= 0 then
+            local ac_def = calc_ac_defense(target_class, tgt.ac)
+            damage = damage - ac_def
+        end
+
         -- Minimum 1 damage on hit
         if damage < 1 then
             damage = 1
@@ -99,6 +106,13 @@ function calc_ranged_attack(ctx)
         local str_dmg = table_lookup(STR_DMG, str)
         -- Java: bow damage = base + DEX_DMG + STR_DMG/2 + arrow
         damage = base + dex_dmg + math.floor(str_dmg / 2) + arrow_dmg + bow_dmg_mod
+
+        -- 職業 AC 防禦減傷（僅對玩家目標生效）
+        local target_class = tgt.class_type or -1
+        if target_class >= 0 then
+            local ac_def = calc_ac_defense(target_class, tgt.ac)
+            damage = damage - ac_def
+        end
 
         if damage < 1 then
             damage = 1

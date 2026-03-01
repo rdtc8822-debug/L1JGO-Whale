@@ -143,6 +143,15 @@ func SendDuelNotify(sess *net.Session, fightId, ownId int32) {
 	sess.Send(w.Bytes())
 }
 
+// SendKarma 發送 S_Karma（善惡值）給客戶端。
+// Java: S_Karma — 使用 S_PacketBox opcode (250) + type 87 + karma 值。
+func SendKarma(sess *net.Session, karma int32) {
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
+	w.WriteC(87) // MSG_KARMA subcode
+	w.WriteD(karma)
+	sess.Send(w.Bytes())
+}
+
 // SendServerMessageN sends S_ServerMessage with a numeric parameter.
 // Format: [H msgID][C argCount][S arg1]
 func SendServerMessageN(sess *net.Session, msgID uint16, value int32) {

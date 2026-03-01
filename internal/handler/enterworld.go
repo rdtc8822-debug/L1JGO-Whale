@@ -71,11 +71,21 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		Intel:     ch.Intel,
 		Cha:       ch.Cha,
 		Exp:        int32(ch.Exp),
-		BonusStats: ch.BonusStats,
-		Food:       40, // Java: initial food = 40 (max 225, increased by eating food items)
-		PKCount:    ch.PKCount,
+		BonusStats:  ch.BonusStats,
+		ElixirStats: ch.ElixirStats,
+		Food:        40, // Java: initial food = 40 (max 225, increased by eating food items)
+		PKCount:     ch.PKCount,
+		Karma:       ch.Karma,
 		Inv:        world.NewInventory(),
 	}
+	// 載入帳號的倉庫密碼
+	if deps.AccountRepo != nil {
+		acct, acctErr := deps.AccountRepo.Load(ctx, sess.AccountName)
+		if acctErr == nil && acct != nil {
+			player.WarehousePassword = acct.WarehousePassword
+		}
+	}
+
 	deps.World.AddPlayer(player)
 
 	// Load inventory from DB (or give starting gold if empty)
@@ -161,6 +171,9 @@ func HandleEnterWorld(sess *net.Session, r *packet.Reader, deps *Deps) {
 		}
 		sendClanAttention(sess)
 	}
+
+	// 12b. S_Karma — 善惡值
+	SendKarma(sess, player.Karma)
 
 	// 13. 屬性配點對話框（等級 51+）
 	if player.Level >= bonusStatMinLevel {
@@ -606,7 +619,7 @@ func sendCharResetInfo(sess *net.Session, ch *persist.CharacterRow, player *worl
 	upCon := clamp(int(ch.Con) - classData.BaseCON)
 	upCha := clamp(int(ch.Cha) - classData.BaseCHA)
 
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT) // opcode 64
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHARSYNACK) // opcode 64
 	w.WriteC(0x04)                                               // sub-type: 屬性增加資訊
 	w.WriteC((upInt << 4) | upStr)
 	w.WriteC((upDex << 4) | upWis)

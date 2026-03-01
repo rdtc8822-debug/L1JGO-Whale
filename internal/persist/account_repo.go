@@ -16,10 +16,11 @@ type AccountRow struct {
 	CharacterSlot int16
 	IP            string
 	Host          string
-	Banned        bool
-	Online        bool
-	CreatedAt     time.Time
-	LastActive    *time.Time
+	Banned            bool
+	Online            bool
+	WarehousePassword int32
+	CreatedAt         time.Time
+	LastActive        *time.Time
 }
 
 type AccountRepo struct {
@@ -34,11 +35,13 @@ func (r *AccountRepo) Load(ctx context.Context, name string) (*AccountRow, error
 	row := &AccountRow{}
 	err := r.db.Pool.QueryRow(ctx,
 		`SELECT name, password_hash, access_level, character_slot,
-		        COALESCE(ip,''), COALESCE(host,''), banned, online, created_at, last_active
+		        COALESCE(ip,''), COALESCE(host,''), banned, online, warehouse_password,
+		        created_at, last_active
 		 FROM accounts WHERE name = $1`, name,
 	).Scan(
 		&row.Name, &row.PasswordHash, &row.AccessLevel, &row.CharacterSlot,
-		&row.IP, &row.Host, &row.Banned, &row.Online, &row.CreatedAt, &row.LastActive,
+		&row.IP, &row.Host, &row.Banned, &row.Online, &row.WarehousePassword,
+		&row.CreatedAt, &row.LastActive,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -90,6 +93,15 @@ func (r *AccountRepo) SetOnline(ctx context.Context, name string, online bool) e
 	_, err := r.db.Pool.Exec(ctx,
 		`UPDATE accounts SET online = $2 WHERE name = $1`,
 		name, online,
+	)
+	return err
+}
+
+// UpdateWarehousePassword 更新帳號的倉庫密碼（Java: AccountReading.updateWarehouse）。
+func (r *AccountRepo) UpdateWarehousePassword(ctx context.Context, name string, pass int32) error {
+	_, err := r.db.Pool.Exec(ctx,
+		`UPDATE accounts SET warehouse_password = $2 WHERE name = $1`,
+		name, pass,
 	)
 	return err
 }

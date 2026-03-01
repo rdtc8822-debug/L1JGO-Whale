@@ -139,6 +139,10 @@ func HandleNpcAction(sess *net.Session, r *packet.Reader, deps *Deps) {
 	case "enca":
 		handleNpcArmorEnchant(sess, player, deps)
 
+	// 角色重置（洗點）— 回憶蠟燭嚮導（Java: Npc_BaseReset2 動作 "ent"）
+	case "ent":
+		StartCharReset(sess, player, deps)
+
 	// Close dialog (empty string or explicit close)
 	case "":
 		// Do nothing — dialog closes
@@ -414,6 +418,56 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		deps.MapData.SetImpassable(player.MapID, player.X, player.Y, false)
 	}
 
+	// ── 收集玩家擁有的同伴（傳送前）──
+	ownedPets := deps.World.GetPetsByOwner(player.CharID)
+	ownedSummons := deps.World.GetSummonsByOwner(player.CharID)
+	ownedDolls := deps.World.GetDollsByOwner(player.CharID)
+	ownedFollower := deps.World.GetFollowerByOwner(player.CharID)
+
+	// 從舊位置附近玩家視野中移除同伴（Java: Teleportation.java removeKnownObject）
+	for _, pet := range ownedPets {
+		if pet.Dead {
+			continue
+		}
+		oldViewers := deps.World.GetNearbyPlayers(pet.X, pet.Y, pet.MapID, 0)
+		removeData := BuildRemoveObject(pet.ID)
+		for _, v := range oldViewers {
+			if v.CharID != player.CharID {
+				v.Session.Send(removeData)
+			}
+		}
+	}
+	for _, sum := range ownedSummons {
+		if sum.Dead {
+			continue
+		}
+		oldViewers := deps.World.GetNearbyPlayers(sum.X, sum.Y, sum.MapID, 0)
+		removeData := BuildRemoveObject(sum.ID)
+		for _, v := range oldViewers {
+			if v.CharID != player.CharID {
+				v.Session.Send(removeData)
+			}
+		}
+	}
+	for _, doll := range ownedDolls {
+		oldViewers := deps.World.GetNearbyPlayers(doll.X, doll.Y, doll.MapID, 0)
+		removeData := BuildRemoveObject(doll.ID)
+		for _, v := range oldViewers {
+			if v.CharID != player.CharID {
+				v.Session.Send(removeData)
+			}
+		}
+	}
+	if ownedFollower != nil && !ownedFollower.Dead {
+		oldViewers := deps.World.GetNearbyPlayers(ownedFollower.X, ownedFollower.Y, ownedFollower.MapID, 0)
+		removeData := BuildRemoveObject(ownedFollower.ID)
+		for _, v := range oldViewers {
+			if v.CharID != player.CharID {
+				v.Session.Send(removeData)
+			}
+		}
+	}
+
 	// 1. 舊位置附近玩家：移除我 + 解鎖我的格子
 	oldNearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
 	for _, other := range oldNearby {
@@ -426,6 +480,36 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 	// 標記新格子不可通行（NPC 尋路用）
 	if deps.MapData != nil {
 		deps.MapData.SetImpassable(mapID, x, y, true)
+	}
+
+	// ── 傳送同伴到新位置（Java: Teleportation.java 寵物跟隨移動）──
+	// 方向偏移：將同伴分散在玩家周圍（避免疊在同一格）
+	offsets := [4][2]int32{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	oi := 0
+	for _, pet := range ownedPets {
+		if pet.Dead {
+			continue
+		}
+		ox, oy := offsets[oi%4][0], offsets[oi%4][1]
+		oi++
+		deps.World.TeleportPet(pet.ID, x+ox, y+oy, mapID, heading)
+	}
+	for _, sum := range ownedSummons {
+		if sum.Dead {
+			continue
+		}
+		ox, oy := offsets[oi%4][0], offsets[oi%4][1]
+		oi++
+		deps.World.TeleportSummon(sum.ID, x+ox, y+oy, mapID, heading)
+	}
+	for _, doll := range ownedDolls {
+		ox, oy := offsets[oi%4][0], offsets[oi%4][1]
+		oi++
+		deps.World.TeleportDoll(doll.ID, x+ox, y+oy, mapID, heading)
+	}
+	if ownedFollower != nil && !ownedFollower.Dead {
+		ox, oy := offsets[oi%4][0], offsets[oi%4][1]
+		deps.World.TeleportFollower(ownedFollower.ID, x+ox, y+oy, mapID, heading)
 	}
 
 	// 3. S_MapID（即使同地圖也要發——客戶端傳送需要）
@@ -471,6 +555,7 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		player.Known.Doors[d.ID] = world.KnownPos{X: d.X, Y: d.Y}
 	}
 
+	// 發送同伴 + 附近其他人的同伴（同伴已傳送到新位置，GetNearby* 會包含它們）
 	nearbySum := deps.World.GetNearbySummons(x, y, mapID)
 	for _, sum := range nearbySum {
 		isOwner := sum.OwnerCharID == player.CharID
@@ -480,6 +565,12 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		}
 		SendSummonPack(sess, sum, isOwner, masterName)
 		player.Known.Summons[sum.ID] = world.KnownPos{X: sum.X, Y: sum.Y}
+		// 也發送給新位置附近的其他玩家（讓他們看到傳送過來的召喚獸）
+		if isOwner {
+			for _, other := range newNearby {
+				SendSummonPack(other.Session, sum, false, player.Name)
+			}
+		}
 	}
 	nearbyDolls := deps.World.GetNearbyDolls(x, y, mapID)
 	for _, doll := range nearbyDolls {
@@ -489,11 +580,21 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		}
 		SendDollPack(sess, doll, masterName)
 		player.Known.Dolls[doll.ID] = world.KnownPos{X: doll.X, Y: doll.Y}
+		if doll.OwnerCharID == player.CharID {
+			for _, other := range newNearby {
+				SendDollPack(other.Session, doll, player.Name)
+			}
+		}
 	}
 	nearbyFollowers := deps.World.GetNearbyFollowers(x, y, mapID)
 	for _, f := range nearbyFollowers {
 		SendFollowerPack(sess, f)
 		player.Known.Followers[f.ID] = world.KnownPos{X: f.X, Y: f.Y}
+		if f.OwnerCharID == player.CharID {
+			for _, other := range newNearby {
+				SendFollowerPack(other.Session, f)
+			}
+		}
 	}
 	nearbyPets := deps.World.GetNearbyPets(x, y, mapID)
 	for _, pet := range nearbyPets {
@@ -504,6 +605,11 @@ func teleportPlayer(sess *net.Session, player *world.PlayerInfo, x, y int32, map
 		}
 		SendPetPack(sess, pet, isOwner, masterName)
 		player.Known.Pets[pet.ID] = world.KnownPos{X: pet.X, Y: pet.Y}
+		if isOwner {
+			for _, other := range newNearby {
+				SendPetPack(other.Session, pet, false, player.Name)
+			}
+		}
 	}
 
 	// Release client teleport lock (Java: S_Paralysis always sent in finally block).

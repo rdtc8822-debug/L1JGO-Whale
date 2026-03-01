@@ -95,7 +95,7 @@ func SendAllBookmarks(sess *net.Session, bookmarks []world.Bookmark) {
 		count = 127
 	}
 
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT) // S_OPCODE_CHARRESET = 64
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHARSYNACK) // S_OPCODE_CHARRESET = 64
 	w.WriteC(0x2a)
 	w.WriteC(0x80)
 	w.WriteC(0x00)

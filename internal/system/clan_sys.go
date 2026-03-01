@@ -232,6 +232,7 @@ func (s *ClanSystem) JoinResponse(sess *net.Session, responder *world.PlayerInfo
 	applicant.ClanName = clan.ClanName
 	applicant.ClanRank = rank
 	applicant.Title = "" // Java: joinPc.setTitle("")
+	applicant.Dirty = true
 
 	// 通知所有在線血盟成員
 	for _, m := range clan.Members {
@@ -716,6 +717,7 @@ func (s *ClanSystem) SetTitle(sess *net.Session, player *world.PlayerInfo, charN
 
 		// 套用稱號
 		player.Title = title
+		player.Dirty = true
 		sendCharTitle(sess, player.CharID, title)
 
 		// 廣播到附近
@@ -754,6 +756,7 @@ func (s *ClanSystem) SetTitle(sess *net.Session, player *world.PlayerInfo, charN
 		}
 
 		target.Title = title
+		target.Dirty = true
 		sendCharTitle(target.Session, target.CharID, title)
 
 		nearby := s.deps.World.GetNearbyPlayers(target.X, target.Y, target.MapID, target.SessionID)
@@ -862,7 +865,7 @@ func sendRankChanged(sess *net.Session, rank byte, name string) {
 
 // sendCharResetEmblem 發送 S_OPCODE_VOICE_CHAT (64) sub-type 0x3c — 盟徽更新。
 func sendCharResetEmblem(sess *net.Session, pcObjID int32, emblemID int32) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHARSYNACK)
 	w.WriteC(0x3c)
 	w.WriteD(pcObjID)
 	w.WriteD(emblemID)

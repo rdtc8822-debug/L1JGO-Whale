@@ -28,27 +28,17 @@ func IsBoardNpc(npcID int32) bool {
 	return boardNpcIDs[npcID]
 }
 
-// HandleBoardOrPlate handles opcode 10, which is shared between board open and stat allocation.
-// In Java yiwei: opcode 10 = C_Board (bulletin board open).
-// Our existing stat allocation also uses opcode 10 (C_Plate format: [H attrCode][C confirm][S stat]).
-// We disambiguate by checking if the first readD is a known board NPC object ID.
+// HandleBoardOrPlate handles opcode 10 = C_Board（佈告欄開啟）。
+// Java: C_Board 格式為 [D npcObjID]。
+// 注意：加點（stat allocation）在 Java 中使用 C_Attr（opcode 121, mode 479），
+// 已由 HandleAttr 處理，不在此 opcode。
 func HandleBoardOrPlate(sess *net.Session, r *packet.Reader, deps *Deps) {
-	firstD := r.ReadD()
+	npcObjID := r.ReadD()
 
-	// Check if it's a board NPC object ID
-	npc := deps.World.GetNpc(firstD)
+	npc := deps.World.GetNpc(npcObjID)
 	if npc != nil && IsBoardNpc(npc.NpcID) {
-		handleBoardOpen(sess, firstD, deps)
-		return
+		handleBoardOpen(sess, npcObjID, deps)
 	}
-
-	// Otherwise treat as stat allocation (HandlePlate).
-	// The original HandlePlate reads [H attrCode][C confirm][S statName].
-	// We already consumed 4 bytes as readD. Re-interpret:
-	// Low 16 bits = attrCode (uint16), next 8 bits = confirm (byte).
-	attrCode := uint16(firstD & 0xFFFF)
-	confirm := byte((firstD >> 16) & 0xFF)
-	handleStatAlloc(sess, attrCode, confirm, r, deps)
 }
 
 // handleBoardOpen sends the first page of board posts (S_Board).

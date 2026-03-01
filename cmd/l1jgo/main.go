@@ -505,6 +505,9 @@ func run() error {
 	runner.Register(system.NewWeatherSystem(worldState))
 	runner.Register(system.NewGroundItemSystem(worldState))
 	runner.Register(system.NewPartyRefreshSystem(worldState, deps, 10)) // 10 ticks = 2 seconds
+	rankingSys := system.NewRankingSystem(worldState, deps)
+	deps.Ranking = rankingSys
+	runner.Register(rankingSys)
 	runner.Register(system.NewVisibilitySystem(worldState, deps))
 	// Phase 4: Output — flush buffered packets to TCP
 	runner.Register(system.NewOutputSystem(sessStore))

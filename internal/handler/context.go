@@ -325,6 +325,12 @@ type ItemUseManager interface {
 	BroadcastEffect(sess *net.Session, player *world.PlayerInfo, gfxID int32)
 }
 
+// RankingChecker 提供英雄排名查詢。由 system.RankingSystem 實作。
+type RankingChecker interface {
+	// IsHero 檢查玩家是否在英雄排名中（TOP10 或任一職業 TOP3）。
+	IsHero(name string) bool
+}
+
 // Deps holds shared dependencies injected into all packet handlers.
 type Deps struct {
 	AccountRepo *persist.AccountRepo
@@ -386,6 +392,7 @@ type Deps struct {
 	DollMgr       DollManager         // filled after DollSystem is created
 	Bus           *event.Bus  // event bus for emitting game events (EntityKilled, etc.)
 	WeaponSkills  *data.WeaponSkillTable
+	Ranking       RankingChecker // filled after RankingSystem is created
 }
 
 // RegisterAll registers all packet handlers into the registry.
@@ -469,6 +476,11 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 			HandleDuel(sess.(*net.Session), r, deps)
 		},
 	)
+	reg.Register(packet.C_OPCODE_CHAR_RESET, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleCharReset(sess.(*net.Session), r, deps)
+		},
+	)
 	reg.Register(packet.C_OPCODE_ATTACK, inWorldStates,
 		func(sess any, r *packet.Reader) {
 			HandleAttack(sess.(*net.Session), r, deps)
@@ -497,6 +509,12 @@ func RegisterAll(reg *packet.Registry, deps *Deps) {
 	reg.Register(packet.C_OPCODE_BUY_SELL, inWorldStates,
 		func(sess any, r *packet.Reader) {
 			HandleBuySell(sess.(*net.Session), r, deps)
+		},
+	)
+	// 倉庫密碼（Java: C_Password — 密碼設定/變更/驗證後開倉）
+	reg.Register(packet.C_OPCODE_WAREHOUSE_CONTROL, inWorldStates,
+		func(sess any, r *packet.Reader) {
+			HandleWarehousePassword(sess.(*net.Session), r, deps)
 		},
 	)
 	reg.Register(packet.C_OPCODE_CHAT, inWorldStates,

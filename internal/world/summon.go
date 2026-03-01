@@ -120,6 +120,24 @@ func (s *State) UpdateSummonPosition(summonID int32, newX, newY int32, heading i
 	s.entity.Move(sum.MapID, oldX, oldY, newX, newY, summonID)
 }
 
+// TeleportSummon moves a summon to a new location (possibly different map).
+// Updates AOI grid + entity grid for cross-map movement.
+func (s *State) TeleportSummon(summonID int32, newX, newY int32, newMapID, heading int16) {
+	sum := s.summons[summonID]
+	if sum == nil {
+		return
+	}
+	oldX, oldY, oldMap := sum.X, sum.Y, sum.MapID
+	s.npcAoi.Remove(summonID, oldX, oldY, oldMap)
+	s.entity.Vacate(oldMap, oldX, oldY, summonID)
+	sum.X = newX
+	sum.Y = newY
+	sum.MapID = newMapID
+	sum.Heading = heading
+	s.npcAoi.Add(summonID, newX, newY, newMapID)
+	s.entity.Occupy(newMapID, newX, newY, summonID)
+}
+
 // AllSummons iterates all in-world summons.
 func (s *State) AllSummons(fn func(*SummonInfo)) {
 	for _, sum := range s.summons {

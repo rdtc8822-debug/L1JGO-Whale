@@ -37,7 +37,8 @@ type PlayerInfo struct {
 	Intel     int16
 	Cha       int16
 	Exp        int32 // cumulative total exp
-	BonusStats int16 // number of bonus stat points already allocated (level 51+)
+	BonusStats  int16 // number of bonus stat points already allocated (level 51+)
+	ElixirStats int16 // 萬能藥使用次數（洗點時用於計算可分配點數）
 	Speed      byte  // 0=normal, 1=fast, etc.
 	MoveSpeed  byte  // 0=normal, 1=hasted (green potion), 2=slowed
 	BraveSpeed byte  // 0=none, 1=brave (attack speed), 3=elf brave
@@ -61,11 +62,19 @@ type PlayerInfo struct {
 	Dodge      int16 // dodge bonus
 	Food       int16 // satiety 0-225 (225=full); sent in S_STATUS
 	PKCount       int32 // PK kill count
+	Karma         int32 // 善惡值（Java: L1Karma）— 正=善, 負=惡
 	PinkName      bool  // temporary red name (180 seconds after attacking blue player)
 	PinkNameTicks int   // remaining ticks for pink name timer
 	WantedTicks   int   // >0 = wanted by guards (24h = 432000 ticks at 200ms/tick)
-	FightId       int32 // 0=無決鬥, >0=決鬥對手角色 ID（Java: L1PcInstance.fightId）
+	FightId           int32 // 0=無決鬥, >0=決鬥對手角色 ID（Java: L1PcInstance.fightId）
+	WarehousePassword int32 // 倉庫密碼（0=未設定, >0=6位數密碼）。從帳號載入。
 	RegenHPAcc int   // HP regen accumulator: counts 1-second ticks since last HP regen
+
+	// 角色重置（洗點）暫存欄位（Java: tempMaxLevel, tempLevel, tempElixirstats 等）
+	InCharReset      bool  // true=正在重置中（凍結操作）
+	ResetTempLevel   int16 // 重置過程中的臨時等級（從 1 開始逐級升）
+	ResetMaxLevel    int16 // 重置目標等級（當前等級）
+	ResetElixirStats int16 // 萬能藥額外點數
 
 	Dead             bool // true when HP <= 0, waiting for restart
 	Invisible        bool // true when under Invisibility

@@ -611,7 +611,7 @@ func buildViewNameEquip(item *world.InvItem, itemInfo *data.ItemInfo) string {
 
 // sendEquipSlotUpdate 發送 S_EquipmentSlot — 單次穿脫動作。
 func sendEquipSlotUpdate(sess *net.Session, itemObjID int32, slot world.EquipSlot, equipped bool) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT)
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHARSYNACK)
 	w.WriteC(0x42)
 	w.WriteD(itemObjID)
 	w.WriteC(world.EquipClientIndex(slot))

@@ -112,6 +112,24 @@ func (s *State) UpdateDollPosition(dollID int32, newX, newY int32, heading int16
 	s.entity.Move(doll.MapID, oldX, oldY, newX, newY, dollID)
 }
 
+// TeleportDoll moves a doll to a new location (possibly different map).
+// Updates AOI grid + entity grid for cross-map movement.
+func (s *State) TeleportDoll(dollID int32, newX, newY int32, newMapID, heading int16) {
+	doll := s.dolls[dollID]
+	if doll == nil {
+		return
+	}
+	oldX, oldY, oldMap := doll.X, doll.Y, doll.MapID
+	s.npcAoi.Remove(dollID, oldX, oldY, oldMap)
+	s.entity.Vacate(oldMap, oldX, oldY, dollID)
+	doll.X = newX
+	doll.Y = newY
+	doll.MapID = newMapID
+	doll.Heading = heading
+	s.npcAoi.Add(dollID, newX, newY, newMapID)
+	s.entity.Occupy(newMapID, newX, newY, dollID)
+}
+
 // AllDolls iterates all in-world dolls.
 func (s *State) AllDolls(fn func(*DollInfo)) {
 	for _, doll := range s.dolls {

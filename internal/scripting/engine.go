@@ -85,6 +85,7 @@ type CombatContext struct {
 	TargetAC       int
 	TargetLevel    int
 	TargetMR       int
+	TargetClassType int // 目標職業（-1=NPC, 0-7=玩家職業）— AC 防禦加成用
 }
 
 // RangedCombatContext holds pre-packed data for a ranged (bow) attack.
@@ -99,6 +100,7 @@ type RangedCombatContext struct {
 	TargetAC          int
 	TargetLevel       int
 	TargetMR          int
+	TargetClassType   int // 目標職業（-1=NPC, 0-7=玩家職業）
 }
 
 // CombatResult is returned by the Lua combat function.
@@ -131,6 +133,7 @@ func (e *Engine) CalcMeleeAttack(ctx CombatContext) CombatResult {
 	tgt.RawSetString("ac", lua.LNumber(ctx.TargetAC))
 	tgt.RawSetString("level", lua.LNumber(ctx.TargetLevel))
 	tgt.RawSetString("mr", lua.LNumber(ctx.TargetMR))
+	tgt.RawSetString("class_type", lua.LNumber(ctx.TargetClassType))
 	t.RawSetString("target", tgt)
 
 	if err := e.vm.CallByParam(lua.P{
@@ -181,6 +184,7 @@ func (e *Engine) CalcRangedAttack(ctx RangedCombatContext) CombatResult {
 	tgt.RawSetString("ac", lua.LNumber(ctx.TargetAC))
 	tgt.RawSetString("level", lua.LNumber(ctx.TargetLevel))
 	tgt.RawSetString("mr", lua.LNumber(ctx.TargetMR))
+	tgt.RawSetString("class_type", lua.LNumber(ctx.TargetClassType))
 	t.RawSetString("target", tgt)
 
 	if err := e.vm.CallByParam(lua.P{
@@ -227,8 +231,9 @@ type SkillDamageContext struct {
 	AttackerDmgMod int
 	AttackerHitMod int
 	AttackerWeapon int // weapon max damage (0 = fist)
-	AttackerHP     int
-	AttackerMaxHP  int
+	AttackerHP         int
+	AttackerMaxHP      int
+	AttackerMagicLevel int // 職業魔法等級（get_magic_level 計算結果）
 
 	// Target
 	TargetAC       int
@@ -279,6 +284,7 @@ func (e *Engine) CalcSkillDamage(ctx SkillDamageContext) SkillDamageResult {
 	atk.RawSetString("weapon_dmg", lua.LNumber(ctx.AttackerWeapon))
 	atk.RawSetString("hp", lua.LNumber(ctx.AttackerHP))
 	atk.RawSetString("max_hp", lua.LNumber(ctx.AttackerMaxHP))
+	atk.RawSetString("magic_level", lua.LNumber(ctx.AttackerMagicLevel))
 	t.RawSetString("attacker", atk)
 
 	tgt := e.vm.NewTable()

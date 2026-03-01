@@ -41,6 +41,14 @@ func (s *PolymorphSystem) DoPoly(player *world.PlayerInfo, polyID int32, duratio
 		return
 	}
 
+	// 英雄變身限制（Java: L1PolyMorph GFX 13715-13745 需排名上榜）
+	if polyID >= 13715 && polyID <= 13745 {
+		if s.deps.Ranking == nil || !s.deps.Ranking.IsHero(player.Name) {
+			handler.SendServerMessage(player.Session, 181) // "你無法使用。"
+			return
+		}
+	}
+
 	// 已有變身則先解除
 	if player.TempCharGfx > 0 {
 		s.UndoPoly(player)

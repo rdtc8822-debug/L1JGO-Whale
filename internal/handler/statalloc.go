@@ -104,6 +104,7 @@ func handleStatAlloc(sess *net.Session, attrCode uint16, confirm byte, r *packet
 	}
 
 	player.BonusStats++
+	player.Dirty = true
 
 	deps.Log.Info(fmt.Sprintf("配點完成  角色=%s  屬性=%s  已用配點=%d", player.Name, statName, player.BonusStats))
 

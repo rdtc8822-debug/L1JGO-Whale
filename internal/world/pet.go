@@ -166,6 +166,24 @@ func (s *State) UpdatePetPosition(petID int32, newX, newY int32, heading int16) 
 	s.entity.Move(pet.MapID, oldX, oldY, newX, newY, petID)
 }
 
+// TeleportPet moves a pet to a new location (possibly different map).
+// Updates AOI grid + entity grid for cross-map movement.
+func (s *State) TeleportPet(petID int32, newX, newY int32, newMapID, heading int16) {
+	pet := s.pets[petID]
+	if pet == nil {
+		return
+	}
+	oldX, oldY, oldMap := pet.X, pet.Y, pet.MapID
+	s.npcAoi.Remove(petID, oldX, oldY, oldMap)
+	s.entity.Vacate(oldMap, oldX, oldY, petID)
+	pet.X = newX
+	pet.Y = newY
+	pet.MapID = newMapID
+	pet.Heading = heading
+	s.npcAoi.Add(petID, newX, newY, newMapID)
+	s.entity.Occupy(newMapID, newX, newY, petID)
+}
+
 // PetDied releases the tile occupied by a dead pet (keeps pet in world for collection).
 func (s *State) PetDied(pet *PetInfo) {
 	s.entity.Vacate(pet.MapID, pet.X, pet.Y, pet.ID)

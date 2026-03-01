@@ -6,18 +6,28 @@ import (
 	"go.uber.org/zap"
 )
 
-// HandleAttr processes C_ATTR (opcode 121) — S_Message_YN yes/no dialog response.
-// Java C_Attr format: [H unknown][D count][H messageType][H response(0=No, 1=Yes)]
-// Special case: if first H == 479, it's a different sub-type (ignored).
+// HandleAttr processes C_ATTR (opcode 121) — 多用途封包。
+// Java C_Attr 格式：
+//   mode = readH()
+//   if mode == 0 { readD(); mode = readH() }  ← 前綴跳過
+//   switch(mode) { case 479: 加點; case 97/252/630/951/953/954: yes/no 回應 }
 func HandleAttr(sess *net.Session, r *packet.Reader, deps *Deps) {
 	player := deps.World.GetBySession(sess.ID)
 	if player == nil {
 		return
 	}
 
-	firstH := r.ReadH()
-	if firstH == 479 {
-		// Special sub-type, not a yes/no response
+	mode := r.ReadH()
+
+	// Java: mode == 0 時，先讀 D（target objID）再讀一次 H 取得真正 mode
+	if mode == 0 {
+		_ = r.ReadD() // tgobjid（RaiseAttr 帶的 charID）
+		mode = r.ReadH()
+	}
+
+	if mode == statAllocAttrCode { // 479 = 加點（Java C_Attr case 479）
+		confirm := r.ReadC()
+		handleStatAlloc(sess, mode, confirm, r, deps)
 		return
 	}
 

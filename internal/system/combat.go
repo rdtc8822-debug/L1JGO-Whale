@@ -142,9 +142,10 @@ func (s *CombatSystem) processMeleeAttack(sessID uint64, targetID int32) *handle
 		AttackerWeapon: weaponDmg,
 		AttackerHitMod: int(player.HitMod),
 		AttackerDmgMod: int(player.DmgMod),
-		TargetAC:       int(npc.AC),
-		TargetLevel:    int(npc.Level),
-		TargetMR:       int(npc.MR),
+		TargetAC:        int(npc.AC),
+		TargetLevel:     int(npc.Level),
+		TargetMR:        int(npc.MR),
+		TargetClassType: -1, // NPC 沒有職業
 	}
 	result := s.deps.Scripting.CalcMeleeAttack(ctx)
 
@@ -323,6 +324,7 @@ func (s *CombatSystem) processRangedAttack(sessID uint64, targetID int32) *handl
 		TargetAC:          int(npc.AC),
 		TargetLevel:       int(npc.Level),
 		TargetMR:          int(npc.MR),
+		TargetClassType:   -1, // NPC 沒有職業
 	}
 	result := s.deps.Scripting.CalcRangedAttack(ctx)
 
@@ -530,6 +532,7 @@ func addExp(player *world.PlayerInfo, expGain int32, deps *handler.Deps) {
 	handler.SendExpUpdate(player.Session, player.Level, player.Exp)
 
 	if leveledUp {
+		player.Dirty = true
 		// 發送完整狀態更新（客戶端偵測等級變化後自動播放升級特效）
 		handler.SendPlayerStatus(player.Session, player)
 

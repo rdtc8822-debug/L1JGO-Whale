@@ -317,7 +317,7 @@ func sendPetHpMeter(sess *net.Session, petID int32, hp, maxHP int32) {
 // sendPetCtrlMenu sends S_PetCtrlMenu (opcode 64) to open/close the pet control panel UI.
 // Java: S_PetCtrlMenu uses S_OPCODE_CHARRESET.
 func sendPetCtrlMenu(sess *net.Session, pet *world.PetInfo, open bool) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_VOICE_CHAT) // opcode 64
+	w := packet.NewWriterWithOpcode(packet.S_OPCODE_CHARSYNACK) // opcode 64
 	w.WriteC(0x0c) // sub-opcode for pet control
 
 	if open {

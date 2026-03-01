@@ -20,6 +20,32 @@ const (
 	skillMsgCastFail    uint16 = 280 // "施展魔法失敗。"
 )
 
+// calcMagicLevel 計算職業魔法等級（Go 側鏡像，與 Lua class_feature.lua 一致）。
+// 用於建構 SkillDamageContext，避免每次技能傷害計算都跨 Lua 呼叫。
+func calcMagicLevel(classType, level int) int {
+	if level <= 0 {
+		return 0
+	}
+	switch classType {
+	case 0: // 王族
+		return min(2, level/10)
+	case 1: // 騎士
+		return level / 50
+	case 2: // 精靈
+		return min(6, level/8)
+	case 3: // 法師
+		return min(13, level/4)
+	case 4: // 黑暗精靈
+		return min(2, level/12)
+	case 5: // 龍騎士
+		return min(4, level/9)
+	case 6: // 幻術師
+		return min(10, level/6)
+	default:
+		return 0
+	}
+}
+
 // SkillSystem processes queued skill requests in Phase 2.
 // 管理技能執行、buff 套用/到期、NPC debuff。
 type SkillSystem struct {
@@ -503,13 +529,14 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 			AttackerSP:      int(player.SP),
 			AttackerDmgMod:  int(player.DmgMod),
 			AttackerHitMod:  int(player.HitMod),
-			AttackerWeapon:  weaponDmg,
-			AttackerHP:      int(player.HP),
-			AttackerMaxHP:   int(player.MaxHP),
-			TargetAC:        int(n.AC),
-			TargetLevel:     int(n.Level),
-			TargetMR:        int(n.MR),
-			TargetMP:        int(n.MP),
+			AttackerWeapon:     weaponDmg,
+			AttackerHP:         int(player.HP),
+			AttackerMaxHP:      int(player.MaxHP),
+			AttackerMagicLevel: calcMagicLevel(int(player.ClassType), int(player.Level)),
+			TargetAC:           int(n.AC),
+			TargetLevel:        int(n.Level),
+			TargetMR:           int(n.MR),
+			TargetMP:           int(n.MP),
 		}
 	}
 
@@ -1340,23 +1367,24 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 				continue
 			}
 			ctx := scripting.SkillDamageContext{
-				SkillID:         int(skill.SkillID),
-				DamageValue:     skill.DamageValue,
-				DamageDice:      skill.DamageDice,
-				DamageDiceCount: skill.DamageDiceCount,
-				SkillLevel:      skill.SkillLevel,
-				Attr:            skill.Attr,
-				AttackerLevel:   int(player.Level),
-				AttackerSTR:     int(player.Str),
-				AttackerDEX:     int(player.Dex),
-				AttackerINT:     int(player.Intel),
-				AttackerWIS:     int(player.Wis),
-				AttackerSP:      int(player.SP),
-				AttackerDmgMod:  int(player.DmgMod),
-				AttackerHitMod:  int(player.HitMod),
-				TargetAC:        int(npc.AC),
-				TargetLevel:     int(npc.Level),
-				TargetMR:        int(npc.MR),
+				SkillID:            int(skill.SkillID),
+				DamageValue:        skill.DamageValue,
+				DamageDice:         skill.DamageDice,
+				DamageDiceCount:    skill.DamageDiceCount,
+				SkillLevel:         skill.SkillLevel,
+				Attr:               skill.Attr,
+				AttackerLevel:      int(player.Level),
+				AttackerSTR:        int(player.Str),
+				AttackerDEX:        int(player.Dex),
+				AttackerINT:        int(player.Intel),
+				AttackerWIS:        int(player.Wis),
+				AttackerSP:         int(player.SP),
+				AttackerDmgMod:     int(player.DmgMod),
+				AttackerHitMod:     int(player.HitMod),
+				AttackerMagicLevel: calcMagicLevel(int(player.ClassType), int(player.Level)),
+				TargetAC:           int(npc.AC),
+				TargetLevel:        int(npc.Level),
+				TargetMR:           int(npc.MR),
 			}
 			res := s.deps.Scripting.CalcSkillDamage(ctx)
 			dmg := int32(res.Damage)
