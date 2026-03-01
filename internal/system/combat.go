@@ -66,6 +66,16 @@ func (s *CombatSystem) processMeleeAttack(sessID uint64, targetID int32) *handle
 		return nil
 	}
 
+	// 絕對屏障：攻擊時自動解除（Java: C_Attack.java 第 164-169 行）
+	if player.AbsoluteBarrier && s.deps.Skill != nil {
+		s.deps.Skill.CancelAbsoluteBarrier(player)
+	}
+
+	// 隱身：攻擊時自動解除（Java: L1BuffUtil.cancelInvisibility）
+	if player.Invisible && s.deps.Skill != nil {
+		s.deps.Skill.CancelInvisibility(player)
+	}
+
 	// 查找目標 — 可能是 NPC 或玩家
 	npc := ws.GetNpc(targetID)
 	if npc == nil || npc.Dead {
@@ -174,10 +184,8 @@ func (s *CombatSystem) processMeleeAttack(sessID uint64, targetID int32) *handle
 		// 武器耐久損耗（Java: L1Attack.damageNpcWeaponDurability）
 		handler.DamageWeaponDurability(player.Session, player, s.deps)
 
-		// 受傷設定仇恨
-		if npc.AggroTarget == 0 {
-			npc.AggroTarget = sessID
-		}
+		// 受傷累加仇恨（Java: L1HateList.add）
+		AddHate(npc, sessID, damage)
 
 		// 廣播 HP 條更新
 		hpRatio := int16(0)
@@ -209,6 +217,16 @@ func (s *CombatSystem) processRangedAttack(sessID uint64, targetID int32) *handl
 	// 麻痺/暈眩/凍結/睡眠時無法攻擊
 	if player.Paralyzed || player.Sleeped {
 		return nil
+	}
+
+	// 絕對屏障：攻擊時自動解除
+	if player.AbsoluteBarrier && s.deps.Skill != nil {
+		s.deps.Skill.CancelAbsoluteBarrier(player)
+	}
+
+	// 隱身：攻擊時自動解除
+	if player.Invisible && s.deps.Skill != nil {
+		s.deps.Skill.CancelInvisibility(player)
 	}
 
 	npc := ws.GetNpc(targetID)
@@ -348,9 +366,8 @@ func (s *CombatSystem) processRangedAttack(sessID uint64, targetID int32) *handl
 		// 武器耐久損耗（遠程也會磨損武器）
 		handler.DamageWeaponDurability(player.Session, player, s.deps)
 
-		if npc.AggroTarget == 0 {
-			npc.AggroTarget = sessID
-		}
+		// 受傷累加仇恨
+		AddHate(npc, sessID, damage)
 
 		hpRatio := int16(0)
 		if npc.MaxHP > 0 {
@@ -394,16 +411,36 @@ func handleNpcDeath(npc *world.NpcInfo, killer *world.PlayerInfo, nearby []*worl
 	// 守衛：無經驗、無善惡、無掉落（Java: L1GuardInstance 無獎勵邏輯）
 	expGain := int32(0)
 	if npc.Impl != "L1Guard" {
-		// 給予擊殺者經驗（套用伺服器經驗倍率）
-		expGain = npc.Exp
+		// 計算基礎經驗（套用伺服器經驗倍率）
+		baseExp := npc.Exp
 		if deps.Config.Rates.ExpRate > 0 {
-			expGain = int32(float64(expGain) * deps.Config.Rates.ExpRate)
-		}
-		if expGain > 0 {
-			addExp(killer, expGain, deps)
+			baseExp = int32(float64(baseExp) * deps.Config.Rates.ExpRate)
 		}
 
-		// 給予主人的寵物經驗（同地圖）
+		// 按仇恨比例分配經驗（Java: CalcExp.calcExp）
+		totalHate := GetTotalHate(npc)
+		if totalHate > 0 && len(npc.HateList) > 1 && baseExp > 0 {
+			// 多人打怪：按傷害比例分配
+			for sid, hate := range npc.HateList {
+				p := deps.World.GetBySession(sid)
+				if p == nil || p.Dead {
+					continue
+				}
+				share := baseExp * hate / totalHate
+				if share > 0 {
+					addExp(p, share, deps)
+				}
+			}
+			expGain = baseExp
+		} else {
+			// 單人或無仇恨列表：全部給 killer（向下相容）
+			expGain = baseExp
+			if expGain > 0 {
+				addExp(killer, expGain, deps)
+			}
+		}
+
+		// 給予 killer 的寵物經驗（同地圖）
 		for _, pet := range deps.World.GetPetsByOwner(killer.CharID) {
 			if !pet.Dead && pet.MapID == killer.MapID {
 				petExp := npc.Exp
@@ -417,12 +454,15 @@ func handleNpcDeath(npc *world.NpcInfo, killer *world.PlayerInfo, nearby []*worl
 			}
 		}
 
-		// 給予善惡值
+		// 善惡值只給 killer（最高仇恨者）
 		deps.PvP.AddLawfulFromNpc(killer, npc.Lawful)
 
-		// 給予掉落物
+		// 掉落物只給 killer
 		handler.GiveDrops(killer, npc.NpcID, deps)
 	}
+
+	// 清空仇恨列表（防止殘留影響重生）
+	ClearHateList(npc)
 
 	// 設定重生計時器（ticks: delay_seconds * 5，200ms tick）
 	if npc.RespawnDelay > 0 {

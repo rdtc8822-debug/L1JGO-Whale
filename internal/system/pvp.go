@@ -30,6 +30,15 @@ func (s *PvPSystem) HandlePvPAttack(attacker, target *world.PlayerInfo) {
 
 	attacker.Heading = handler.CalcHeading(attacker.X, attacker.Y, target.X, target.Y)
 
+	// 目標絕對屏障：免疫所有傷害（Java: L1AttackPc.dmg0 — AbsoluteBarrier 返回 true）
+	if target.AbsoluteBarrier {
+		nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
+		for _, viewer := range nearby {
+			handler.SendAttackPacket(viewer.Session, attacker.CharID, target.CharID, 0, attacker.Heading)
+		}
+		return
+	}
+
 	// 安全區內只播放動畫，不造成傷害（Java: isSafetyZone 檢查）
 	if s.inSafetyZone(attacker) || s.inSafetyZone(target) {
 		nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
@@ -37,6 +46,11 @@ func (s *PvPSystem) HandlePvPAttack(attacker, target *world.PlayerInfo) {
 			handler.SendAttackPacket(viewer.Session, attacker.CharID, target.CharID, 0, attacker.Heading)
 		}
 		return
+	}
+
+	// 被攻擊時解除睡眠（Java: L1PcInstance.receiveDamage → wakeUp）
+	if target.Sleeped {
+		s.breakPlayerSleep(target)
 	}
 
 	s.triggerPinkName(attacker, target)
@@ -70,6 +84,26 @@ func (s *PvPSystem) HandlePvPAttack(attacker, target *world.PlayerInfo) {
 	}
 
 	nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
+
+	// 反擊屏障（skill 91）：PvP 近戰機率反彈（Java: L1AttackPc.calcCounterBarrierDamage）
+	if damage > 0 && target.HasBuff(91) {
+		if world.RandInt(100)+1 <= 25 {
+			cbDmg := s.calcCounterBarrierDmg(target)
+			if cbDmg > 0 {
+				attacker.HP -= int16(cbDmg)
+				if attacker.HP < 0 {
+					attacker.HP = 0
+				}
+				handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(target.CharID, 10710))
+				handler.SendHpUpdate(attacker.Session, attacker)
+				damage = 0 // 反彈後原傷害歸零
+				if attacker.HP <= 0 {
+					s.deps.Death.KillPlayer(attacker)
+				}
+			}
+		}
+	}
+
 	for _, viewer := range nearby {
 		handler.SendAttackPacket(viewer.Session, attacker.CharID, target.CharID, damage, attacker.Heading)
 	}
@@ -82,8 +116,12 @@ func (s *PvPSystem) HandlePvPAttack(attacker, target *world.PlayerInfo) {
 		handler.SendHpUpdate(target.Session, target)
 
 		if target.HP <= 0 {
+			// 在 KillPlayer 之前保存決鬥狀態（KillPlayer 會清除 FightId）
+			isDuel := attacker.FightId == target.CharID && target.FightId == attacker.CharID
 			s.deps.Death.KillPlayer(target)
-			s.processPKKill(attacker, target)
+			if !isDuel {
+				s.processPKKill(attacker, target)
+			}
 		}
 	}
 }
@@ -114,6 +152,21 @@ func (s *PvPSystem) HandlePvPFarAttack(attacker, target *world.PlayerInfo) {
 		return
 	}
 
+	// 目標絕對屏障：免疫所有傷害
+	if target.AbsoluteBarrier {
+		handler.SendArrowAttackPacket(attacker.Session, attacker.CharID, target.CharID, 0, attacker.Heading,
+			attacker.X, attacker.Y, target.X, target.Y)
+		nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
+		for _, viewer := range nearby {
+			if viewer.SessionID == attacker.SessionID {
+				continue
+			}
+			handler.SendArrowAttackPacket(viewer.Session, attacker.CharID, target.CharID, 0, attacker.Heading,
+				attacker.X, attacker.Y, target.X, target.Y)
+		}
+		return
+	}
+
 	// 安全區內只播放動畫
 	if s.inSafetyZone(attacker) || s.inSafetyZone(target) {
 		handler.SendArrowAttackPacket(attacker.Session, attacker.CharID, target.CharID, 0, attacker.Heading,
@@ -127,6 +180,11 @@ func (s *PvPSystem) HandlePvPFarAttack(attacker, target *world.PlayerInfo) {
 				attacker.X, attacker.Y, target.X, target.Y)
 		}
 		return
+	}
+
+	// 被攻擊時解除睡眠
+	if target.Sleeped {
+		s.breakPlayerSleep(target)
 	}
 
 	s.triggerPinkName(attacker, target)
@@ -196,8 +254,11 @@ func (s *PvPSystem) HandlePvPFarAttack(attacker, target *world.PlayerInfo) {
 		handler.SendHpUpdate(target.Session, target)
 
 		if target.HP <= 0 {
+			isDuel := attacker.FightId == target.CharID && target.FightId == attacker.CharID
 			s.deps.Death.KillPlayer(target)
-			s.processPKKill(attacker, target)
+			if !isDuel {
+				s.processPKKill(attacker, target)
+			}
 		}
 	}
 }
@@ -240,6 +301,10 @@ func (s *PvPSystem) inSafetyZone(p *world.PlayerInfo) bool {
 
 // triggerPinkName 攻擊藍名玩家時觸發粉紅名。
 func (s *PvPSystem) triggerPinkName(attacker, victim *world.PlayerInfo) {
+	// 決鬥對象不觸發粉紅名（Java: L1PinkName.onAction 決鬥豁免）
+	if attacker.FightId == victim.CharID {
+		return
+	}
 	if attacker.PinkName {
 		return
 	}
@@ -390,4 +455,33 @@ func (s *PvPSystem) dropOneItem(victim *world.PlayerInfo) {
 	handler.SendServerMessageStr(victim.Session, 638, itemInfo.Name)
 
 	s.deps.Log.Info(fmt.Sprintf("PK 死亡掉落物品  受害者=%s  道具=%s  數量=%d", victim.Name, itemInfo.Name, dropCount))
+}
+
+// breakPlayerSleep 被攻擊時解除玩家睡眠狀態（Java: L1PcInstance.wakeUp）。
+func (s *PvPSystem) breakPlayerSleep(target *world.PlayerInfo) {
+	target.Sleeped = false
+	target.RemoveBuff(62)  // 沉睡之霧（視覺）
+	target.RemoveBuff(66)  // 沉睡之霧
+	target.RemoveBuff(103) // 暗黑盲咒
+	handler.SendParalysis(target.Session, handler.SleepRemove)
+}
+
+// calcCounterBarrierDmg 計算 PvP 反擊屏障的反彈傷害。
+// Java: L1AttackMode.calcCounterBarrierDamage（PC 版本）
+// 公式：(武器大傷 + 強化等級 + 傷害修正) × 2 × 1.5 倍率
+func (s *PvPSystem) calcCounterBarrierDmg(target *world.PlayerInfo) int32 {
+	wpn := target.Equip.Weapon()
+	if wpn == nil {
+		return 0
+	}
+	info := s.deps.Items.Get(wpn.ItemID)
+	if info == nil {
+		return 0
+	}
+	dmg := int32((info.DmgLarge + int(wpn.EnchantLvl) + info.DmgMod) << 1)
+	dmg = dmg * 3 / 2 // 倍率 1.5（Java: ConfigSkill.COUNTER_BARRIER_DMG）
+	if dmg < 0 {
+		dmg = 0
+	}
+	return dmg
 }

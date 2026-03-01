@@ -137,10 +137,8 @@ func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInf
 			target.HP = 0
 		}
 
-		// 設定仇恨
-		if target.AggroTarget == 0 {
-			target.AggroTarget = player.SessionID
-		}
+		// 武器技能傷害累加仇恨
+		AddHate(target, player.SessionID, int32(dmg))
 
 		// 廣播受傷動畫
 		for _, viewer := range nearby {

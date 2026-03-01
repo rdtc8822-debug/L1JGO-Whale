@@ -26,9 +26,9 @@ func NewItemUseSystem(deps *handler.Deps) *ItemUseSystem {
 
 // ---------- 消耗品使用（藥水、食物） ----------
 
-// UseConsumable 處理消耗品使用。
+// UseConsumable 處理消耗品使用。回傳 true 表示物品已被消耗。
 // 藥水效果定義在 Lua (scripts/item/potions.lua)。
-func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo) {
+func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo) bool {
 	consumed := false
 
 	pot := s.deps.Scripting.GetPotionEffect(int(invItem.ItemID))
@@ -37,7 +37,7 @@ func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInf
 		// Message 698: "喉嚨灼熱，無法喝東西"
 		if player.HasBuff(handler.SkillDecayPotion) {
 			handler.SendServerMessage(sess, 698)
-			return
+			return false
 		}
 
 		switch pot.Type {
@@ -185,6 +185,7 @@ func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInf
 		}
 		handler.SendWeightUpdate(sess, player)
 	}
+	return consumed
 }
 
 // ---------- 衝裝卷軸 ----------

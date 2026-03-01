@@ -179,7 +179,7 @@ func (s *ItemGroundSystem) PickupItem(sess *net.Session, player *world.PlayerInf
 	pickupInfo := s.deps.Items.Get(gndItem.ItemID)
 	if pickupInfo != nil {
 		addWeight := pickupInfo.Weight * gndItem.Count
-		maxW := world.MaxWeight(player.Str, player.Con)
+		maxW := world.PlayerMaxWeight(player)
 		if player.Inv.IsOverWeight(addWeight, maxW) {
 			handler.SendServerMessage(sess, 82) // 此物品太重了，所以你無法攜帶。
 			return

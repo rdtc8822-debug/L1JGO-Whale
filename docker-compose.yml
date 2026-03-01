@@ -1,0 +1,38 @@
+# ============================================================
+#  L1JGO-Whale Docker Compose
+#  用法：docker compose up -d
+# ============================================================
+
+services:
+  # ── PostgreSQL 資料庫 ──────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: aa123456
+      POSTGRES_DB: l1jgo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── L1JGO-Whale 遊戲伺服器 ────────────────────────────────
+  l1jgo:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "7002:7001"
+    volumes:
+      - ./emblem:/app/emblem                              # 血盟紋章持久化
+      - ./config/server.docker.toml:/app/config/server.toml:ro  # Docker 版設定
+    restart: unless-stopped
+
+volumes:
+  pgdata:

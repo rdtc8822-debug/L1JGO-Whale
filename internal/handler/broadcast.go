@@ -369,7 +369,7 @@ func sendPlayerStatus(sess *net.Session, p *world.PlayerInfo) {
 	w.WriteD(gameTime)
 
 	w.WriteC(byte(p.Food))
-	maxW := world.MaxWeight(p.Str, p.Con)
+	maxW := world.PlayerMaxWeight(p)
 	w.WriteC(p.Inv.Weight242(maxW))
 	w.WriteH(uint16(p.Lawful))
 	w.WriteH(uint16(p.FireRes))
@@ -523,7 +523,7 @@ func SendBluePotionIcon(sess *net.Session, timeSec uint16) {
 // Java: S_PacketBox.WEIGHT = 10; format: [C opcode=250][C 10][C weight242]
 // Sent after every inventory add/remove/count change.
 func sendWeightUpdate(sess *net.Session, p *world.PlayerInfo) {
-	maxW := world.MaxWeight(p.Str, p.Con)
+	maxW := world.PlayerMaxWeight(p)
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_EVENT)
 	w.WriteC(10) // subcode: WEIGHT
 	w.WriteC(p.Inv.Weight242(maxW))

@@ -196,6 +196,16 @@ func MaxWeight(str, con int16) int32 {
 	return int32(150 * math.Floor(0.6*float64(str)+0.4*float64(con)+1))
 }
 
+// PlayerMaxWeight 計算角色的有效最大負重（含 buff 加成）。
+// Java: L1PcInstance.getMaxWeight() — weightReductionByMagic = 180（buff 14 / 218）
+func PlayerMaxWeight(p *PlayerInfo) int32 {
+	base := MaxWeight(p.Str, p.Con)
+	if p.HasBuff(14) || p.HasBuff(218) {
+		base += 180
+	}
+	return base
+}
+
 // Weight242 returns weight as a 0-242 scale value for the client UI bar.
 // Java: round((currentWeight / maxWeight) * 242), clamped to 0-242.
 func (inv *Inventory) Weight242(maxWeight int32) byte {

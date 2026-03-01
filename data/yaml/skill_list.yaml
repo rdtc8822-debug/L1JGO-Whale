@@ -955,8 +955,8 @@ skills:
     id: 64
     name_id: '$1980'
     action_id: 19
-    cast_gfx: 2174
-    cast_gfx2: 0
+    cast_gfx: 10701
+    cast_gfx2: 10702
     sys_msg_happen: 0
     sys_msg_stop: 0
     sys_msg_fail: 0

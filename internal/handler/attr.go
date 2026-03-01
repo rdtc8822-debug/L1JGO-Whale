@@ -53,5 +53,8 @@ func HandleAttr(sess *net.Session, r *packet.Reader, deps *Deps) {
 
 	case 97: // Clan join request: %0想加入你的血盟，是否同意？(Y/N)
 		HandleClanJoinResponse(sess, player, data, accepted, deps)
+
+	case 630: // 決鬥確認: %0 要與你決鬥。你是否同意？(Y/N)
+		HandleDuelResponse(sess, player, data, accepted, deps)
 	}
 }

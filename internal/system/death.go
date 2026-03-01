@@ -26,6 +26,9 @@ func (s *DeathSystem) KillPlayer(player *world.PlayerInfo) {
 		return
 	}
 
+	// 決鬥死亡：清除雙方決鬥狀態（在其他處理之前）
+	handler.ClearDuelOnDeath(player, s.deps.World)
+
 	player.Dead = true
 	player.HP = 0
 

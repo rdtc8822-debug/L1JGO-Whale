@@ -117,6 +117,16 @@ func (s *SkillSystem) processSkill(sessID uint64, skillID, targetID int32) {
 
 	// --- 驗證 ---
 
+	// 絕對屏障：施法時自動解除（Java: C_UseSkill.java 第 353-358 行）
+	if player.AbsoluteBarrier {
+		s.cancelAbsoluteBarrier(player)
+	}
+
+	// 隱身：施法時自動解除（Java: L1BuffUtil.cancelInvisibility 在 C_UseSkill）
+	if player.Invisible {
+		s.cancelInvisibility(player)
+	}
+
 	// 麻痺/暈眩/凍結/睡眠/沉默時無法施法
 	if player.Paralyzed || player.Sleeped || player.Silenced {
 		return
@@ -440,6 +450,12 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 
 	player.Heading = CalcHeading(player.X, player.Y, npc.X, npc.Y)
 
+	// 起死回生術 (18)：對不死族 NPC 機率即死
+	if skill.SkillID == 18 {
+		s.executeTurnUndead(sess, player, skill, npc)
+		return
+	}
+
 	// Triple Arrow (132)：消耗 1 箭矢
 	if skill.SkillID == 132 {
 		arrow := FindArrow(player, s.deps)
@@ -572,9 +588,8 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 				t.npc.MP -= t.drainMP
 			}
 
-			if t.npc.AggroTarget == 0 {
-				t.npc.AggroTarget = sess.ID
-			}
+			// 技能傷害累加仇恨
+			AddHate(t.npc, sess.ID, dmg)
 
 			hpRatio := int16(0)
 			if t.npc.MaxHP > 0 {
@@ -590,8 +605,8 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 		}
 	}
 
-	// 吸血鬼之吻：傷害轉為治療（Java: heal = this._dmg）
-	if skill.SkillID == 28 {
+	// 吸血系技能：傷害轉為治療（Java: CHILL_TOUCH / VAMPIRIC_TOUCH — heal = this._dmg）
+	if skill.SkillID == 28 || skill.SkillID == 10 {
 		totalDmg := int16(0)
 		for _, t := range hits {
 			totalDmg += int16(t.dmg)
@@ -605,23 +620,95 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 		}
 	}
 
-	// 冰雪颶風：攻擊型路徑也可能對 NPC 施加凍結
-	if skill.SkillID == 80 {
+	// 凍結類攻擊技能：傷害後 MR 判定凍結（Java: setFrozen + S_Poison 灰色）
+	// 22=寒冰氣息, 30=岩牢, 80=冰雪颶風
+	if skill.SkillID == 22 || skill.SkillID == 30 || skill.SkillID == 80 {
 		for _, t := range hits {
-			if t.npc.Dead || t.npc.Paralyzed || t.npc.HasDebuff(50) || t.npc.HasDebuff(80) {
+			if t.npc.Dead || t.npc.Paralyzed || t.npc.HasDebuff(22) || t.npc.HasDebuff(30) || t.npc.HasDebuff(50) || t.npc.HasDebuff(80) {
 				continue
 			}
 			if s.checkNpcMRResist(player, t.npc, skill.SkillID) {
 				dur := skill.BuffDuration
 				if dur <= 0 {
-					dur = 16
+					switch skill.SkillID {
+					case 22:
+						dur = 8
+					case 30:
+						dur = 10
+					case 80:
+						dur = 16
+					}
 				}
 				t.npc.Paralyzed = true
-				t.npc.AddDebuff(80, (dur+1)*5)
+				t.npc.AddDebuff(skill.SkillID, (dur+1)*5)
 				handler.BroadcastToPlayers(nearby, handler.BuildPoison(t.npc.ID, 2))
 			}
 		}
 	}
+}
+
+// executeTurnUndead 起死回生術（skill 18）— 對不死族 NPC 機率即死。
+// Java 參考: L1SkillUse.java TYPE_CURSE 分支，undeadType == 1 || 3 時 _dmg = currentHp。
+// GFX：不走攻擊動畫，走 ActionGfx + SkillEffect（Java 明確排除 Turn Undead 的 S_UseAttackSkill）。
+func (s *SkillSystem) executeTurnUndead(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, npc *world.NpcInfo) {
+	ws := s.deps.World
+	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+
+	// 施法動畫（Java: S_DoActionGFX）
+	handler.BroadcastToPlayers(nearby, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
+
+	// 前置判定：目標必須是不死族（Java: undeadType == 1 || 3 且 isTU == true）
+	if !npc.Undead {
+		// 非不死族：施法動畫播放但不造成傷害
+		return
+	}
+
+	// 目標特效（Java: S_SkillSound(targetId, castGfx=754)）
+	if skill.CastGfx > 0 {
+		handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
+	}
+
+	// 機率判定（Java: calcProbabilityMagic → default 分支）
+	// diceCount = max(magicBonus + magicLevel, 1)
+	// probability = sum of diceCount rolls of d7
+	// 成功條件: probability >= random(1~100)
+	magicLevel := int(player.Level) / 4 // 簡化：施法者等級 / 4
+	magicBonus := int(player.Intel) - 12
+	if magicBonus < 0 {
+		magicBonus = 0
+	}
+	diceCount := magicLevel + magicBonus
+	if diceCount < 1 {
+		diceCount = 1
+	}
+	probability := 0
+	for i := 0; i < diceCount; i++ {
+		probability += world.RandInt(7) + 1 // 1~7
+	}
+	rnd := world.RandInt(100) + 1 // 1~100
+	if probability < rnd {
+		// 失敗
+		handler.SendServerMessage(sess, skillMsgCastFail)
+		return
+	}
+
+	// 成功：傷害 = 目標當前 HP（即死）
+	dmg := npc.HP
+	npc.HP = 0
+
+	// 受傷時解除睡眠
+	if npc.Sleeped {
+		BreakNpcSleep(npc, ws)
+	}
+
+	// 即死傷害累加仇恨
+	AddHate(npc, sess.ID, dmg)
+
+	hpData := handler.BuildHpMeter(npc.ID, 0)
+	handler.BroadcastToPlayers(nearby, hpData)
+
+	_ = dmg // 即死傷害值，用於 handleNpcDeath 的經驗計算
+	handleNpcDeath(npc, player, nearby, s.deps)
 }
 
 // ========================================================================
@@ -653,6 +740,28 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 		}
 	}
 
+	// 魔法屏障攔截：對其他玩家施放非豁免技能時，檢查目標是否有 Counter Magic（buff 31）
+	if target.CharID != player.CharID && s.tryCounterMagic(target, skill.SkillID) {
+		// 技能被抵消，仍播放施法動畫但不產生效果
+		nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
+		handler.BroadcastToPlayers(nearby, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
+		return
+	}
+
+	// 玩家 debuff MR 抗性判定：對其他玩家施放 debuff 時必須通過 MR 檢查
+	if target.CharID != player.CharID && playerDebuffSkills[skill.SkillID] {
+		if !s.checkPlayerMRResist(player, target) {
+			handler.SendServerMessage(sess, skillMsgCastFail)
+			// 仍播放施法動畫（Java: 即使 miss 也會播放動畫）
+			nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
+			handler.BroadcastToPlayers(nearby, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
+			if skill.CastGfx > 0 {
+				handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(target.CharID, skill.CastGfx))
+			}
+			return
+		}
+	}
+
 	nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
 
 	// 廣播施法動畫
@@ -679,8 +788,13 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 			BroadcastPlayerPoison(target, 1, s.deps) // 綠色
 		}
 
-	case 23: // 能量感測
-		// TODO: 發送目標屬性給施法者
+	case 23: // 能量感測 — 顯示目標的等級、HP/MP、屬性抗性等資訊
+		if target.CharID != player.CharID {
+			msg := fmt.Sprintf("\\f2【%s】 Lv.%d  HP:%d/%d  MP:%d/%d  AC:%d  MR:%d  火:%d 水:%d 風:%d 地:%d",
+				target.Name, target.Level, target.HP, target.MaxHP, target.MP, target.MaxMP,
+				target.AC, target.MR, target.FireRes, target.WaterRes, target.WindRes, target.EarthRes)
+			handler.SendGlobalChat(sess, 9, msg)
+		}
 
 	case 20, 40: // 闇盲咒術 / 黑闇之影
 		handler.SendCurseBlind(target.Session, 1)
@@ -726,6 +840,15 @@ func (s *SkillSystem) executeBuffSkill(sess *net.Session, player *world.PlayerIn
 			CurePoison(target, s.deps)
 			CureCurseParalysis(target, s.deps)
 			s.cancelAllBuffs(target)
+		}
+		// 施法時自身也解除隱身（Java: if srcpc.isInvisble() → srcpc.delInvis()）
+		if player.Invisible {
+			s.cancelInvisibility(player)
+		}
+
+	case 71: // 藥水霜化術 — 通知目標無法使用藥水
+		if target.CharID != player.CharID {
+			handler.SendServerMessage(target.Session, 698) // "喉嚨灼熱，無法喝東西。"
 		}
 
 	case 153: // 魔法消除 — 解除 buff
@@ -793,10 +916,8 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 
 	player.Heading = CalcHeading(player.X, player.Y, npc.X, npc.Y)
 
-	// 對 NPC 施放 debuff 技能 → 設定仇恨（讓 NPC 追擊施法者）
-	if npc.AggroTarget == 0 {
-		npc.AggroTarget = sess.ID
-	}
+	// 對 NPC 施放 debuff 技能 → 累加仇恨（讓 NPC 追擊施法者）
+	AddHate(npc, sess.ID, 1)
 
 	nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
 
@@ -894,9 +1015,7 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 		npc.PoisonDmgAmt = 5
 		npc.PoisonDmgTimer = 0
 		npc.PoisonAttackerSID = sess.ID // 仇恨歸屬
-		if npc.AggroTarget == 0 {
-			npc.AggroTarget = sess.ID
-		}
+		AddHate(npc, sess.ID, 1)
 		npc.AddDebuff(11, 150) // 30 秒 = 150 ticks
 		handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 1))
 		if skill.CastGfx > 0 {
@@ -919,6 +1038,26 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 		}
 		s.deps.Log.Info(fmt.Sprintf("緩速術  施法者=%s  NPC=%s  技能=%d  持續=%d秒", player.Name, npc.Name, skill.SkillID, dur))
 
+	case 50: // 冰矛 — NPC 凍結（Java: setFrozen + S_Poison 灰色）
+		if npc.Paralyzed || npc.HasDebuff(50) || npc.HasDebuff(80) || npc.HasDebuff(22) || npc.HasDebuff(30) {
+			break // 已被凍結
+		}
+		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
+			handler.SendServerMessage(sess, skillMsgCastFail)
+			return
+		}
+		dur := skill.BuffDuration
+		if dur <= 0 {
+			dur = 8
+		}
+		npc.Paralyzed = true
+		npc.AddDebuff(50, (dur+1)*5)
+		handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 2))
+		if skill.CastGfx > 0 {
+			handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
+		}
+		s.deps.Log.Info(fmt.Sprintf("冰矛凍結  施法者=%s  NPC=%s  持續=%d秒", player.Name, npc.Name, dur+1))
+
 	case 80: // 冰雪颶風 — 對 NPC 施加凍結（Java: setFrozen + S_Poison 灰色）
 		if npc.Paralyzed || npc.HasDebuff(50) || npc.HasDebuff(80) {
 			break // 已被凍結/冰矛
@@ -937,6 +1076,55 @@ func (s *SkillSystem) executeNpcDebuffSkill(sess *net.Session, player *world.Pla
 			handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
 		}
 		s.deps.Log.Info(fmt.Sprintf("冰雪颶風凍結  施法者=%s  NPC=%s  持續=%d秒", player.Name, npc.Name, dur+1))
+
+	case 47: // 弱化術 — NPC debuff（Java: DMG-5, HIT-1）
+		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
+			handler.SendServerMessage(sess, skillMsgCastFail)
+			return
+		}
+		dur := skill.BuffDuration
+		if dur <= 0 {
+			dur = 64
+		}
+		npc.AddDebuff(47, dur*5)
+		if skill.CastGfx > 0 {
+			handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
+		}
+		s.deps.Log.Info(fmt.Sprintf("弱化術  施法者=%s  NPC=%s  持續=%d秒", player.Name, npc.Name, dur))
+
+	case 56: // 疾病術 — NPC debuff（Java: DMG-6, AC+12）
+		if !s.checkNpcMRResist(player, npc, skill.SkillID) {
+			handler.SendServerMessage(sess, skillMsgCastFail)
+			return
+		}
+		dur := skill.BuffDuration
+		if dur <= 0 {
+			dur = 64
+		}
+		npc.AddDebuff(56, dur*5)
+		if skill.CastGfx > 0 {
+			handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
+		}
+		s.deps.Log.Info(fmt.Sprintf("疾病術  施法者=%s  NPC=%s  持續=%d秒", player.Name, npc.Name, dur))
+
+	case 44: // 魔法相消術 — 解除 NPC 所有 debuff + 狀態（Java: CANCELLATION.java:158-167）
+		// 清除所有 debuffs
+		for debuffID := range npc.ActiveDebuffs {
+			delete(npc.ActiveDebuffs, debuffID)
+		}
+		// 清除毒
+		npc.PoisonDmgAmt = 0
+		npc.PoisonDmgTimer = 0
+		// 清除麻痺/凍結/睡眠
+		npc.Paralyzed = false
+		npc.Sleeped = false
+		// 清除所有視覺效果（毒色/灰色）
+		handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 0))
+		// 施法特效
+		if skill.CastGfx > 0 {
+			handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(npc.ID, skill.CastGfx))
+		}
+		s.deps.Log.Info(fmt.Sprintf("魔法相消術(NPC)  施法者=%s  NPC=%s", player.Name, npc.Name))
 
 	default:
 		if skill.CastGfx > 0 {
@@ -957,6 +1145,40 @@ func (s *SkillSystem) checkNpcMRResist(caster *world.PlayerInfo, npc *world.NpcI
 	return world.RandInt(100) < prob
 }
 
+// playerDebuffSkills 需要對玩家目標進行 MR 抗性判定的 debuff 技能。
+// 這些技能對其他玩家施放時，必須通過魔法抗性檢查才能命中。
+var playerDebuffSkills = map[int32]bool{
+	11:  true, // 毒咒
+	20:  true, // 闇盲咒術
+	29:  true, // 緩速術
+	33:  true, // 木乃伊詛咒
+	40:  true, // 黑闇之影
+	47:  true, // 弱化術
+	56:  true, // 疾病術
+	66:  true, // 沉睡之霧
+	71:  true, // 藥水霜化術
+	76:  true, // 集體緩速術
+	103: true, // 暗黑盲咒
+	152: true, // 究極緩速術
+}
+
+// checkPlayerMRResist 對玩家目標的魔法抗性判定（debuff 用）。
+// 簡化版公式（Java L1MagicPc.calcProbabilityMagic 的核心概念）：
+//
+//	prob = 50 + (casterLevel - targetLevel) * 3 + casterINT - targetMR
+//	clamp(prob, 10, 90)
+//	success = rand(100) < prob
+func (s *SkillSystem) checkPlayerMRResist(caster, target *world.PlayerInfo) bool {
+	prob := 50 + (int(caster.Level)-int(target.Level))*3 + int(caster.Intel) - int(target.MR)
+	if prob < 10 {
+		prob = 10
+	}
+	if prob > 90 {
+		prob = 90
+	}
+	return world.RandInt(100) < prob
+}
+
 // ========================================================================
 //  自身技能
 // ========================================================================
@@ -969,13 +1191,53 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 	case 2: // 日光術
 		// 有持續時間但無屬性變化，由 applyBuffEffect 處理
 
-	case 13: // 無所遁形術
-		// TODO: 清除附近隱身玩家
+	case 13, 72: // 無所遁形術 / 強力無所遁形術 — 揭示附近隱身玩家
+		// Java 參考: L1SkillUse.detection() — 移除 buff 60（隱身術）和 97（暗影閃避）
+		// 注意: GM 隱身免疫（isGmInvis），待 GM 系統實作後加入
+		for _, tgt := range nearby {
+			if tgt.CharID == player.CharID {
+				continue
+			}
+			if tgt.HasBuff(60) || tgt.HasBuff(97) {
+				s.removeBuffAndRevert(tgt, 60)
+				s.removeBuffAndRevert(tgt, 97)
+				// 通知被揭示者：你不再隱身
+				handler.SendInvisible(tgt.Session, tgt.CharID, false)
+				// 向附近玩家廣播角色出現（讓被揭示者重新顯示在其他人畫面上）
+				nearbyOfTarget := s.deps.World.GetNearbyPlayersAt(tgt.X, tgt.Y, tgt.MapID)
+				for _, viewer := range nearbyOfTarget {
+					if viewer.CharID != tgt.CharID {
+						handler.SendPutObject(viewer.Session, tgt)
+					}
+				}
+			}
+		}
+		// 施法者自己若在隱身中也會被揭示
+		if player.HasBuff(60) || player.HasBuff(97) {
+			s.removeBuffAndRevert(player, 60)
+			s.removeBuffAndRevert(player, 97)
+			handler.SendInvisible(sess, player.CharID, false)
+		}
 
 	case 44: // 魔法相消術（自身）
 		s.cancelAllBuffs(player)
 
-	case 72: // 強力無所遁形術
+	case 78: // 絕對屏障 — 免疫所有傷害，停止 HP/MP 回復
+		// Java: 攻擊/施法/使用道具/裝備武器時解除；移動時不解除
+		player.AbsoluteBarrier = true
+		dur := skill.BuffDuration
+		if dur <= 0 {
+			dur = 12
+		}
+		abBuff := &world.ActiveBuff{
+			SkillID:            skill.SkillID,
+			TicksLeft:          dur * 5,
+			SetAbsoluteBarrier: true,
+		}
+		old78 := player.AddBuff(abBuff)
+		if old78 != nil {
+			s.revertBuffStats(player, old78)
+		}
 
 	case 130: // 心靈轉換 — HP 轉 MP
 		transfer := player.HP / 4
@@ -1103,9 +1365,8 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 			if npc.HP < 0 {
 				npc.HP = 0
 			}
-			if npc.AggroTarget == 0 {
-				npc.AggroTarget = sess.ID
-			}
+			// 攻擊技能傷害累加仇恨
+			AddHate(npc, sess.ID, dmg)
 			hpRatio := int16(0)
 			if npc.MaxHP > 0 {
 				hpRatio = int16((npc.HP * 100) / npc.MaxHP)
@@ -1133,6 +1394,11 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 
 	// 套用 buff 效果
 	s.applyBuffEffect(player, skill)
+
+	// 負重強化：套用時立即更新負重顯示
+	if skill.SkillID == 14 || skill.SkillID == 218 {
+		handler.SendWeightUpdate(sess, player)
+	}
 
 	// 效果 GFX
 	if skill.CastGfx > 0 {
@@ -1226,15 +1492,38 @@ func (s *SkillSystem) executeCreateMagicalWeapon(sess *net.Session, player *worl
 		return
 	}
 
-	// TODO: 完整強化邏輯（safe_enchant 檢查、enchant_level == 0 檢查、+1 強化）
-	// 目前僅驗證物品為武器，避免對非武器物品誤操作
+	// safe_enchant 檢查（Java: safe_enchant <= 0 → msg 79）
+	if itemInfo.SafeEnchant <= 0 {
+		handler.SendServerMessage(sess, 79)
+		return
+	}
+
+	// 只對未強化武器有效（Java: enchant_level != 0 → msg 79）
+	if invItem.EnchantLvl != 0 {
+		handler.SendServerMessage(sess, 79)
+		return
+	}
+
+	// 廣播施法動畫
 	nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
 	handler.BroadcastToPlayers(nearby, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
 	if skill.CastGfx > 0 {
 		handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(player.CharID, skill.CastGfx))
 	}
 
-	handler.SendServerMessage(sess, 79) // 暫時回報「沒有任何事情發生」直到完整實作
+	// 成功：強化 +1（100% 成功率）
+	invItem.EnchantLvl = 1
+
+	// 發送 msg 161：「%0 閃耀 %1 %2 的光芒」（Java: item_name, "$245", "$247"）
+	itemName := invItem.Name
+	if invItem.Identified {
+		itemName = "+0 " + invItem.Name
+	}
+	handler.SendServerMessageArgs(sess, 161, itemName, "$245", "$247")
+
+	// 更新物品名稱顯示
+	handler.SendItemNameUpdate(sess, invItem, itemInfo)
+	player.Dirty = true
 }
 
 // executeBringStone 處理提煉魔石（skill 100）— 魔石升級鏈。
@@ -1256,14 +1545,69 @@ func (s *SkillSystem) executeBringStone(sess *net.Session, player *world.PlayerI
 		return
 	}
 
-	// TODO: 完整升級邏輯（成功率計算、物品轉換、消耗處理）
+	// 計算成功率與結果物品 ID
+	rate, resultID, msgArg := calcBringStoneRate(player, invItem.ItemID)
+	if resultID == 0 {
+		handler.SendServerMessage(sess, 79)
+		return
+	}
+
+	// 廣播施法動畫
 	nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
 	handler.BroadcastToPlayers(nearby, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
 	if skill.CastGfx > 0 {
 		handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(player.CharID, skill.CastGfx))
 	}
 
-	handler.SendServerMessage(sess, skillMsgCastFail) // 暫時回報失敗直到完整實作
+	// 消耗原石（Java: 無論成功失敗都消耗）
+	removed := player.Inv.RemoveItem(invItem.ObjectID, 1)
+	if removed {
+		handler.SendRemoveInventoryItem(sess, invItem.ObjectID)
+	} else {
+		handler.SendItemCountUpdate(sess, invItem)
+	}
+	// 更新負重
+	handler.SendWeightUpdate(sess, player)
+
+	// 擲骰判定（Java: random.nextInt(100)+1，即 1~100）
+	if world.RandInt(100)+1 <= rate {
+		// 成功：新增升級石到背包
+		resultInfo := s.deps.Items.Get(resultID)
+		if resultInfo == nil {
+			handler.SendServerMessage(sess, 280)
+			player.Dirty = true
+			return
+		}
+		newItem := player.Inv.AddItem(resultID, 1, resultInfo.Name, resultInfo.InvGfx, resultInfo.Weight, resultInfo.Stackable, byte(resultInfo.Bless))
+		handler.SendAddItem(sess, newItem, resultInfo)
+		handler.SendServerMessageStr(sess, 403, msgArg)
+	} else {
+		// 失敗：魔法失敗了
+		handler.SendServerMessage(sess, 280)
+	}
+	handler.SendWeightUpdate(sess, player)
+	player.Dirty = true
+}
+
+// calcBringStoneRate 計算提煉魔石的成功率。
+// Java 公式：dark = floor(10 + level*0.8 + (wis-6)*1.2)，逐級除以常數。
+func calcBringStoneRate(p *world.PlayerInfo, itemID int32) (rate int, resultID int32, msgArg string) {
+	dark := int(10 + float64(p.Level)*0.8 + float64(p.Wis-6)*1.2)
+	brave := int(float64(dark) / 2.1)
+	wise := int(float64(brave) / 2.0)
+	kayser := int(float64(wise) / 1.9)
+
+	switch itemID {
+	case 40320:
+		return dark, 40321, "$2475"
+	case 40321:
+		return brave, 40322, "$2476"
+	case 40322:
+		return wise, 40323, "$2477"
+	case 40323:
+		return kayser, 40324, "$2478"
+	}
+	return 0, 0, ""
 }
 
 // ========================================================================
@@ -1366,7 +1710,30 @@ func (s *SkillSystem) executeTeleportSpell(sess *net.Session, player *world.Play
 	// 傳送時取消交易
 	handler.CancelTradeIfActive(player, s.deps)
 
+	// --- 集體傳送(69)：施法者傳送前先收集同公會成員 ---
+	var clanMembers []*world.PlayerInfo
+	if skill.SkillID == 69 && player.ClanID != 0 {
+		for _, member := range nearby {
+			if member.CharID == player.CharID {
+				continue
+			}
+			if member.ClanID != player.ClanID {
+				continue
+			}
+			if chebyshevDist(player.X, player.Y, member.X, member.Y) > 3 {
+				continue
+			}
+			clanMembers = append(clanMembers, member)
+		}
+	}
+
 	handler.TeleportPlayer(sess, player, destX, destY, destMapID, destHeading, s.deps)
+
+	// --- 集體傳送(69)：傳送血盟成員到相同目的地 ---
+	for _, member := range clanMembers {
+		handler.CancelTradeIfActive(member, s.deps)
+		handler.TeleportPlayer(member.Session, member, destX, destY, destMapID, destHeading, s.deps)
+	}
 }
 
 // ========================================================================
@@ -1504,12 +1871,10 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 			switch skill.SkillID {
 			case 87:
 				handler.SendParalysis(target.Session, handler.StunApply)
-			case 157:
+			case 157, 50, 80, 22, 30:
 				handler.SendParalysis(target.Session, handler.FreezeApply)
-			case 50:
-				handler.SendParalysis(target.Session, handler.FreezeApply)
-			case 80:
-				handler.SendParalysis(target.Session, handler.FreezeApply)
+				// 凍結類：廣播灰色色調給附近所有玩家（Java: S_Poison type=2）
+				broadcastPlayerPoison(target, 2, s.deps)
 			default:
 				handler.SendParalysis(target.Session, handler.ParalysisApply)
 			}
@@ -1542,6 +1907,113 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 // 實際委派給 applyBuffEffect，由 NpcAISystem 透過 SkillManager 介面呼叫。
 func (s *SkillSystem) ApplyNpcDebuff(target *world.PlayerInfo, skill *data.SkillInfo) {
 	s.applyBuffEffect(target, skill)
+}
+
+// cancelAbsoluteBarrier 解除絕對屏障效果（Java: L1BuffUtil.cancelAbsoluteBarrier）。
+// 被攻擊/施法/使用道具時呼叫。移動時不解除。
+func (s *SkillSystem) cancelAbsoluteBarrier(player *world.PlayerInfo) {
+	s.removeBuffAndRevert(player, 78)
+	// removeBuffAndRevert → revertBuffStats 會清除 AbsoluteBarrier flag
+}
+
+// CancelAbsoluteBarrier 匯出版本，供 handler（movement/item）呼叫。
+func (s *SkillSystem) CancelAbsoluteBarrier(player *world.PlayerInfo) {
+	if player.AbsoluteBarrier {
+		s.cancelAbsoluteBarrier(player)
+	}
+}
+
+// cancelInvisibility 解除隱身效果（Java: L1BuffUtil.cancelInvisibility）。
+// 攻擊/施法時呼叫。移除隱身 buff 並通知周圍玩家重新顯示此角色。
+func (s *SkillSystem) cancelInvisibility(player *world.PlayerInfo) {
+	// 移除隱身術 (60) 和暗隱術 (97) 的 buff
+	s.removeBuffAndRevert(player, 60)
+	s.removeBuffAndRevert(player, 97)
+	// removeBuffAndRevert → revertBuffStats 會清除 Invisible flag
+
+	// 通知玩家自己已解除隱身
+	handler.SendInvisible(player.Session, player.CharID, false)
+
+	// 通知周圍玩家重新顯示此角色（下一 tick VisibilitySystem 也會處理，
+	// 但主動 SendPutObject 讓解除更即時）
+	nearby := s.deps.World.GetNearbyPlayersAt(player.X, player.Y, player.MapID)
+	for _, viewer := range nearby {
+		if viewer.CharID != player.CharID {
+			handler.SendPutObject(viewer.Session, player)
+		}
+	}
+}
+
+// CancelInvisibility 匯出版本，供 combat/handler 呼叫。
+func (s *SkillSystem) CancelInvisibility(player *world.PlayerInfo) {
+	if player.Invisible {
+		s.cancelInvisibility(player)
+	}
+}
+
+// ApplyGMBuff GM 強制套用 buff（繞過已學/MP/材料驗證）。
+func (s *SkillSystem) ApplyGMBuff(player *world.PlayerInfo, skillID int32) bool {
+	skill := s.deps.Skills.Get(skillID)
+	if skill == nil {
+		return false
+	}
+	s.applyBuffEffect(player, skill)
+	dur := uint16(skill.BuffDuration)
+	if dur == 0 {
+		dur = 300 // 預設 5 分鐘
+	}
+	s.sendBuffIcon(player, skillID, dur)
+	handler.SendPlayerStatus(player.Session, player)
+	// 負重強化：套用時更新負重
+	if skillID == 14 || skillID == 218 {
+		handler.SendWeightUpdate(player.Session, player)
+	}
+	return true
+}
+
+// counterMagicExempt 魔法屏障不可抵擋的技能清單（Java: EXCEPT_COUNTER_MAGIC[]）。
+// 這些技能穿透魔法屏障，不會被抵消。
+var counterMagicExempt = map[int32]bool{
+	1: true, 2: true, 3: true, 5: true, 8: true, 9: true, 12: true, 13: true, 14: true,
+	19: true, 21: true, 26: true, 31: true, 32: true, 35: true, 37: true, 42: true,
+	43: true, 44: true, 48: true, 49: true, 52: true, 54: true, 55: true, 57: true,
+	60: true, 61: true, 63: true, 67: true, 68: true, 69: true, 72: true, 73: true,
+	75: true, 78: true, 79: true, 87: true, 88: true, 89: true, 90: true, 91: true,
+	97: true, 98: true, 99: true, 100: true, 101: true, 102: true, 104: true, 105: true,
+	106: true, 107: true, 109: true, 110: true, 111: true, 113: true, 114: true, 115: true,
+	116: true, 117: true, 118: true, 129: true, 130: true, 131: true, 132: true, 134: true,
+	137: true, 138: true, 146: true, 147: true, 148: true, 149: true, 150: true, 151: true,
+	155: true, 156: true, 158: true, 159: true, 161: true, 163: true, 164: true, 165: true,
+	166: true, 168: true, 169: true, 170: true, 171: true, 175: true, 176: true, 181: true,
+	185: true, 190: true, 194: true, 195: true, 201: true, 204: true, 209: true, 211: true,
+	213: true, 214: true, 216: true, 219: true, 228: true, 230: true,
+	10026: true, 10027: true, 10028: true, 10029: true, 41472: true,
+}
+
+// tryCounterMagic 檢查目標是否有魔法屏障（buff 31），若有則觸發抵消。
+// 回傳 true 表示技能被抵消，呼叫方應跳過該目標的效果。
+// Java 參考: L1SkillUse.isUseCounterMagic()
+func (s *SkillSystem) tryCounterMagic(target *world.PlayerInfo, skillID int32) bool {
+	// 豁免技能不受魔法屏障影響
+	if counterMagicExempt[skillID] {
+		return false
+	}
+	// 目標沒有魔法屏障
+	if !target.HasBuff(31) {
+		return false
+	}
+	// 觸發：移除魔法屏障 buff + 播放 GFX
+	s.removeBuffAndRevert(target, 31)
+	// 取得 castGfx2（魔法屏障觸發動畫）
+	gfx := int32(10702) // 預設值
+	if sk := s.deps.Skills.Get(31); sk != nil && sk.CastGfx2 > 0 {
+		gfx = sk.CastGfx2
+	}
+	// 廣播觸發動畫給附近玩家 + 目標自己
+	nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
+	data := handler.BuildSkillEffect(target.CharID, gfx)
+	handler.BroadcastToPlayers(nearby, data)
+	return true
 }
 
 // removeBuffAndRevert 移除衝突 buff 並還原屬性。
@@ -1610,6 +2082,9 @@ func (s *SkillSystem) revertBuffStats(target *world.PlayerInfo, buff *world.Acti
 	if buff.SetSleeped {
 		target.Sleeped = false
 	}
+	if buff.SetAbsoluteBarrier {
+		target.AbsoluteBarrier = false
+	}
 }
 
 // sendSpeedToAll 向自己和附近玩家發送速度封包。
@@ -1635,6 +2110,14 @@ func (s *SkillSystem) cancelAllBuffs(target *world.PlayerInfo) {
 	if target.ActiveBuffs == nil {
 		return
 	}
+
+	// 追蹤需要發送的客戶端通知（迴圈結束後統一發送）
+	needFreezeRemove := false
+	needStunRemove := false
+	needParalysisRemove := false
+	needSleepRemove := false
+	needInvisRemove := false
+
 	for skillID, buff := range target.ActiveBuffs {
 		if s.deps.Scripting.IsNonCancellable(int(skillID)) {
 			continue
@@ -1656,7 +2139,57 @@ func (s *SkillSystem) cancelAllBuffs(target *world.PlayerInfo) {
 			target.BraveSpeed = 0
 			s.sendBraveToAll(target, 0, 0)
 		}
+
+		// 追蹤麻痺/凍結/暈眩類型
+		if buff.SetParalyzed {
+			switch skillID {
+			case 87:
+				needStunRemove = true
+			case 157, 50, 80, 22, 30:
+				needFreezeRemove = true
+			default:
+				needParalysisRemove = true
+			}
+		}
+		if buff.SetSleeped {
+			needSleepRemove = true
+		}
+		if buff.SetInvisible {
+			needInvisRemove = true
+		}
 	}
+
+	// 凍結解除通知（控制鎖 + 灰色色調）
+	if needFreezeRemove {
+		handler.SendParalysis(target.Session, handler.FreezeRemove)
+		broadcastPlayerPoison(target, 0, s.deps)
+	}
+	if needStunRemove {
+		handler.SendParalysis(target.Session, handler.StunRemove)
+	}
+	if needParalysisRemove {
+		handler.SendParalysis(target.Session, handler.ParalysisRemove)
+	}
+	// 睡眠解除通知
+	if needSleepRemove {
+		handler.SendParalysis(target.Session, handler.SleepRemove)
+	}
+	// 隱身解除通知 + 周圍玩家重新顯示
+	if needInvisRemove {
+		handler.SendInvisible(target.Session, target.CharID, false)
+		nearby := s.deps.World.GetNearbyPlayersAt(target.X, target.Y, target.MapID)
+		for _, viewer := range nearby {
+			if viewer.CharID != target.CharID {
+				handler.SendPutObject(viewer.Session, target)
+			}
+		}
+	}
+
+	// 重新檢查是否仍有非 buff 來源的麻痺（毒麻痺/詛咒麻痺）
+	if shouldStayParalyzed(target, false, false) {
+		target.Paralyzed = true
+	}
+
 	handler.SendPlayerStatus(target.Session, target)
 }
 
@@ -1700,8 +2233,10 @@ func (s *SkillSystem) tickPlayerBuffs(p *world.PlayerInfo) {
 				switch skillID {
 				case 87:
 					handler.SendParalysis(p.Session, handler.StunRemove)
-				case 157, 50, 80:
+				case 157, 50, 80, 22, 30:
 					handler.SendParalysis(p.Session, handler.FreezeRemove)
+					// 清除灰色色調
+					broadcastPlayerPoison(p, 0, s.deps)
 				default:
 					handler.SendParalysis(p.Session, handler.ParalysisRemove)
 				}
@@ -1719,6 +2254,11 @@ func (s *SkillSystem) tickPlayerBuffs(p *world.PlayerInfo) {
 				p.WisdomTicks = 0
 			}
 
+			// 負重強化到期：更新負重顯示
+			if skillID == 14 || skillID == 218 {
+				handler.SendWeightUpdate(p.Session, p)
+			}
+
 			if s.deps.Skills != nil {
 				if sk := s.deps.Skills.Get(skillID); sk != nil && sk.SysMsgStop > 0 {
 					handler.SendServerMessage(p.Session, uint16(sk.SysMsgStop))
@@ -1726,6 +2266,12 @@ func (s *SkillSystem) tickPlayerBuffs(p *world.PlayerInfo) {
 			}
 
 			handler.SendPlayerStatus(p.Session, p)
+		} else if buff.SetParalyzed && buff.TicksLeft%25 == 0 {
+			// 3.80C 客戶端灰色色調會自動淡出，每 5 秒重發維持視覺
+			switch skillID {
+			case 157, 50, 80, 22, 30:
+				broadcastPlayerPoison(p, 2, s.deps)
+			}
 		}
 	}
 

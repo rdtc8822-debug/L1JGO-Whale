@@ -50,6 +50,12 @@ type SkillManager interface {
 	RemoveBuffAndRevert(target *world.PlayerInfo, skillID int32)
 	// ApplyNpcDebuff NPC 對玩家施放 debuff 技能（麻痺/睡眠/減速等）。
 	ApplyNpcDebuff(target *world.PlayerInfo, skill *data.SkillInfo)
+	// CancelAbsoluteBarrier 解除絕對屏障（攻擊/施法/使用道具時）。
+	CancelAbsoluteBarrier(player *world.PlayerInfo)
+	// CancelInvisibility 解除隱身（攻擊/施法時自動觸發）。
+	CancelInvisibility(player *world.PlayerInfo)
+	// ApplyGMBuff GM 強制套用 buff（繞過已學/MP/材料驗證）。
+	ApplyGMBuff(player *world.PlayerInfo, skillID int32) bool
 }
 
 // DeathManager 處理玩家死亡與重生。由 system.DeathSystem 實作。
@@ -297,8 +303,8 @@ type EquipManager interface {
 
 // ItemUseManager 處理物品使用邏輯（消耗品、衝裝、鑑定、技能書、傳送卷軸、掉落）。由 system.ItemUseSystem 實作。
 type ItemUseManager interface {
-	// UseConsumable 處理消耗品使用（藥水、食物）。
-	UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo)
+	// UseConsumable 處理消耗品使用（藥水、食物）。回傳 true 表示已消耗。
+	UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo) bool
 	// EnchantItem 處理衝裝卷軸使用。
 	EnchantItem(sess *net.Session, r *packet.Reader, player *world.PlayerInfo, scroll *world.InvItem, scrollInfo *data.ItemInfo)
 	// IdentifyItem 處理鑑定卷軸使用。

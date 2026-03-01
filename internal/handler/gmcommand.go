@@ -92,10 +92,16 @@ func HandleGMCommand(sess *net.Session, player *world.PlayerInfo, text string, d
 		gmClearWall(sess, player, deps)
 	case "weather":
 		gmWeather(sess, player, args, deps)
+	case "buff":
+		gmBuff(sess, player, args, deps)
+	case "allbuff":
+		gmAllBuff(sess, player, deps)
 	case "stresstest":
 		gmStressTest(sess, player, args, deps)
 	case "cleartest":
 		gmClearTest(sess, player, deps)
+	case "invisible":
+		gmInvisible(sess, player, deps)
 	default:
 		gmMsg(sess, "\\f3未知的GM指令: ."+cmd+"  輸入 .help 查看指令列表")
 	}
@@ -144,6 +150,8 @@ func gmHelp(sess *net.Session) {
 	gmMsg(sess, ".loc [玩家名]  — 顯示自己或指定玩家的當下座標")
 	gmMsg(sess, ".wall [1|2|3]  — 測試牆壁: 1=隱形門 2=僅封包 3=可見門")
 	gmMsg(sess, ".clearwall  — 清除測試牆壁")
+	gmMsg(sess, ".buff <skillID>  — 強制套用buff(繞過驗證)")
+	gmMsg(sess, ".allbuff  — 套用所有常用buff")
 	gmMsg(sess, ".stresstest <npcID> [數量] [半徑]  — 壓力測試(預設10000隻,半徑50)")
 	gmMsg(sess, ".cleartest  — 清除所有壓力測試怪物")
 }
@@ -1396,4 +1404,81 @@ func gmClearTest(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
 		removed++
 	}
 	gmMsgf(sess, "已清除 %d 隻測試怪物", removed)
+}
+
+// gmBuff 強制套用指定 buff（繞過已學/MP/材料驗證）。
+// 用法: .buff <skillID>
+func gmBuff(sess *net.Session, player *world.PlayerInfo, args []string, deps *Deps) {
+	if len(args) < 1 {
+		gmMsg(sess, "\\f3用法: .buff <skillID>")
+		return
+	}
+	skillID, err := strconv.Atoi(args[0])
+	if err != nil {
+		gmMsg(sess, "\\f3技能ID必須是數字")
+		return
+	}
+	if deps.Skill == nil {
+		gmMsg(sess, "\\f3技能系統未初始化")
+		return
+	}
+	ok := deps.Skill.ApplyGMBuff(player, int32(skillID))
+	if !ok {
+		gmMsgf(sess, "\\f3未知的技能ID: %d", skillID)
+		return
+	}
+	skill := deps.Skills.Get(int32(skillID))
+	name := fmt.Sprintf("%d", skillID)
+	if skill != nil {
+		name = skill.Name
+	}
+	gmMsgf(sess, "\\f=已套用 buff: %s (ID:%d)", name, skillID)
+}
+
+// gmAllBuff 套用所有常用 buff。
+// 用法: .allbuff
+func gmAllBuff(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
+	if deps.Skill == nil {
+		gmMsg(sess, "\\f3技能系統未初始化")
+		return
+	}
+	// 常用 buff 列表
+	buffList := []int32{
+		3,  // 保護罩 Shield (AC-2)
+		8,  // 神聖武器 Holy Weapon (dmg+1, hit+1)
+		42, // 體魄強健術 Physical Enchant STR (STR+5)
+		43, // 加速術 Haste (移動加速)
+		32, // 冥想術 Meditation (MPR+5)
+		14, // 負重強化 Decrease Weight (負重+180)
+	}
+	count := 0
+	for _, sid := range buffList {
+		if deps.Skill.ApplyGMBuff(player, sid) {
+			count++
+		}
+	}
+	gmMsgf(sess, "\\f=已套用 %d 個常用 buff", count)
+}
+
+// gmInvisible 切換 GM 隱身狀態（不受 Cancellation 影響的純旗標隱身）。
+func gmInvisible(sess *net.Session, player *world.PlayerInfo, deps *Deps) {
+	player.Invisible = !player.Invisible
+	SendInvisible(sess, player.CharID, player.Invisible)
+
+	ws := deps.World
+	nearby := ws.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
+
+	if player.Invisible {
+		// 隱身：周圍玩家移除我的角色顯示
+		for _, other := range nearby {
+			SendRemoveObject(other.Session, player.CharID)
+		}
+		gmMsg(sess, "\\f2GM 隱身已開啟。")
+	} else {
+		// 解除隱身：周圍玩家重新顯示我
+		for _, other := range nearby {
+			SendPutObject(other.Session, player)
+		}
+		gmMsg(sess, "\\f2GM 隱身已關閉。")
+	}
 }

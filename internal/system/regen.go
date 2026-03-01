@@ -61,6 +61,10 @@ func (s *RegenSystem) tickHPRegen(p *world.PlayerInfo) {
 	if p.Dead || p.HP <= 0 || p.HP >= p.MaxHP {
 		return
 	}
+	// 絕對屏障期間停止 HP 回復（Java: pc.stopHpRegeneration）
+	if p.AbsoluteBarrier {
+		return
+	}
 
 	// Increment 1-second accumulator
 	p.RegenHPAcc++
@@ -76,7 +80,7 @@ func (s *RegenSystem) tickHPRegen(p *world.PlayerInfo) {
 	p.RegenHPAcc = 0
 
 	// Calculate HP regen amount via Lua
-	maxW := world.MaxWeight(p.Str, p.Con)
+	maxW := world.PlayerMaxWeight(p)
 	amount := s.lua.CalcHPRegenAmount(scripting.HPRegenContext{
 		Level:             int(p.Level),
 		Con:               int(p.Con),
@@ -111,9 +115,13 @@ func (s *RegenSystem) tickMPRegen(p *world.PlayerInfo) {
 	if p.Dead || p.MP >= p.MaxMP {
 		return
 	}
+	// 絕對屏障期間停止 MP 回復（Java: pc.stopMpRegeneration）
+	if p.AbsoluteBarrier {
+		return
+	}
 
 	// Calculate MP regen amount via Lua
-	maxW := world.MaxWeight(p.Str, p.Con)
+	maxW := world.PlayerMaxWeight(p)
 	amount := s.lua.CalcMPRegenAmount(scripting.MPRegenContext{
 		Wis:               int(p.Wis),
 		MPR:               int(p.MPR),

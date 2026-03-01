@@ -1,0 +1,11 @@
+bin/
+*.exe
+.git/
+docs/
+tools/
+Makefile
+README.md
+CHANGELOG.md
+clan.md
+map.zip
+*.zip

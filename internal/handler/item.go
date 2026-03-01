@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/l1jgo/server/internal/data"
 	"github.com/l1jgo/server/internal/net"
@@ -17,6 +18,32 @@ const (
 	msgClassCannotUse uint16 = 264 // "你的職業無法使用此道具。"
 	msgLevelTooLow    uint16 = 318 // "等級 %0以上才可使用此道具。"
 )
+
+// hasItemDelay 檢查物品延遲是否在冷卻中。
+// 若已過期則自動清除並回傳 false。
+func hasItemDelay(player *world.PlayerInfo, delayID int, now time.Time) bool {
+	if player.ItemDelays == nil {
+		return false
+	}
+	expiry, ok := player.ItemDelays[delayID]
+	if !ok {
+		return false
+	}
+	if now.After(expiry) {
+		delete(player.ItemDelays, delayID)
+		return false
+	}
+	return true
+}
+
+// setItemDelay 設定物品使用延遲到期時間。
+// delayTimeMs 為延遲毫秒數。
+func setItemDelay(player *world.PlayerInfo, delayID int, delayTimeMs int) {
+	if player.ItemDelays == nil {
+		player.ItemDelays = make(map[int]time.Time)
+	}
+	player.ItemDelays[delayID] = time.Now().Add(time.Duration(delayTimeMs) * time.Millisecond)
+}
 
 // Virtual SkillIDs for potion-based buffs (matching Java L1SkillId.java STATUS_* constants).
 // These are NOT real spell IDs — they are virtual IDs used by setSkillEffect to track
@@ -347,9 +374,20 @@ func handleUseEtcItem(sess *net.Session, r *packet.Reader, player *world.PlayerI
 		}
 	}
 
+	// 物品使用延遲檢查（Java: L1ItemDelay）
+	now := time.Now()
+	if itemInfo.DelayID != 0 {
+		if hasItemDelay(player, itemInfo.DelayID, now) {
+			return // 冷卻中 → 靜默拒絕（與 Java 行為一致）
+		}
+	}
+
 	// All other consumables (potions, food) → ItemUseSystem
 	if deps.ItemUse != nil {
-		deps.ItemUse.UseConsumable(sess, player, invItem, itemInfo)
+		consumed := deps.ItemUse.UseConsumable(sess, player, invItem, itemInfo)
+		if consumed && itemInfo.DelayID != 0 && itemInfo.DelayTime != 0 {
+			setItemDelay(player, itemInfo.DelayID, itemInfo.DelayTime)
+		}
 	}
 }
 

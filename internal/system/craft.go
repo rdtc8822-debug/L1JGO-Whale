@@ -112,7 +112,7 @@ func (s *CraftSystem) ExecuteCraft(sess *net.Session, player *world.PlayerInfo, 
 			addWeight += outInfo.Weight * out.Amount * amount
 		}
 	}
-	maxW := world.MaxWeight(player.Str, player.Con)
+	maxW := world.PlayerMaxWeight(player)
 	if player.Inv.IsOverWeight(addWeight, maxW) {
 		// msg 82: "超過角色可攜帶的物品重量"
 		handler.SendServerMessage(sess, 82)

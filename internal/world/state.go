@@ -64,13 +64,15 @@ type PlayerInfo struct {
 	PinkName      bool  // temporary red name (180 seconds after attacking blue player)
 	PinkNameTicks int   // remaining ticks for pink name timer
 	WantedTicks   int   // >0 = wanted by guards (24h = 432000 ticks at 200ms/tick)
+	FightId       int32 // 0=無決鬥, >0=決鬥對手角色 ID（Java: L1PcInstance.fightId）
 	RegenHPAcc int   // HP regen accumulator: counts 1-second ticks since last HP regen
 
-	Dead       bool  // true when HP <= 0, waiting for restart
-	Invisible bool // true when under Invisibility
-	Paralyzed bool // true when frozen/stunned/bound
-	Sleeped   bool // true when under sleep effect
-	Silenced  bool // 沉默狀態（沉默毒 / silence 技能）— 禁止施法
+	Dead             bool // true when HP <= 0, waiting for restart
+	Invisible        bool // true when under Invisibility
+	Paralyzed        bool // true when frozen/stunned/bound
+	Sleeped          bool // true when under sleep effect
+	Silenced         bool // 沉默狀態（沉默毒 / silence 技能）— 禁止施法
+	AbsoluteBarrier  bool // 絕對屏障（skill 78）— 免疫所有傷害，攻擊/施法/使用道具時解除
 
 	LastMoveTime int64 // time.Now().UnixNano() of last accepted move (0 = no throttle)
 
@@ -167,6 +169,10 @@ type PlayerInfo struct {
 	// Exclude/block list (session-only, max 16 entries, NOT persisted)
 	ExcludeList []string
 
+	// 物品使用延遲（runtime-only，不持久化）
+	// key=DelayID (如 502=道具共用), value=到期時間
+	ItemDelays map[int]time.Time
+
 	// Dirty flag for batch persistence. Set to true when any persisted state
 	// changes (position, HP/MP, exp, inventory, buffs). PersistenceSystem only
 	// saves dirty players and resets this flag after each successful save.
@@ -225,9 +231,10 @@ type ActiveBuff struct {
 	// Special flags for non-stat effects
 	SetMoveSpeed  byte // if > 0, the buff set MoveSpeed to this value
 	SetBraveSpeed byte // if > 0, the buff set BraveSpeed to this value
-	SetInvisible  bool // buff made player invisible
-	SetParalyzed  bool // buff paralyzed/froze player
-	SetSleeped    bool // buff put player to sleep
+	SetInvisible        bool // buff made player invisible
+	SetParalyzed        bool // buff paralyzed/froze player
+	SetSleeped          bool // buff put player to sleep
+	SetAbsoluteBarrier  bool // buff 設定了絕對屏障（到期/移除時清 flag）
 }
 
 // HasBuff returns true if the player has the given skill effect active.

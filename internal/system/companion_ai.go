@@ -233,22 +233,23 @@ func (s *CompanionAISystem) summonAttackTarget(sum *world.SummonInfo) {
 		dmg = 1
 	}
 
-	// Apply damage to NPC
+	// 扣血
 	targetNpc.HP -= dmg
 	heading := calcNpcHeading(sum.X, sum.Y, targetNpc.X, targetNpc.Y)
 
-	// Broadcast attack animation
+	// 廣播攻擊動畫
 	nearby := ws.GetNearbyPlayersAt(sum.X, sum.Y, sum.MapID)
 	atkData := buildNpcAttack(sum.ID, targetNpc.ID, dmg, heading)
 	handler.BroadcastToPlayers(nearby, atkData)
 
-	// Send HP update to summon's master only
+	// 傷害歸屬主人（仇恨累加到主人 SessionID）
 	master := ws.GetByCharID(sum.OwnerCharID)
 	if master != nil {
+		AddHate(targetNpc, master.SessionID, dmg)
 		sendCompanionHpMeter(master.Session, sum.ID, sum.HP, sum.MaxHP)
 	}
 
-	// Attack cooldown (based on attack speed or default 10 ticks = 2 seconds)
+	// 攻擊冷卻
 	atkCooldown := 10
 	if sum.AtkSpeed > 0 {
 		atkCooldown = int(sum.AtkSpeed) / 200
@@ -258,21 +259,25 @@ func (s *CompanionAISystem) summonAttackTarget(sum *world.SummonInfo) {
 	}
 	sum.AttackTimer = atkCooldown
 
-	// Check NPC death
+	// NPC 死亡 → 統一走 handleNpcDeath（含經驗分配、掉落、善惡）
 	if targetNpc.HP <= 0 {
 		targetNpc.HP = 0
-		targetNpc.Dead = true
-		ws.NpcDied(targetNpc)
-		targetNpc.DeleteTimer = 50 // 10 seconds for death animation
-		if targetNpc.RespawnDelay > 0 {
-			targetNpc.RespawnTimer = targetNpc.RespawnDelay*5 + 50
-		}
 		sum.AggroTarget = 0
-
-		// Broadcast death (no exp/drops from summon kills)
-		for _, viewer := range nearby {
-			sendNpcDeath(viewer.Session, targetNpc.ID)
-			handler.SendNpcDeadPack(viewer.Session, targetNpc)
+		if master != nil {
+			handleNpcDeath(targetNpc, master, nearby, s.deps)
+		} else {
+			// 主人離線：僅做基礎死亡處理（無經驗/掉落）
+			targetNpc.Dead = true
+			ws.NpcDied(targetNpc)
+			targetNpc.DeleteTimer = 50
+			if targetNpc.RespawnDelay > 0 {
+				targetNpc.RespawnTimer = targetNpc.RespawnDelay * 5
+			}
+			ClearHateList(targetNpc)
+			for _, viewer := range nearby {
+				handler.SendActionGfx(viewer.Session, targetNpc.ID, 8)
+				handler.SendNpcDeadPack(viewer.Session, targetNpc)
+			}
 		}
 	}
 }
@@ -626,23 +631,29 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 		dmg = 1
 	}
 
-	// Apply damage
+	// 扣血
 	targetNpc.HP -= dmg
 	heading := calcNpcHeading(pet.X, pet.Y, targetNpc.X, targetNpc.Y)
 
-	// Broadcast attack animation
+	// 廣播攻擊動畫
 	nearby := ws.GetNearbyPlayersAt(pet.X, pet.Y, pet.MapID)
 	petAtkData := buildNpcAttack(pet.ID, targetNpc.ID, dmg, heading)
 	handler.BroadcastToPlayers(nearby, petAtkData)
 
-	// NPC counterattack — simplified damage calc
+	// 傷害歸屬主人（仇恨累加到主人 SessionID）
+	master := ws.GetByCharID(pet.OwnerCharID)
+	if master != nil {
+		AddHate(targetNpc, master.SessionID, dmg)
+	}
+
+	// NPC 反擊 — 簡化傷害計算
 	if targetNpc.HP > 0 {
 		retalDmg := int32(targetNpc.Level) / 2
 		if retalDmg < 1 {
 			retalDmg = 1
 		}
 		retalDmg += int32(world.RandInt(int(retalDmg/2 + 1)))
-		// Apply pet AC reduction
+		// 寵物 AC 減傷
 		acReduction := int32(-pet.AC) / 3
 		retalDmg -= acReduction
 		if retalDmg < 1 {
@@ -653,7 +664,6 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 			if s.deps.PetLife != nil {
 				s.deps.PetLife.PetDie(pet)
 			}
-			master := ws.GetByCharID(pet.OwnerCharID)
 			if master != nil {
 				sendCompanionHpMeter(master.Session, pet.ID, 0, pet.MaxHP)
 			}
@@ -661,13 +671,12 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 		}
 	}
 
-	// Send HP update to pet's master only
-	master := ws.GetByCharID(pet.OwnerCharID)
+	// 更新主人的寵物血量
 	if master != nil {
 		sendCompanionHpMeter(master.Session, pet.ID, pet.HP, pet.MaxHP)
 	}
 
-	// Attack cooldown
+	// 攻擊冷卻
 	atkCooldown := 10
 	if pet.AtkSpeed > 0 {
 		atkCooldown = int(pet.AtkSpeed) / 200
@@ -677,23 +686,29 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 	}
 	pet.AttackTimer = atkCooldown
 
-	// Check NPC death
+	// NPC 死亡 → 統一走 handleNpcDeath（含經驗分配、掉落、善惡）+ 寵物自身經驗
 	if targetNpc.HP <= 0 {
 		targetNpc.HP = 0
-		targetNpc.Dead = true
-		ws.NpcDied(targetNpc)
-		targetNpc.DeleteTimer = 50
-		if targetNpc.RespawnDelay > 0 {
-			targetNpc.RespawnTimer = targetNpc.RespawnDelay*5 + 50
-		}
 		pet.AggroTarget = 0
 
-		for _, viewer := range nearby {
-			sendNpcDeath(viewer.Session, targetNpc.ID)
-			handler.SendNpcDeadPack(viewer.Session, targetNpc)
+		if master != nil {
+			handleNpcDeath(targetNpc, master, nearby, s.deps)
+		} else {
+			// 主人離線：僅做基礎死亡處理
+			targetNpc.Dead = true
+			ws.NpcDied(targetNpc)
+			targetNpc.DeleteTimer = 50
+			if targetNpc.RespawnDelay > 0 {
+				targetNpc.RespawnTimer = targetNpc.RespawnDelay * 5
+			}
+			ClearHateList(targetNpc)
+			for _, viewer := range nearby {
+				handler.SendActionGfx(viewer.Session, targetNpc.ID, 8)
+				handler.SendNpcDeadPack(viewer.Session, targetNpc)
+			}
 		}
 
-		// Give EXP to pet for the kill
+		// 寵物自身經驗（獨立於玩家經驗分配）
 		petExp := targetNpc.Exp
 		if s.deps.Config.Rates.PetExpRate > 0 {
 			petExp = int32(float64(petExp) * s.deps.Config.Rates.PetExpRate)
@@ -855,13 +870,6 @@ func sendCompanionHpMeter(sess *gonet.Session, objID int32, hp, maxHP int32) {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_HP_METER)
 	w.WriteD(objID)
 	w.WriteC(ratio)
-	sess.Send(w.Bytes())
-}
-
-func sendNpcDeath(sess *gonet.Session, npcID int32) {
-	w := packet.NewWriterWithOpcode(packet.S_OPCODE_ACTION)
-	w.WriteD(npcID)
-	w.WriteC(8) // death action
 	sess.Send(w.Bytes())
 }
 

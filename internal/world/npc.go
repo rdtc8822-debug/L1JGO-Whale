@@ -59,8 +59,9 @@ type NpcInfo struct {
 	DeleteTimer  int // ticks until S_RemoveObject is sent (Java: NPC_DELETION_TIME, default 10s = 50 ticks)
 	RespawnTimer int // ticks remaining until respawn
 
-	// AI state
-	AggroTarget  uint64 // SessionID of hate target (0 = no target)
+	// AI state — 仇恨系統
+	AggroTarget  uint64           // SessionID of hate target (0 = no target)，由仇恨列表驅動
+	HateList     map[uint64]int32 // 仇恨列表 — key=SessionID, value=累積傷害仇恨值
 	AttackTimer  int    // ticks until next attack (cooldown)
 	MoveTimer    int    // ticks until next move towards target
 	StuckTicks   int    // consecutive ticks blocked by another entity (for stuck detection)

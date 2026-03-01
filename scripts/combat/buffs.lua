@@ -49,7 +49,7 @@ BUFF_DEFS = {
     [54] = { move_speed = 1, exclusions = {43, 29, 76} },                    -- Greater Haste
 
     [55] = { hit_mod = 2, dmg_mod = 5, ac = 10 },                            -- Berserker
-    [56] = { dmg_mod = -5, hit_mod = -1 },                                   -- Weakness (debuff)
+    [56] = { dmg_mod = -6, ac = 12 },                                         -- Disease 疾病術 (debuff: DMG-6, AC+12)
 
     [60] = { invisible = true },                                              -- Invisibility
 
@@ -86,10 +86,10 @@ BUFF_DEFS = {
     -- ==================== Knight/Royal Skills (87-91, 109-118) ====================
 
     [87]  = { paralyzed = true },                                             -- Shock Stun
-    [88]  = { ac = -4 },                                                      -- Solid Carriage
-    [89]  = {},                                                               -- Spiked Armor (reflect flag)
-    [90]  = { ac = -2 },                                                      -- Counter Barrier
-    [91]  = {},                                                               -- Counter Mirror (reflect flag)
+    [88]  = { ac = -4 },                                                      -- Reduction Armor（增幅防禦）
+    [89]  = { hit_mod = 6 },                                                  -- Spiked Armor（尖刺盔甲，HIT+6 + PvP 武器破壞）
+    [90]  = { ac = -2 },                                                      -- Solid Carriage（堅固防護）
+    [91]  = { ac = -2 },                                                      -- Counter Barrier（反擊屏障）— AC-2 + 近戰反彈
 
     [109] = { str = 1 },                                                      -- Dress Mighty
     [110] = { dex = 1 },                                                      -- Dress Dexterity
@@ -217,13 +217,48 @@ end
 -- Non-cancellable skill IDs (used by Cancellation/Dispel)
 ---------------------------------------------------------------------
 NON_CANCELLABLE = {
-    [12] = true,   -- Enchant Weapon
-    [21] = true,   -- Blessed Armor
-    [33] = true,   -- Curse Paralyze（木乃伊詛咒，不可被解除魔法消除）
-    [78] = true,   -- Absolute Barrier
-    [79] = true,   -- Advance Spirit
-    [87] = true,   -- Shock Stun（衝擊之暈，不可被解除魔法消除）
-    [157] = true,  -- Earth Bind（大地屏障，不可被解除魔法消除）
+    -- 法師系
+    [12]  = true,  -- Enchant Weapon（武器強化）
+    [21]  = true,  -- Blessed Armor（鎧甲護持）
+    [79]  = true,  -- Advance Spirit（靈魂昇華）
+
+    -- 騎士系
+    [87]  = true,  -- Shock Stun（衝擊之暈）
+    [88]  = true,  -- Reduction Armor（增幅防禦）
+    [89]  = true,  -- Bounce Attack（尖刺盔甲）
+    [90]  = true,  -- Solid Carriage（堅固防護）
+    [91]  = true,  -- Counter Barrier（反擊屏障）
+
+    -- 暗黑妖精系
+    [99]  = true,  -- Shadow Armor（暗影防護）
+    [106] = true,  -- Uncanny Dodge（暗影閃避）
+    [107] = true,  -- Shadow Fang（暗影之牙）
+
+    -- 王族系
+    [109] = true,  -- Dress Mighty（力量提升）
+    [110] = true,  -- Dress Dexterity（敏捷提升）
+    [111] = true,  -- Dress Evasion（迴避提升）
+
+    -- 特殊 debuff（不可被相消術解除）
+    [33]  = true,  -- Curse Paralyze（木乃伊詛咒）
+    [78]  = true,  -- Absolute Barrier（絕對屏障）
+    [112] = true,  -- Armor Break（破壞盔甲）
+    [157] = true,  -- Earth Bind（大地屏障）
+    [208] = true,  -- Bone Break（骷髏毀壞）
+    [226] = true,  -- Gigantic（巨人化）
+    [228] = true,  -- Power Grip（力量支配）
+    [230] = true,  -- Desperado（亡命之徒）
+
+    -- 龍騎士覺醒
+    [185] = true,  -- Awaken Antharas（安乘覺醒）
+    [190] = true,  -- Awaken Fafurion（法利昂覺醒）
+    [195] = true,  -- Awaken Valakas（巴拉卡斯覺醒）
+
+    -- 幻術師幻象
+    [204] = true,  -- Illusion Ogre（幻覺：歐吉）
+    [209] = true,  -- Illusion Lich（幻覺：巫妖）
+    [214] = true,  -- Illusion Dia Golem（幻覺：鑽石乙魔）
+    [219] = true,  -- Illusion Avatar（幻覺：化身）
 }
 
 function is_non_cancellable(skill_id)

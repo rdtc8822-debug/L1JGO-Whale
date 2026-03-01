@@ -6,6 +6,7 @@ import (
 
 	coresys "github.com/l1jgo/server/internal/core/system"
 	"github.com/l1jgo/server/internal/data"
+	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/net"
 	"github.com/l1jgo/server/internal/net/packet"
 	"github.com/l1jgo/server/internal/persist"
@@ -179,6 +180,9 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 			player.TradeItems = nil
 			player.TradeGold = 0
 		}
+
+		// 決鬥中斷線：清除對手的決鬥狀態
+		handler.ClearDuelOnDisconnect(player, s.worldState)
 
 		// Clean up party membership — matching Java breakup logic:
 		// Leader leaves or only 2 members → dissolve entire party.

@@ -66,16 +66,28 @@ func (s *NpcAISystem) tickMonsterAI(npc *world.NpcInfo) {
 		npc.MoveTimer--
 	}
 
-	// --- Target detection (Go engine responsibility) ---
+	// --- 目標檢測（含仇恨列表回退） ---
 	var target *world.PlayerInfo
 	if npc.AggroTarget != 0 {
 		target = s.world.GetBySession(npc.AggroTarget)
 		if target == nil || target.Dead || target.MapID != npc.MapID {
+			// 當前目標失效 → 從仇恨列表移除，嘗試回退到次高仇恨
+			RemoveHateTarget(npc, npc.AggroTarget)
 			npc.AggroTarget = 0
 			target = nil
+			// 嘗試仇恨列表中的下一個目標
+			if nextSID := GetMaxHateTarget(npc); nextSID != 0 {
+				if nextTarget := s.world.GetBySession(nextSID); nextTarget != nil &&
+					!nextTarget.Dead && nextTarget.MapID == npc.MapID {
+					npc.AggroTarget = nextSID
+					target = nextTarget
+				} else {
+					RemoveHateTarget(npc, nextSID)
+				}
+			}
 		}
 		// 注意：不在此處檢查安全區域。被動仇恨（被攻擊）不受安全區域限制。
-		// 安全區域只阻止主動索敵（agro scan），由下方第 95-98 行處理。
+		// 安全區域只阻止主動索敵（agro scan），由下方處理。
 		// Java 行為：隱藏之谷等新手區整張地圖都是安全區域，怪物被打一定會反擊。
 	}
 
@@ -342,6 +354,21 @@ func (s *NpcAISystem) guardTeleportHome(npc *world.NpcInfo) {
 // ---------- NPC Combat ----------
 
 func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInfo) {
+	// 目標絕對屏障：免疫所有傷害（Java: L1AttackNpc.dmg0）
+	if target.AbsoluteBarrier {
+		npc.AggroTarget = 0 // NPC 無法攻擊屏障目標，清除仇恨
+		return
+	}
+
+	// 被攻擊時解除睡眠
+	if target.Sleeped {
+		target.Sleeped = false
+		target.RemoveBuff(62)
+		target.RemoveBuff(66)
+		target.RemoveBuff(103)
+		handler.SendParalysis(target.Session, handler.SleepRemove)
+	}
+
 	npc.Heading = calcNpcHeading(npc.X, npc.Y, target.X, target.Y)
 
 	res := s.deps.Scripting.CalcNpcMelee(scripting.CombatContext{
@@ -359,6 +386,45 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 	}
 
 	nearby := s.world.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+
+	// 反擊屏障（skill 91）：近戰攻擊時機率觸發反彈
+	// Java 參考: L1AttackNpc.calcDamage() — 檢查 target.hasSkillEffect(COUNTER_BARRIER)
+	if damage > 0 && target.HasBuff(91) {
+		// 機率判定：probability = probabilityValue(25) ，與 random(1~100) 比較
+		prob := 25 // 基礎觸發率
+		if world.RandInt(100)+1 <= prob {
+			// 計算反彈傷害（Java: calcCounterBarrierDamage — NPC 版本：(STR + Level) << 1）
+			cbDmg := int32((int(npc.STR) + int(npc.Level)) << 1)
+			// 套用設定倍率（Java: ConfigSkill.COUNTER_BARRIER_DMG = 1.5）
+			cbDmg = cbDmg * 3 / 2
+			if cbDmg > 0 {
+				// 反彈傷害施加在 NPC 身上
+				npc.HP -= cbDmg
+				if npc.HP < 0 {
+					npc.HP = 0
+				}
+				// 播放反擊屏障觸發特效（GFX 10710）
+				handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(target.CharID, 10710))
+				// 原始攻擊傷害歸零
+				damage = 0
+				// 如果 NPC 被反彈殺死
+				if npc.HP <= 0 {
+					hpData := handler.BuildHpMeter(npc.ID, 0)
+					handler.BroadcastToPlayers(nearby, hpData)
+					handleNpcDeath(npc, target, nearby, s.deps)
+					npc.AggroTarget = 0
+					return
+				}
+				// 廣播 NPC HP 條
+				hpRatio := int16(0)
+				if npc.MaxHP > 0 {
+					hpRatio = int16((npc.HP * 100) / npc.MaxHP)
+				}
+				handler.BroadcastToPlayers(nearby, handler.BuildHpMeter(npc.ID, hpRatio))
+			}
+		}
+	}
+
 	atkData := buildNpcAttack(npc.ID, target.CharID, damage, npc.Heading)
 	handler.BroadcastToPlayers(nearby, atkData)
 
@@ -383,6 +449,21 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 }
 
 func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerInfo) {
+	// 目標絕對屏障：免疫所有傷害
+	if target.AbsoluteBarrier {
+		npc.AggroTarget = 0
+		return
+	}
+
+	// 被攻擊時解除睡眠
+	if target.Sleeped {
+		target.Sleeped = false
+		target.RemoveBuff(62)
+		target.RemoveBuff(66)
+		target.RemoveBuff(103)
+		handler.SendParalysis(target.Session, handler.SleepRemove)
+	}
+
 	npc.Heading = calcNpcHeading(npc.X, npc.Y, target.X, target.Y)
 
 	res := s.deps.Scripting.CalcNpcRanged(scripting.CombatContext{
@@ -426,6 +507,12 @@ func (s *NpcAISystem) npcRangedAttack(npc *world.NpcInfo, target *world.PlayerIn
 
 // executeNpcSkill handles an NPC using a skill on a player.
 func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerInfo, skillID, actID, gfxID int) {
+	// 目標絕對屏障：免疫所有傷害和 debuff
+	if target.AbsoluteBarrier {
+		npc.AggroTarget = 0
+		return
+	}
+
 	skill := s.deps.Skills.Get(int32(skillID))
 	if skill == nil {
 		s.npcMeleeAttack(npc, target)
@@ -785,6 +872,7 @@ func tickNpcDebuffs(npc *world.NpcInfo, ws *world.State, deps *handler.Deps) {
 	if len(npc.ActiveDebuffs) == 0 {
 		return
 	}
+	refreshGrey := false // 凍結類 debuff 是否需要定期重發灰色色調
 	for skillID, ticksLeft := range npc.ActiveDebuffs {
 		ticksLeft--
 		if ticksLeft <= 0 {
@@ -792,8 +880,25 @@ func tickNpcDebuffs(npc *world.NpcInfo, ws *world.State, deps *handler.Deps) {
 			removeNpcDebuffEffect(npc, skillID, ws)
 		} else {
 			npc.ActiveDebuffs[skillID] = ticksLeft
+			// 3.80C 客戶端的 S_Poison 灰色色調會自動淡出，需定期重發維持視覺
+			if !refreshGrey && isFreezeDebuff(skillID) && ticksLeft%25 == 0 {
+				refreshGrey = true
+			}
 		}
 	}
+	if refreshGrey && npc.Paralyzed {
+		nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+		handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 2))
+	}
+}
+
+// isFreezeDebuff 判斷是否為凍結類 debuff（需要維持灰色色調的技能）。
+func isFreezeDebuff(skillID int32) bool {
+	switch skillID {
+	case 22, 30, 50, 80, 157:
+		return true
+	}
+	return false
 }
 
 // removeNpcDebuffEffect 清除 NPC 的 debuff 狀態旗標，並廣播視覺解除封包。
@@ -824,10 +929,26 @@ func removeNpcDebuffEffect(npc *world.NpcInfo, skillID int32, ws *world.State) {
 	case 11: // 毒咒 — 清除傷害毒
 		npc.PoisonDmgAmt = 0
 		npc.PoisonDmgTimer = 0
-		handler.BroadcastToPlayers(nearby, clearPoison)
+		if npc.Paralyzed {
+			// NPC 仍在凍結中 → 清除綠色後重發灰色色調
+			handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 2))
+		} else {
+			handler.BroadcastToPlayers(nearby, clearPoison)
+		}
 	case 80: // 冰雪颶風 — 解除凍結
 		npc.Paralyzed = false
 		handler.BroadcastToPlayers(nearby, clearPoison)
+	case 22: // 寒冰氣息 — 解除凍結 + 灰色色調
+		npc.Paralyzed = false
+		handler.BroadcastToPlayers(nearby, clearPoison)
+	case 30: // 岩牢 — 解除凍結 + 灰色色調
+		npc.Paralyzed = false
+		handler.BroadcastToPlayers(nearby, clearPoison)
+	case 50: // 冰矛 — 解除凍結 + 灰色色調
+		npc.Paralyzed = false
+		handler.BroadcastToPlayers(nearby, clearPoison)
+	case 47: // 弱化術 — 僅計時自動清除
+	case 56: // 疾病術 — 僅計時自動清除
 	}
 }
 
@@ -861,15 +982,19 @@ func tickNpcPoison(npc *world.NpcInfo, ws *world.State, deps *handler.Deps) {
 		npc.PoisonDmgAmt = 0
 		npc.PoisonDmgTimer = 0
 		npc.PoisonAttackerSID = 0
-		// 清除綠色色調
 		nearby := ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
-		handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 0))
+		if npc.Paralyzed {
+			// NPC 仍在凍結中 → 維持灰色色調
+			handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 2))
+		} else {
+			handler.BroadcastToPlayers(nearby, handler.BuildPoison(npc.ID, 0))
+		}
 		return
 	}
 
-	// 仇恨歸屬：毒傷害觸發仇恨（Java: NPC 會追擊施毒者）
-	if npc.AggroTarget == 0 && npc.PoisonAttackerSID != 0 {
-		npc.AggroTarget = npc.PoisonAttackerSID
+	// 仇恨歸屬：毒傷害累加仇恨（Java: NPC 會追擊施毒者）
+	if npc.PoisonAttackerSID != 0 {
+		AddHate(npc, npc.PoisonAttackerSID, npc.PoisonDmgAmt)
 	}
 
 	npc.PoisonDmgTimer++
