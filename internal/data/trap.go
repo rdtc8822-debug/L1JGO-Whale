@@ -11,10 +11,11 @@ import (
 // TrapTemplate 陷阱範本定義（從 YAML 載入）。
 // Java: L1Trap — 6 種類型：傷害/治療/怪物/中毒/技能/傳送。
 type TrapTemplate struct {
-	TrapID       int32  `yaml:"trap_id"`
-	Note         string `yaml:"note,omitempty"`
-	Type         int32  `yaml:"type"`   // 1=傷害 2=治療 3=怪物 4=中毒 5=技能 6=傳送
-	GfxID        int32  `yaml:"gfx_id"` // 客戶端動畫 ID（0=無動畫）
+	TrapID        int32  `yaml:"trap_id"`
+	Note          string `yaml:"note,omitempty"`
+	Type          int32  `yaml:"type"`                    // 1=傷害 2=治療 3=怪物 4=中毒 5=技能 6=傳送
+	GfxID         int32  `yaml:"gfx_id"`                  // 客戶端動畫 ID（0=無動畫）
+	Detectionable bool   `yaml:"detectionable,omitempty"` // Java: isDetectionable，DETECTION 只對 true 顯示特效
 
 	// 傷害/治療（type 1, 2）
 	Base      int32 `yaml:"base,omitempty"`       // 基礎值
@@ -23,7 +24,7 @@ type TrapTemplate struct {
 
 	// 怪物（type 3）
 	MonsterNpcID int32 `yaml:"monster_npc_id,omitempty"` // 召喚的 NPC ID
-	MonsterCount int32 `yaml:"monster_count,omitempty"` // 召喚數量
+	MonsterCount int32 `yaml:"monster_count,omitempty"`  // 召喚數量
 
 	// 中毒（type 4）
 	PoisonType   int32 `yaml:"poison_type,omitempty"`   // 1=一般 2=沉默 3=麻痺
@@ -46,8 +47,8 @@ type TrapTemplate struct {
 type TrapSpawn struct {
 	TrapID int32 `yaml:"trap_id"` // 對應 TrapTemplate.TrapID
 	MapID  int32 `yaml:"map_id"`
-	X      int32 `yaml:"x"`    // 基準座標 X
-	Y      int32 `yaml:"y"`    // 基準座標 Y
+	X      int32 `yaml:"x"`     // 基準座標 X
+	Y      int32 `yaml:"y"`     // 基準座標 Y
 	RndX   int32 `yaml:"rnd_x"` // 隨機範圍 X（0=固定位置）
 	RndY   int32 `yaml:"rnd_y"` // 隨機範圍 Y（0=固定位置）
 	Count  int32 `yaml:"count"` // 生成數量

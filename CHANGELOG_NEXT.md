@@ -1,14 +1,33 @@
-# 下次提交變更摘要
-
-- 將伺服器版本修訂號提升至 `v0.3.31`，同步本次 yiwei 行為對齊推送。
-- 對齊 yiwei 多個 buff/debuff 早退分支的 `sendGrfx()` 後置語義，補上 `CANCELLATION(44)`、`DARK_BLIND(103)`、`PHANTASM(212)`、`ARMOR_BREAK(112)`、`ELEMENTAL_FALL_DOWN(133)`、`EARTH_BIND(157)`、`WIND_SHACKLE(167)` 的目標特效與 PC 狀態刷新。
-- 補齊 `POLLUTE_WATER(173)` / `STRIKER_GALE(174)` 對 NPC 目標的 debuff 套用、ShowID 廣播與 NPC/玩家治療倍率互動。
-- 對齊 NPC mobskill 的 `trigger_random`、`isSkillUseble` gate 與可用技能隨機選擇流程。
-- 補齊速度類互消後的 PC 狀態刷新，並讓 `SLOW(29)` / `MASS_SLOW(76)` / `ENTANGLE(152)` 跳過 `BraveSpeed=5` 目標。
-- 對齊 yiwei 裝備型急速道具：YAML 標記 `20235 伊娃之盾` 為 `haste_item`，新增 `HasteItem` / `HasteItemEquipped`，裝備/卸裝/登入恢復/相消術/速度技能施放皆依 `getHasteItemEquipped()` 行為處理。
-- 對齊 yiwei 卸下武器時解除武器依賴 buff：`COUNTER_BARRIER(91)` 與 `FIRE_BLESS(155)` 會在卸下最後一把武器時移除，並送出 `S_SkillBrave(type=0,duration=0)` 還原烈炎氣息速度。
-
-- 補齊 yiwei PC→NPC 近戰打到持有 COUNTER_BARRIER(91) 的 NPC 時的反擊屏障路徑：命中後依 25 + npc.Level - player.Level + 33 判定，成功時反傷玩家、送 NPC 10710 與玩家 action=2，並取消原本對 NPC 的傷害。
-- 補齊 yiwei NPC 持有 KIRTAS_BARRIER1(11060) 時的物攻反擊屏障：PC 近戰命中後無機率反傷玩家、送 NPC 10710 與玩家 action=2，並取消原本對 NPC 的物理傷害；91 COUNTER_BARRIER 原本機率與武器限制維持不變。
-- 補齊 yiwei NPC type 2 mobskill 施放 KIRTAS_BARRIER1(11060) 時的自身屏障套用：NPC 會取得 11060 狀態、切換 Kirtas hidden/status20、廣播 NPC pack，並在 barrierTime > 15 或滿血顯形時清除 11060。
-- 補齊 yiwei KIRTAS_BARRIER3(11058) / ABSOLUTE_BARRIER(78) 的 NPC 傷害歸零，以及 KIRTAS_BARRIER2(11059) 的 PC→NPC 魔法反射：11058 期間物攻與魔攻不傷 NPC，11059 會將 PC 魔法傷害反彈給施法者並取消原傷害。
+- 補齊魔法娃娃 `dmg_reduction` 實際受傷減免：`Doll_DmgDown` 套入的 `EquipBonuses.DmgReduction` 現在會進入既有 incoming damage 減傷 helper，NPC→PC、PvP 與已接入該 helper 的攻擊魔法路徑不再只追蹤欄位。
+- 修正魔法娃娃召喚缺圖崩潰：`dolls.yaml` 的 `gfx_id` 改為客戶端 sprite gfx，而非 NPC template id；野狼寶寶等 15 筆既有娃娃召喚不再把 801xx/921xx 編號寫進物件封包，並新增資料回歸測試鎖定 yiwei/client gfx 對照。
+- 對齊 yiwei 龍門 NPC 生成/抵達/移除語義：`DragonDoorSystem.SpawnKeeper` 現在依 `L1SpawnUtil.spawn(pc, npcID, 0, 7200)` 使用玩家座標、heading 固定 5，並繼承玩家 ShowID；生成、抵達死亡動作與移除廣播改走 Go 現有 `GetNearbyPlayersInShow`，避免不同副本/ShowID 玩家看到龍門 NPC。
+- 對齊 yiwei 家具 NPC 生成/移除語義：家具現在依玩家 heading 0/2 放在面前一格、NPC heading 固定 0，並繼承玩家 ShowID；生成與移除廣播改走 `GetNearbyPlayersInShow`，只通知同 ShowID 可見玩家。
+- 收斂 yiwei 斷線主玩家移除物件 ShowID 邊界：`InputSystem.handleDisconnect` 的玩家 `S_RemoveObject` 廣播改走 Go 現有 `GetNearbyPlayersInShow`，與已修的 companion 清理一致，只通知同 ShowID 可見玩家。
+- 收斂 yiwei 換角回選單的移除物件 ShowID 邊界：`HandleChangeChar` 角色從 world 移除前後的 `S_RemoveObject` 廣播改走 Go 現有 `GetNearbyPlayersInShow`，只通知同 ShowID 可見玩家，避免不同副本/ShowID 玩家看到角色消失；不搬 Java known-object/logout 類別流程。
+- 對齊 yiwei `145 RETURN_TO_NATURE` 指定目標語義：技能現在只釋放 `targetID` 指定的召喚獸，允許作用於其他玩家召喚獸；非召喚目標送 `S_ServerMessage(79)` 且不誤動施法者自己的召喚獸，成功率以召喚獸主人等級作 defenseLevel，施法 `cast_gfx` 以目標召喚獸為特效物件，保留 Go 既有 SummonSystem/world state/ShowID 廣播整合。
+- 補齊 yiwei 召喚技能成功施法視覺：`SUMMON_MONSTER(51)`、`TAMING_MONSTER(36)`、`CREATE_ZOMBIE(41)`、`RETURN_TO_NATURE(145)`、`LESSER_ELEMENTAL(154)`、`GREATER_ELEMENTAL(162)` 通過 Go 既有 SummonSystem 驗證與資源消耗後，向同 ShowID 玩家廣播施法者 `action_id` 與 `cast_gfx`，補上 Java `sendGrfx(true)` 的客戶端可見行為，不搬 Java `L1SkillUse` 流程架構。
+- 補齊 yiwei 龍之魔眼 `6685/6687/6688/6689` 的魔法傷害減免：PC 與 NPC 對玩家造成魔法傷害時，目標持水龍／生命／誕生／形象魔眼會依 `random(100) < 10` 觸發整數減半並廣播 `S_SkillSound(6320)`；實作接入 Go 現有 SkillSystem/NpcAISystem 傷害流程與封包 helper，不搬 Java `L1MagicPc/L1MagicNpc` 類別結構。
+- 補齊 yiwei `4009/4010/4018` ADLV80 龍副本祝福狀態：改以 Go 現有 Lua buff delta + SkillSystem 套用/還原流程承接 Java skillmode 數值，包含 HP/MP 上限、HPR/MPR、命中/傷害、弓命中/弓傷害、元素抗性、MR、DEX 與 `add_weightUP(4)` 負重百分比；MaxHP/MaxMP 與負重變化現在會同步 `S_HPUpdate`、`S_MPUpdate` 與負重封包，不搬 Java 三個 skillmode class 架構。
+- 補齊 yiwei `11061 LINDVIOR_SKY_SPIKED` 的方向落點特效：NPC type 2 魔法攻擊命中範圍目標時，依目標相對方位額外送 `S_EffectLocation` 7987/8050/8051，保留 Go 現有 NPC AI、LOS、ShowID 與傷害流程，不搬 Java skillmode 執行架構。
+- 對齊 yiwei 陷阱特效送出時機：`TriggerTraps` 不再於分派前一律送 `S_EffectLocation`，改由各 type 通過 Java 對應有效條件後才送特效，避免 `base<=0`、無效技能等陷阱仍在客戶端播放效果。
+- 對齊 yiwei type 1 傷害陷阱的 SKM0 防線：陷阱傷害落地前會檢查玩家 `ABSOLUTE_BARRIER(78)`、`ICE_LANCE(50)`、`EARTH_BIND(157)`、`FREEZING_BLIZZARD(80)` 等阻傷狀態；傷害被擋下時不解除 buff，陷阱仍照常消耗。
+- 對齊 yiwei type 5 技能陷阱的持續時間：`TrapSystem` 現在會把陷阱資料的 `skill_time` 傳入 Go SkillSystem 的 GM buff duration override，讓陷阱技能依 yiwei `_skillTimeSeconds` 設定 buff ticks，同時仍走 Go 既有 buff/stat/icon 流程。
+- 補齊 yiwei type 4 中毒陷阱整合：陷阱傷害毒不再立即扣血，而是走 Go 既有 PoisonSystem 並依 `poison_time` 延後 tick 扣血；沉默毒與麻痺毒也改用現有毒狀態、封包與訊息流程，麻痺毒支援陷阱自己的 `poison_delay` / `poison_time`，不搬 Java timer/thread 架構。
+- 補齊 yiwei type 3 召喚怪物陷阱：`TrapSystem` 現在會依 `monster_npc_id` / `monster_count` 在觸發玩家周圍生成怪物，套用 `setLink(trodFrom)` 等價 0 hate 目標鎖定，並繼承玩家 ShowID、只向同 ShowID 玩家送 NPC 顯示；NPC AI 召喚與陷阱召喚共用 Go runtime NPC template helper，避免複製 Java `L1SpawnUtil` 架構。
+- 補齊 yiwei `13 DETECTION` / `72 COUNTER_DETECTION` 的畫面內陷阱偵測：技能現在會透過 `TrapTriggerer.DetectTraps()` 委派 TrapSystem 偵測 `isInScreen()` 內陷阱，依 `detectionable` 顯示特效並停用畫面內陷阱；`traps.yaml` 與轉檔工具同步保留 Java `isDetectionable` 欄位。
+- 對齊 yiwei `13 DETECTION` / `72 COUNTER_DETECTION` 的 GM 隱身排除：無所遁形術現在對 `isGMInvisible()` 的施法者自身與同 ShowID 目標都不會解除 60/97 隱身 buff，也不會向觀眾重送角色顯示。
+- 對齊 yiwei 移動踩陷阱的 GM 隱身排除：`C_MoveChar` 只在 `!pc.isGmInvis()` 時呼叫 `WorldTrap.onPlayerMoved()`，Go `TrapSystem.TriggerTraps()` 現在共用既有 `isGMInvisible()`，GM 隱身不扣血、不送陷阱效果、不停用陷阱；一般隱身玩家仍照常觸發陷阱。
+- 收斂 yiwei 舊版特殊武器 ID：`287` 玄冰弓不再誤走酷寒之矛 AoE，`290` 耀武雙手劍不再誤走奇古獸公式，`264` 雷雨之劍補回 yiwei `getLightningEdgeDamage()` 特例。
+- 修正武器技能 hardcode ID 對應：yiwei `L1AttackPc.weaponSkill()` 的巴風特魔杖特例是 `124`，Go 原本誤把 `121` 冰之女王魔杖攔成巴風特流程；現在 `121` 回到 `weapon_skill.yaml`，`124` 才走巴風特魔杖公式。
+- 對齊 yiwei 骰子匕首 `W_SK001` NPC 目標語義：Java 只對 `L1PcInstance` 套用毀滅性傷害，Go 原本打 NPC 會額外扣 2/3 HP；現在 NPC 目標只保留觸發後武器消失與 158 訊息，不再追加 NPC 傷害。
+- 對齊 yiwei 玩家遠攻對 NPC 的 SKM0 傷害歸零：`L1AttackPc.calcNpcDamage()` 近戰與遠攻都會先跑 `dmg0(_targetNpc)`，Go 現在遠攻命中後也共用 `npcDamageBlockedBySkm0LikeJava()`，避免持有 `ICE_LANCE(50)` 等狀態的 NPC 被弓箭打穿。
+- 對齊 yiwei companion 攻擊 NPC 的 SKM0 防線：召喚物與寵物攻擊怪物對應 Java `L1AttackNpc.calcNpcDamage()`，Go `summonAttackTarget()` / `petAttackTarget()` 現在在傷害落地前共用 `npcDamageBlockedBySkm0LikeJava()`；傷害歸零時不扣 HP、不加仇恨，寵物也不因未造成傷害觸發反擊。
+- 擴大 yiwei `SKM0` 傷害歸零到 PC→NPC 近戰、攻擊技能與自身範圍技能：Go 原本部分路徑只檢查 `ABSOLUTE_BARRIER(78)`，現在統一使用 `npcDamageBlockedBySkm0LikeJava()`，讓 `ICE_LANCE(50)`、`EARTH_BIND(157)`、`FREEZING_BLIZZARD(80)` 也能擋下對 NPC 傷害。
+- 對齊 yiwei NPC→PC `COUNTER_BARRIER(91)` 反傷的 SKM0 防線：`L1AttackNpc.commitCounterBarrier()` 對 NPC 攻擊者呼叫 `_npc.receiveDamage(...)`，Go 現在保留反屏成功後原始攻擊歸零與 10710 特效，但不再對持有 SKM0 狀態的 NPC 扣 HP。
+- 對齊 yiwei NPC 毒傷 tick 的 SKM0 防線：`L1DamagePoison` 對怪物呼叫 `mob.receiveDamage(...)`，Go `tickNpcPoison()` 現在保留毒 tick 計時，但對持有 `ABSOLUTE_BARRIER(78)` 等 SKM0 狀態的 NPC 不再扣 HP。
+- 對齊 yiwei `MORTAL_BODY(191)` 對 NPC 反彈傷害的 SKM0 防線：Java 反彈 NPC 攻擊者時走 `attackNpc.receiveDamage(...)`，Go 端保留反彈觸發與視覺封包，但不再對持有 `ABSOLUTE_BARRIER(78)` 等 SKM0 狀態的 NPC 扣 HP。
+- 對齊 yiwei `FOE_SLAYER(187)` 對 NPC 的 SKM0 傷害歸零：三段 `cha.onAction(srcpc)` 在 Java 會進入 `L1AttackPc.dmg0`，Go 端屠宰者 NPC 傷害計算與落地扣血已共用 `npcDamageBlockedBySkm0LikeJava()`，不再打穿 `ABSOLUTE_BARRIER(78)` 等狀態。
+- 對齊 yiwei 烏木魔杖目標判定：`Lightning_Magic_Wand.doWandAction` 的 `glanceCheck` 隔牆早退已接回 Go `MapData.HasLineOfSight`，隔牆時只扣魔杖次數、不扣 NPC HP；NPC 直接傷害同步套用 `SKM0` 歸零，避免持有 `ABSOLUTE_BARRIER(78)` 等狀態的怪物被魔杖打穿。
+- 補齊 yiwei `SKM0` 傷害歸零語義於地面效果 NPC 直接傷害路徑：火牢與和諧立方對持有 `ABSOLUTE_BARRIER(78)` / `ICE_LANCE(50)` / `EARTH_BIND(157)` / `FREEZING_BLIZZARD(80)` 的 NPC 不再繞過 receiveDamage 防線扣血，仍保留和諧立方回 MP 行為。
+- 對齊 yiwei 狂風之劍 `weaponId=260` 範圍中心：AoE 次要目標改以施法者自身為中心，保留一般武器與冰矛 `263/287` 以主目標為中心，避免玩家身旁怪物漏吃狂風之劍範圍傷害。
+- 對齊 yiwei 魔法娃娃機率能力：`chance > 0` 的 `dmg` / `dmg_reduction` 現在對應 `Doll_DmgR` / `Doll_DmgDownR`，不再誤套成常駐 `DmgMod` 或固定傷害減免；PC 物理攻擊與玩家受傷減免流程已接入娃娃機率增傷 / 機率減傷，並補上回歸測試。

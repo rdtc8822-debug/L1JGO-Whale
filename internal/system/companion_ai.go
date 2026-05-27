@@ -243,9 +243,13 @@ func (s *CompanionAISystem) summonAttackTarget(sum *world.SummonInfo) {
 	if dmg < 1 {
 		dmg = 1
 	}
+	if npcDamageBlockedBySkm0LikeJava(targetNpc) {
+		dmg = 0
+	}
 
-	// 扣血
-	targetNpc.HP -= dmg
+	if dmg > 0 {
+		targetNpc.HP -= dmg
+	}
 	heading := calcNpcHeading(sum.X, sum.Y, targetNpc.X, targetNpc.Y)
 
 	// 廣播攻擊動畫
@@ -255,7 +259,7 @@ func (s *CompanionAISystem) summonAttackTarget(sum *world.SummonInfo) {
 
 	// 傷害歸屬主人（仇恨累加到主人 SessionID）
 	master := ws.GetByCharID(sum.OwnerCharID)
-	if master != nil {
+	if master != nil && dmg > 0 {
 		AddHate(targetNpc, master.SessionID, dmg)
 		sendCompanionHpMeter(master.Session, sum.ID, sum.HP, sum.MaxHP)
 	}
@@ -739,9 +743,13 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 	if dmg < 1 {
 		dmg = 1
 	}
+	if npcDamageBlockedBySkm0LikeJava(targetNpc) {
+		dmg = 0
+	}
 
-	// 扣血
-	targetNpc.HP -= dmg
+	if dmg > 0 {
+		targetNpc.HP -= dmg
+	}
 	heading := calcNpcHeading(pet.X, pet.Y, targetNpc.X, targetNpc.Y)
 
 	// 廣播攻擊動畫
@@ -751,12 +759,12 @@ func (s *CompanionAISystem) petAttackTarget(pet *world.PetInfo) {
 
 	// 傷害歸屬主人（仇恨累加到主人 SessionID）
 	master := ws.GetByCharID(pet.OwnerCharID)
-	if master != nil {
+	if master != nil && dmg > 0 {
 		AddHate(targetNpc, master.SessionID, dmg)
 	}
 
 	// NPC 反擊 — 簡化傷害計算
-	if targetNpc.HP > 0 {
+	if dmg > 0 && targetNpc.HP > 0 {
 		retalDmg := int32(targetNpc.Level) / 2
 		if retalDmg < 1 {
 			retalDmg = 1

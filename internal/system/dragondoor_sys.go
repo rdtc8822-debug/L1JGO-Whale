@@ -12,7 +12,6 @@ package system
 // 計時器以 tick 計數驅動（5 ticks ≈ 1 秒），Phase 3（PostUpdate）。
 
 import (
-	"math/rand"
 	"time"
 
 	coresys "github.com/l1jgo/server/internal/core/system"
@@ -160,9 +159,9 @@ func (s *DragonDoorSystem) SpawnKeeper(sess *net.Session, player *world.PlayerIn
 		return
 	}
 
-	// 計算生成座標（玩家附近 ±2）
-	x := player.X + int32(rand.Intn(5)) - 2
-	y := player.Y + int32(rand.Intn(5)) - 2
+	// 對齊 yiwei L1SpawnUtil.spawn(pc, npcID, 0, 7200)：r=0 時生成在玩家座標。
+	x := player.X
+	y := player.Y
 
 	// 解析動畫速度
 	atkSpeed := tmpl.AtkSpeed
@@ -198,7 +197,7 @@ func (s *DragonDoorSystem) SpawnKeeper(sess *net.Session, player *world.PlayerIn
 		X:                 x,
 		Y:                 y,
 		MapID:             player.MapID,
-		Heading:           int16(rand.Intn(8)),
+		Heading:           5,
 		HP:                tmpl.HP,
 		MaxHP:             tmpl.HP,
 		MP:                tmpl.MP,
@@ -224,6 +223,7 @@ func (s *DragonDoorSystem) SpawnKeeper(sess *net.Session, player *world.PlayerIn
 		AtkMagicSpeed:     tmpl.AtkMagicSpeed,
 		SubMagicSpeed:     tmpl.SubMagicSpeed,
 		MoveSpeed:         moveSpeed,
+		ShowID:            player.ShowID,
 		SpawnX:            x,
 		SpawnY:            y,
 		SpawnMapID:        player.MapID,
@@ -232,7 +232,7 @@ func (s *DragonDoorSystem) SpawnKeeper(sess *net.Session, player *world.PlayerIn
 	s.ws.AddNpc(npc)
 
 	// 廣播給附近玩家
-	nearby := s.ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+	nearby := s.ws.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
 	for _, viewer := range nearby {
 		handler.SendNpcPack(viewer.Session, npc)
 	}
@@ -314,7 +314,7 @@ func (s *DragonDoorSystem) tickWalkingKeeper(k *keeperEntry, npc *world.NpcInfo)
 // keeperArrived 門衛抵達目的地後的處理。
 // Java: 到達後 → 設定 heading → 死亡台詞 → 死亡動畫 → 刪除 → 開橋
 func (s *DragonDoorSystem) keeperArrived(k *keeperEntry, npc *world.NpcInfo) {
-	nearby := s.ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+	nearby := s.ws.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
 
 	// 設定 heading
 	npc.Heading = k.profile.heading
@@ -356,7 +356,7 @@ func (s *DragonDoorSystem) openBridge(npc *world.NpcInfo, bridgeID int32) {
 
 // removeKeeper 從世界中移除門衛 NPC 並廣播。
 func (s *DragonDoorSystem) removeKeeper(npc *world.NpcInfo) {
-	nearby := s.ws.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+	nearby := s.ws.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
 	rmData := handler.BuildRemoveObject(npc.ID)
 	handler.BroadcastToPlayers(nearby, rmData)
 

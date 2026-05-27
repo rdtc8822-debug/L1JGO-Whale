@@ -53,6 +53,7 @@ type InvItem struct {
 	UseType     byte
 	ChargeCount int16 // 魔杖充能次數（0=無限制或不適用；>0=剩餘使用次數）
 	Equipped    bool  // true if currently worn/wielded
+	LastUsedAt  int64 // delay_effect 專用上次使用時間（Unix 秒，0=未使用）
 
 	// Weapon durability: 0 = perfect, higher = more damaged (range 0-127).
 	// Effective enchant = EnchantLvl - Durability (Java: L1Attack line 328).
@@ -218,6 +219,9 @@ func PlayerMaxWeight(p *PlayerInfo) int32 {
 		base += 180
 	}
 	base += p.WeightBonus
+	if p.WeightBonusPct != 0 {
+		base = int32(int64(base) * int64(100+p.WeightBonusPct) / 100)
+	}
 	return base
 }
 

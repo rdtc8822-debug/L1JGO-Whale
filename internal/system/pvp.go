@@ -132,6 +132,7 @@ func (s *PvPSystem) HandlePvPAttack(attacker, target *world.PlayerInfo) {
 	damage = darkElfPhysicalDamage(attacker, damage, weaponType)
 	damage = elfMeleeDamage(attacker, damage, weaponType)
 	damage = braveAuraDamage(attacker, damage)
+	damage = applyDollRandomDamageAdd(attacker, damage)
 	damage = applyImmuneToHarmDamage(target, damage)
 	damage = applyReductionArmorDamage(target, damage, true)
 
@@ -333,6 +334,7 @@ func (s *PvPSystem) HandlePvPFarAttack(attacker, target *world.PlayerInfo) {
 	// 弓矢攻擊命中時 15% 機率 1.5x 傷害；DOUBLE_BREAK 由 doubleBreakChance("bow")=0 自然排除。
 	damage = darkElfPhysicalDamage(attacker, damage, "bow")
 	damage = braveAuraDamage(attacker, damage)
+	damage = applyDollRandomDamageAdd(attacker, damage)
 	damage = applyImmuneToHarmDamage(target, damage)
 	damage = applyReductionArmorDamage(target, damage, true)
 

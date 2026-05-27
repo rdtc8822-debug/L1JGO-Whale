@@ -400,6 +400,7 @@ func loadInventoryFromDB(player *world.PlayerInfo, deps *Deps) {
 				invItem.InnHall = row.InnHall
 				invItem.InnDueTime = row.InnDueTime
 				invItem.ChargeCount = row.ChargeCount
+				invItem.LastUsedAt = row.LastUsedAt
 				// 自動修復：migration 前的魔杖 ChargeCount=0（DB default），恢復為最大充能
 				if invItem.ChargeCount == 0 && itemInfo.MaxChargeCount > 0 {
 					invItem.ChargeCount = int16(itemInfo.MaxChargeCount)

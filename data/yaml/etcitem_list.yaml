@@ -35786,6 +35786,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47018
     name: 水龍之魔眼
@@ -35809,6 +35810,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47019
     name: 風龍之魔眼
@@ -35832,6 +35834,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47020
     name: 火龍之魔眼
@@ -35855,6 +35858,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47021
     name: 誕生之魔眼
@@ -35878,6 +35882,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47022
     name: 形象之魔眼
@@ -35901,6 +35906,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47023
     name: 生命之魔眼
@@ -35924,6 +35930,7 @@ items:
     tradeable: false
     delay_id: 0
     delay_time: 0
+    delay_effect: 3600
     food_volume: 0
   - item_id: 47024
     name: 死亡競賽之勝利碎片

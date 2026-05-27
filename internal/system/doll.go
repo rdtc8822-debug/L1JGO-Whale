@@ -82,7 +82,12 @@ func (s *DollSystem) UseDoll(sess *net.Session, player *world.PlayerInfo, invIte
 		case "hit":
 			doll.BonusHit += int16(p.Value)
 		case "dmg":
-			doll.BonusDmg += int16(p.Value)
+			if p.Chance > 0 {
+				doll.BonusDmgRandom += int16(p.Value)
+				doll.BonusDmgRandomChance += p.Chance
+			} else {
+				doll.BonusDmg += int16(p.Value)
+			}
 		case "bow_hit":
 			doll.BonusBowHit += int16(p.Value)
 		case "bow_dmg":
@@ -122,9 +127,13 @@ func (s *DollSystem) UseDoll(sess *net.Session, player *world.PlayerInfo, invIte
 		case "freeze_resist":
 			doll.BonusFreezeRes += int16(p.Value)
 		case "dmg_reduction":
-			// Java Doll_DmgDown — 受傷減免（目前僅追蹤至 EquipBonuses.DmgReduction；
-			// combat 對 DmgReduction 的讀取為獨立後續任務）。
-			doll.BonusDmgReduce += int16(p.Value)
+			if p.Chance > 0 {
+				doll.BonusDmgReduceRandom += int16(p.Value)
+				doll.BonusDmgReduceRandomChance += p.Chance
+			} else {
+				// Java Doll_DmgDown — 透過 DamageReductionByArmor 參與受傷減免。
+				doll.BonusDmgReduce += int16(p.Value)
+			}
 		case "weight":
 			// Java Doll_Weight — 額外負重上限。
 			doll.BonusWeight += int16(p.Value)
@@ -198,6 +207,8 @@ func (s *DollSystem) RemoveDollBonuses(player *world.PlayerInfo, doll *world.Dol
 func (s *DollSystem) applyDollBonuses(player *world.PlayerInfo, doll *world.DollInfo) {
 	player.AC += int16(doll.BonusAC)
 	player.DmgMod += int16(doll.BonusDmg)
+	player.DollDmgAdd += int16(doll.BonusDmgRandom)
+	player.DollDmgAddChance += doll.BonusDmgRandomChance
 	player.HitMod += int16(doll.BonusHit)
 	player.BowDmgMod += int16(doll.BonusBowDmg)
 	player.BowHitMod += int16(doll.BonusBowHit)
@@ -220,12 +231,16 @@ func (s *DollSystem) applyDollBonuses(player *world.PlayerInfo, doll *world.Doll
 	player.Cha += int16(doll.BonusCHA)
 	player.WeightBonus += int32(doll.BonusWeight)
 	player.EquipBonuses.DmgReduction += int(doll.BonusDmgReduce)
+	player.DollDmgReduceRandom += int16(doll.BonusDmgReduceRandom)
+	player.DollDmgReduceRandomChance += doll.BonusDmgReduceRandomChance
 }
 
 // removeDollBonuses 還原娃娃屬性加成。
 func (s *DollSystem) removeDollBonuses(player *world.PlayerInfo, doll *world.DollInfo) {
 	player.AC -= int16(doll.BonusAC)
 	player.DmgMod -= int16(doll.BonusDmg)
+	player.DollDmgAdd -= int16(doll.BonusDmgRandom)
+	player.DollDmgAddChance -= doll.BonusDmgRandomChance
 	player.HitMod -= int16(doll.BonusHit)
 	player.BowDmgMod -= int16(doll.BonusBowDmg)
 	player.BowHitMod -= int16(doll.BonusBowHit)
@@ -248,6 +263,8 @@ func (s *DollSystem) removeDollBonuses(player *world.PlayerInfo, doll *world.Dol
 	player.Cha -= int16(doll.BonusCHA)
 	player.WeightBonus -= int32(doll.BonusWeight)
 	player.EquipBonuses.DmgReduction -= int(doll.BonusDmgReduce)
+	player.DollDmgReduceRandom -= int16(doll.BonusDmgReduceRandom)
+	player.DollDmgReduceRandomChance -= doll.BonusDmgReduceRandomChance
 	// 限制 HP/MP 不超過最大值
 	if player.HP > player.MaxHP {
 		player.HP = player.MaxHP

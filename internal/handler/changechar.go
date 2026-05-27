@@ -7,6 +7,7 @@ import (
 	"github.com/l1jgo/server/internal/net"
 	"github.com/l1jgo/server/internal/net/packet"
 	"github.com/l1jgo/server/internal/persist"
+	"github.com/l1jgo/server/internal/world"
 	"go.uber.org/zap"
 )
 
@@ -42,11 +43,7 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 			partyLeaveMember(player, deps)
 		}
 
-		// Broadcast removal to nearby players
-		nearby := deps.World.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-		for _, other := range nearby {
-			SendRemoveObject(other.Session, player.CharID)
-		}
+		broadcastChangeCharRemoveObject(player, deps.World, sess.ID)
 
 		// Save full character state
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -162,6 +159,16 @@ func HandleChangeChar(sess *net.Session, _ *packet.Reader, deps *Deps) {
 	// 注意：不主動推送角色列表。
 	// Java 在此等待客戶端收到 LOGOUT 後自動發送 C_CommonClick (opcode 16)，
 	// 再由 HandleCommonClick 回應角色列表。
+}
+
+func broadcastChangeCharRemoveObject(player *world.PlayerInfo, ws *world.State, excludeSession uint64) {
+	if player == nil || ws == nil {
+		return
+	}
+	nearby := ws.GetNearbyPlayersInShow(player.X, player.Y, player.MapID, excludeSession, player.ShowID)
+	for _, other := range nearby {
+		SendRemoveObject(other.Session, player.CharID)
+	}
 }
 
 // sendPacketBoxLogout sends S_PacketBoxSelect (opcode 250) subcode 42 — 告知客戶端返回選角畫面。

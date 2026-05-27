@@ -173,3 +173,46 @@ func TestInputCleanupFollowerRespawnsOriginalNpcOnlySameShowLikeJava(t *testing.
 		t.Fatalf("yiwei follower deleteMe/respawn 可見性受 ShowID 約束，不同 ShowID 玩家不應收到還原原 NPC 顯示封包")
 	}
 }
+
+func TestInputDisconnectRemoveObjectBroadcastsOnlySameShowLikeJava(t *testing.T) {
+	ws := world.NewState()
+	player := addSkillTestPlayer(ws, &world.PlayerInfo{
+		CharID:    9501,
+		Name:      "leaver",
+		X:         100,
+		Y:         100,
+		MapID:     900,
+		ShowID:    77,
+		SessionID: 21,
+		Session:   newSkillTestSession(t, 21),
+	})
+	sameShow := addSkillTestPlayer(ws, &world.PlayerInfo{
+		CharID:    9502,
+		Name:      "same",
+		X:         101,
+		Y:         100,
+		MapID:     900,
+		ShowID:    77,
+		SessionID: 22,
+		Session:   newSkillTestSession(t, 22),
+	})
+	otherShow := addSkillTestPlayer(ws, &world.PlayerInfo{
+		CharID:    9503,
+		Name:      "other",
+		X:         101,
+		Y:         100,
+		MapID:     900,
+		ShowID:    88,
+		SessionID: 23,
+		Session:   newSkillTestSession(t, 23),
+	})
+
+	broadcastDisconnectRemoveObject(player, ws, player.SessionID)
+
+	if !hasRemoveObjectPacket(drainSkillTestPackets(sameShow.Session), player.CharID) {
+		t.Fatalf("同 ShowID 玩家應收到斷線玩家移除封包")
+	}
+	if hasRemoveObjectPacket(drainSkillTestPackets(otherShow.Session), player.CharID) {
+		t.Fatalf("yiwei logout/getRecognizePlayer 受 ShowID 約束，不同 ShowID 玩家不應收到斷線玩家移除封包")
+	}
+}

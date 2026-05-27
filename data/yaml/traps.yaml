@@ -6,6 +6,7 @@
   note: トラバサミ
   type: 1
   gfx_id: 1065
+  detectionable: true
   base: 10
   dice: 10
   dice_count: 1
@@ -13,6 +14,7 @@
   note: ヒール
   type: 2
   gfx_id: 1074
+  detectionable: false
   base: 10
   dice: 10
   dice_count: 1
@@ -20,6 +22,7 @@
   note: ダメージ毒
   type: 4
   gfx_id: 1066
+  detectionable: true
   poison_type: 1
   poison_delay: 0
   poison_time: 5000
@@ -28,6 +31,7 @@
   note: 沈黙毒
   type: 4
   gfx_id: 1066
+  detectionable: true
   poison_type: 2
   poison_delay: 0
   poison_time: 0
@@ -36,6 +40,7 @@
   note: 麻痺毒
   type: 4
   gfx_id: 1066
+  detectionable: true
   poison_type: 3
   poison_delay: 5000
   poison_time: 5000
@@ -44,6 +49,7 @@
   note: メテオ
   type: 1
   gfx_id: 1085
+  detectionable: true
   base: 10
   dice: 10
   dice_count: 1
@@ -51,6 +57,7 @@
   note: 針(横)
   type: 1
   gfx_id: 1070
+  detectionable: true
   base: 10
   dice: 10
   dice_count: 1
@@ -58,210 +65,245 @@
   note: TOI4Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45348
   monster_count: 2
 - trap_id: 9
   note: TOI8Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45407
   monster_count: 2
 - trap_id: 10
   note: TOI14Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45394
   monster_count: 2
 - trap_id: 11
   note: TOI18Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45406
   monster_count: 2
 - trap_id: 12
   note: TOI24Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45384
   monster_count: 2
 - trap_id: 13
   note: TOI28Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45471
   monster_count: 2
 - trap_id: 14
   note: TOI34Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45403
   monster_count: 2
 - trap_id: 15
   note: TOI38Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45455
   monster_count: 2
 - trap_id: 16
   note: TOI44Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45514
   monster_count: 2
 - trap_id: 17
   note: TOI48Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45522
   monster_count: 2
 - trap_id: 18
   note: TOI54Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45524
   monster_count: 2
 - trap_id: 19
   note: TOI64Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45528
   monster_count: 2
 - trap_id: 20
   note: TOI74Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45503
   monster_count: 2
 - trap_id: 21
   note: TOI78Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45532
   monster_count: 2
 - trap_id: 22
   note: TOI84Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45586
   monster_count: 2
 - trap_id: 23
   note: TOI94Fモンスター
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45621
   monster_count: 2
 - trap_id: 24
   note: IT4Fアイアンゴーレム
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45372
   monster_count: 2
 - trap_id: 25
   note: IT4Fミミック
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45141
   monster_count: 2
 - trap_id: 26
   note: IT4Fリビングアーマー
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45322
   monster_count: 2
 - trap_id: 27
   note: IT5Fアイアンゴーレム
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45372
   monster_count: 3
 - trap_id: 28
   note: IT5Fミミック
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45141
   monster_count: 3
 - trap_id: 29
   note: IT5Fリビングアーマー
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45322
   monster_count: 3
 - trap_id: 30
   note: IT6Fシルエット
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45162
   monster_count: 3
 - trap_id: 31
   note: IT6Fデス
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45221
   monster_count: 3
 - trap_id: 32
   note: IT7Fシルエット
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45162
   monster_count: 4
 - trap_id: 33
   note: IT7Fデス
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45221
   monster_count: 4
 - trap_id: 34
   note: IT8Fアイアンゴーレム
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45372
   monster_count: 5
 - trap_id: 35
   note: IT8Fシルエット
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45162
   monster_count: 5
 - trap_id: 36
   note: IT8Fデス
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45221
   monster_count: 5
 - trap_id: 37
   note: IT8Fリビングアーマー
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 45322
   monster_count: 5
 - trap_id: 38
   note: フランコ迷路ラバーボーン ソルジャー
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 46057
   monster_count: 4
 - trap_id: 39
   note: フランコ迷路ラバーボーン  アーチャー
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 46058
   monster_count: 4
 - trap_id: 40
   note: フランコ迷路ラバーボーン  ヘッド
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 46059
   monster_count: 4
 - trap_id: 41
   note: フランコ迷路ラバーボーン  ナイフ
   type: 3
   gfx_id: 0
+  detectionable: false
   monster_npc_id: 46056
   monster_count: 4
 - trap_id: 42
   note: フランコ迷路スタート地点
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32679
   teleport_y: 32742
   teleport_map_id: 482
@@ -269,6 +311,7 @@
   note: ディエゴの閉ざされた牢スタート地点
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32736
   teleport_y: 32800
   teleport_map_id: 483
@@ -276,30 +319,35 @@
   note: お化け屋敷パラライズ
   type: 5
   gfx_id: 0
+  detectionable: false
   skill_id: 33
   skill_time: 0
 - trap_id: 45
   note: お化け屋敷ブラインド
   type: 5
   gfx_id: 0
+  detectionable: false
   skill_id: 20
   skill_time: 5
 - trap_id: 46
   note: お化け屋敷スロー
   type: 5
   gfx_id: 0
+  detectionable: false
   skill_id: 29
   skill_time: 5
 - trap_id: 47
   note: お化け屋敷ヘイスト
   type: 5
   gfx_id: 0
+  detectionable: false
   skill_id: 43
   skill_time: 5
 - trap_id: 48
   note: お化け屋敷テレポート
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32730
   teleport_y: 32829
   teleport_map_id: 5140
@@ -307,6 +355,7 @@
   note: お化け屋敷テレポート
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32749
   teleport_y: 32813
   teleport_map_id: 5140
@@ -314,6 +363,7 @@
   note: お化け屋敷テレポート
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32747
   teleport_y: 32867
   teleport_map_id: 5140
@@ -321,6 +371,7 @@
   note: お化け屋敷テレポート
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32785
   teleport_y: 32819
   teleport_map_id: 5140
@@ -328,6 +379,7 @@
   note: お化け屋敷テレポート
   type: 6
   gfx_id: 0
+  detectionable: false
   teleport_x: 32797
   teleport_y: 32869
   teleport_map_id: 5140

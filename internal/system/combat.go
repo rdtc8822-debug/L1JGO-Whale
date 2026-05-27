@@ -209,7 +209,7 @@ func (s *CombatSystem) processMeleeAttack(sessID uint64, targetID int32) *handle
 		damage = 0
 	}
 	nearby := ws.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
-	if damage > 0 && npcHasAbsoluteBarrierDamageZeroLikeJava(npc) {
+	if damage > 0 && npcDamageBlockedBySkm0LikeJava(npc) {
 		damage = 0
 	}
 	if s.tryNpcCounterBarrierAgainstPlayerLikeJava(player, npc, weaponType, damage, nearby) {
@@ -227,6 +227,7 @@ func (s *CombatSystem) processMeleeAttack(sessID uint64, targetID int32) *handle
 	damage = darkElfPhysicalDamage(player, damage, weaponType)
 	damage = elfMeleeDamage(player, damage, weaponType)
 	damage = braveAuraDamage(player, damage)
+	damage = applyDollRandomDamageAdd(player, damage)
 
 	// 取附近玩家用於廣播
 	// 燃燒擊砍（182）：一次性 +10 + 廣播 S_EffectLocation + 消耗 buff（Java L1AttackPc.calcBuffDamage:2434-2438）
@@ -561,11 +562,15 @@ func (s *CombatSystem) processRangedAttackForPlayer(player *world.PlayerInfo, ta
 	if !result.IsHit {
 		damage = 0
 	}
+	if damage > 0 && npcDamageBlockedBySkm0LikeJava(npc) {
+		damage = 0
+	}
 	damage = strikerGaleRangedDamageToNpc(npc, damage)
 	// 黑妖燃燒鬥志（102）：Java L1AttackPc.BuffDmgUp 在 calcNpcDamage 涵蓋近戰與遠程，
 	// 弓矢攻擊命中時 15% 機率 1.5x 傷害；DOUBLE_BREAK 由 doubleBreakChance("bow")=0 自然排除。
 	damage = darkElfPhysicalDamage(player, damage, "bow")
 	damage = braveAuraDamage(player, damage)
+	damage = applyDollRandomDamageAdd(player, damage)
 
 	nearby := ws.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, sessID, npc.ShowID)
 

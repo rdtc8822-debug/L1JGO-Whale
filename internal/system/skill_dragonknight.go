@@ -257,7 +257,7 @@ func mortalBodyReflectFromNpc(target *world.PlayerInfo, npc *world.NpcInfo, dama
 	if npc.HasDebuff(immuneToHarmSkillID) {
 		reflectDmg /= 2
 	}
-	if reflectDmg > 0 {
+	if reflectDmg > 0 && !npcDamageBlockedBySkm0LikeJava(npc) {
 		npc.HP -= reflectDmg
 		if npc.HP < 0 {
 			npc.HP = 0
@@ -336,6 +336,9 @@ func (s *SkillSystem) calcFoeSlayerPlayerHitDamage(caster, target *world.PlayerI
 }
 
 func (s *SkillSystem) calcFoeSlayerNpcHitDamage(caster *world.PlayerInfo, npc *world.NpcInfo) int32 {
+	if npcDamageBlockedBySkm0LikeJava(npc) {
+		return 0
+	}
 	if s.deps == nil || s.deps.Scripting == nil {
 		return 0
 	}
@@ -409,6 +412,9 @@ func (s *SkillSystem) applyFoeSlayerPlayerDamage(sess *net.Session, caster, targ
 
 func (s *SkillSystem) applyFoeSlayerNpcDamage(sess *net.Session, caster *world.PlayerInfo, npc *world.NpcInfo, damage int32, nearby []*world.PlayerInfo) {
 	if damage <= 0 || npc.Dead {
+		return
+	}
+	if npcDamageBlockedBySkm0LikeJava(npc) {
 		return
 	}
 	// 副本武器需求檢查（火龍窟「必須裝備真死亡騎士烈炎之劍」）：FoeSlayer 龍騎士魔法傷害同樣受限。

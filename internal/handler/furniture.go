@@ -90,6 +90,12 @@ func spawnFurnitureNpc(sess *net.Session, player *world.PlayerInfo, itemObjID, n
 		deps.Log.Warn("家具 NPC 模板不存在", zap.Int32("npcID", npcTemplateID))
 		return
 	}
+	x, y := player.X, player.Y
+	if player.Heading == 0 {
+		y--
+	} else if player.Heading == 2 {
+		x++
+	}
 
 	npc := &world.NpcInfo{
 		ID:                 world.NextNpcID(),
@@ -99,14 +105,15 @@ func spawnFurnitureNpc(sess *net.Session, player *world.PlayerInfo, itemObjID, n
 		Name:               tmpl.Name,
 		NameID:             tmpl.NameID,
 		Level:              tmpl.Level,
-		X:                  player.X,
-		Y:                  player.Y,
+		X:                  x,
+		Y:                  y,
 		MapID:              player.MapID,
-		Heading:            player.Heading,
+		Heading:            0,
 		HP:                 tmpl.HP,
 		MaxHP:              tmpl.HP,
 		MP:                 tmpl.MP,
 		MaxMP:              tmpl.MP,
+		ShowID:             player.ShowID,
 		FurnitureItemObjID: itemObjID,
 		RespawnDelay:       0, // 不重生
 	}
@@ -114,8 +121,7 @@ func spawnFurnitureNpc(sess *net.Session, player *world.PlayerInfo, itemObjID, n
 	deps.World.AddNpc(npc)
 	deps.World.AddFurnitureNpc(itemObjID, npc.ID)
 
-	// 廣播給附近玩家
-	nearby := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+	nearby := deps.World.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
 	for _, viewer := range nearby {
 		SendNpcPack(viewer.Session, npc)
 	}
@@ -135,8 +141,7 @@ func removeFurnitureNpc(npcObjID, itemObjID int32, deps *Deps) {
 		return
 	}
 
-	// 廣播移除
-	nearby := deps.World.GetNearbyPlayersAt(npc.X, npc.Y, npc.MapID)
+	nearby := deps.World.GetNearbyPlayersInShow(npc.X, npc.Y, npc.MapID, 0, npc.ShowID)
 	removeData := BuildRemoveObject(npc.ID)
 	BroadcastToPlayers(nearby, removeData)
 

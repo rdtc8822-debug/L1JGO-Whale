@@ -26,16 +26,18 @@ func processWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 
 	// 特殊武器優先（硬編碼，與 Java 一致）
 	switch weaponItemID {
-	case 121: // 乙乙乙巫師杖 Baphomet Staff
+	case 124: // 巴風特魔杖 Baphomet Staff
 		return processBaphometStaff(player, npc, nearby, deps)
 	case 2: // 骰子匕首 Dice Dagger
 		return processDiceDagger(player, npc, nearby, deps)
-	case 270, 290: // 奇鍛古 Kiringku
+	case 270: // 奇古獸 Kiringku
 		return processKiringku(player, npc, weaponItemID, nearby, deps)
-	case 263, 287: // 冰矛 Freezing Lancer
+	case 263: // 酷寒之矛 Freezing Lancer
 		return processAreaSkillWeapon(player, npc, weaponItemID, nearby, deps)
 	case 260: // 狂風之劍 Raging Wind
 		return processAreaSkillWeapon(player, npc, weaponItemID, nearby, deps)
+	case 264: // 雷雨之劍 Lightning Edge
+		return processLightningEdge(player, npc, nearby, deps)
 	}
 
 	ws := deps.WeaponSkills.Get(weaponItemID)
@@ -105,9 +107,12 @@ func processWeaponSkillProc(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 // 以主目標為中心，對範圍內其他 NPC 造成傷害。
 // Java: L1WeaponSkill 的 area 迴圈邏輯。
 func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInfo, baseDmg float64, area int, attr int, nearby []*world.PlayerInfo, deps *handler.Deps) {
+	processWeaponSkillAoEFrom(player, primaryTarget.X, primaryTarget.Y, primaryTarget.MapID, primaryTarget, baseDmg, area, attr, nearby, deps)
+}
+
+func processWeaponSkillAoEFrom(player *world.PlayerInfo, centerX, centerY int32, mapID int16, primaryTarget *world.NpcInfo, baseDmg float64, area int, attr int, nearby []*world.PlayerInfo, deps *handler.Deps) {
 	ws := deps.World
-	// 以主目標為中心，取範圍內的 NPC
-	npcs := ws.GetNearbyNpcs(primaryTarget.X, primaryTarget.Y, primaryTarget.MapID)
+	npcs := ws.GetNearbyNpcs(centerX, centerY, mapID)
 
 	for _, target := range npcs {
 		// 排除主目標（由主攻擊處理）和已死亡的
@@ -115,7 +120,7 @@ func processWeaponSkillAoE(player *world.PlayerInfo, primaryTarget *world.NpcInf
 			continue
 		}
 		// 距離檢查
-		dist := chebyshevDist(primaryTarget.X, primaryTarget.Y, target.X, target.Y)
+		dist := chebyshevDist(centerX, centerY, target.X, target.Y)
 		if area > 0 && dist > int32(area) {
 			continue
 		}
@@ -245,7 +250,7 @@ func isNpcFrozen(npc *world.NpcInfo) bool {
 
 // --- 特殊武器處理 ---
 
-// processBaphometStaff 乙乙乙巫師杖（item 121）：14% 觸發，(INT+SP)*1.8 傷害，地屬性。
+// processBaphometStaff 巴風特魔杖（item 124）：14% 觸發，(INT+SP)*1.8 傷害，地屬性。
 // Java: L1WeaponSkill.getBaphometStaffDamage()
 func processBaphometStaff(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
 	if world.RandInt(100)+1 > 14 {
@@ -282,11 +287,6 @@ func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*w
 		return 0
 	}
 
-	dmg := npc.HP * 2 / 3
-	if npc.HP-dmg < 0 {
-		dmg = 0
-	}
-
 	// 消耗武器（Java: removeItem(weapon, 1)）
 	wpn := player.Equip.Weapon()
 	if wpn != nil {
@@ -296,7 +296,8 @@ func processDiceDagger(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*w
 		handler.SendServerMessage(player.Session, 158) // "%0 消失了。"
 	}
 
-	return dmg
+	// yiwei W_SK001 只對 L1PcInstance 套用毀滅性傷害；NPC 目標只會觸發武器消失。
+	return 0
 }
 
 // processKiringku 奇鍛古（item 270/290）：固定觸發，2D5+value * INT 係數。
@@ -352,6 +353,33 @@ func processKiringku(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID 
 	return int32(dmg)
 }
 
+// processLightningEdge 雷雨之劍（item 264）：4% 觸發，INT/SP 係數傷害，風屬性。
+func processLightningEdge(player *world.PlayerInfo, npc *world.NpcInfo, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
+	if world.RandInt(100)+1 > 4 {
+		return 0
+	}
+	if isNpcFrozen(npc) {
+		return 0
+	}
+
+	sp := calcPlayerSPLikeJava(player)
+	intel := int(player.Intel)
+	if intel+sp <= 0 {
+		return 0
+	}
+	dmg := float64(intel+sp)*2.0 + float64(world.RandInt(intel+sp))*2.0
+
+	for _, viewer := range nearby {
+		handler.SendSkillEffect(viewer.Session, npc.ID, 10)
+	}
+
+	dmg = calcWeaponSkillDmgReduction(player, npc, dmg, attrWind)
+	if dmg < 0 {
+		dmg = 0
+	}
+	return int32(dmg)
+}
+
 // processAreaSkillWeapon 冰矛/狂風之劍等特殊 AoE 武器。
 // Java: L1WeaponSkill.getAreaSkillWeaponDamage()
 func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weaponItemID int32, nearby []*world.PlayerInfo, deps *handler.Deps) int32 {
@@ -362,7 +390,7 @@ func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 	var effectID int32
 
 	switch weaponItemID {
-	case 263, 287: // 冰矛 Freezing Lancer
+	case 263: // 酷寒之矛 Freezing Lancer
 		probability = 5
 		attr = attrWater
 		area = 3
@@ -403,7 +431,11 @@ func processAreaSkillWeapon(player *world.PlayerInfo, npc *world.NpcInfo, weapon
 	}
 
 	// AoE 傷害
-	processWeaponSkillAoE(player, npc, dmg, area, attr, nearby, deps)
+	centerX, centerY, mapID := npc.X, npc.Y, npc.MapID
+	if weaponItemID == 260 {
+		centerX, centerY, mapID = player.X, player.Y, player.MapID
+	}
+	processWeaponSkillAoEFrom(player, centerX, centerY, mapID, npc, dmg, area, attr, nearby, deps)
 
 	// 主目標減傷
 	dmg = calcWeaponSkillDmgReduction(player, npc, dmg, attr)

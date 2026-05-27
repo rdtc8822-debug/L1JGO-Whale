@@ -10,13 +10,50 @@ import (
 
 const (
 	npcAbsoluteBarrierSkillID = int32(78)
+	npcIceLanceSkillID        = int32(50)
+	npcEarthBindSkillID       = int32(157)
+	npcFreezingBlizzardID     = int32(80)
+	dragonEyeFafurionSkillID  = int32(6685)
+	dragonEyeLifeSkillID      = int32(6687)
+	dragonEyeBirthSkillID     = int32(6688)
+	dragonEyeFigureSkillID    = int32(6689)
+	dragonEyeReductionGfxID   = int32(6320)
 	skillTypeChange           = 2
 	skillTypeRestore          = 32
 	skillFinalBurn            = int32(108)
 )
 
-func npcHasAbsoluteBarrierDamageZeroLikeJava(npc *world.NpcInfo) bool {
-	return npc != nil && npc.HasDebuff(npcAbsoluteBarrierSkillID)
+func npcDamageBlockedBySkm0LikeJava(npc *world.NpcInfo) bool {
+	return npc != nil &&
+		(npc.HasDebuff(npcAbsoluteBarrierSkillID) ||
+			npc.HasDebuff(npcIceLanceSkillID) ||
+			npc.HasDebuff(npcEarthBindSkillID) ||
+			npc.HasDebuff(npcFreezingBlizzardID))
+}
+
+func playerDamageBlockedBySkm0LikeJava(player *world.PlayerInfo) bool {
+	return player != nil &&
+		(player.AbsoluteBarrier ||
+			player.HasBuff(npcIceLanceSkillID) ||
+			player.HasBuff(npcEarthBindSkillID) ||
+			player.HasBuff(npcFreezingBlizzardID))
+}
+
+func applyDragonEyeMagicDamageReductionLikeYiwei(target *world.PlayerInfo, damage int32, roll int, nearby []*world.PlayerInfo) int32 {
+	if target == nil || damage <= 0 || roll >= 10 {
+		return damage
+	}
+	if !target.HasBuff(dragonEyeFafurionSkillID) &&
+		!target.HasBuff(dragonEyeLifeSkillID) &&
+		!target.HasBuff(dragonEyeBirthSkillID) &&
+		!target.HasBuff(dragonEyeFigureSkillID) {
+		return damage
+	}
+	damage /= 2
+	if len(nearby) > 0 {
+		handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(target.CharID, dragonEyeReductionGfxID))
+	}
+	return damage
 }
 
 func (s *SkillSystem) applyNpcKirtasMirrorMagicDamageLikeJava(attacker *world.PlayerInfo, npc *world.NpcInfo, damage int32, nearby []*world.PlayerInfo) int32 {
@@ -215,6 +252,7 @@ func (s *SkillSystem) applySkillDamageToPlayer(sess *net.Session, player, target
 	}
 	dmg = applyImmuneToHarmDamage(target, dmg)
 	dmg = applyReductionArmorDamage(target, dmg, false)
+	dmg = applyDragonEyeMagicDamageReductionLikeYiwei(target, dmg, world.RandInt(100), nearby)
 	dmg = s.applyCounterMirrorMagicDamage(player, target, dmg, world.RandInt(100), nearby)
 
 	gfxID := int32(skill.CastGfx)
@@ -303,7 +341,7 @@ func (s *SkillSystem) applyAreaSkillDamageToNpc(sess *net.Session, player *world
 	if npcRejectsDamageWhileHiddenLikeJava(npc) {
 		dmg = 0
 	}
-	if dmg > 0 && npcHasAbsoluteBarrierDamageZeroLikeJava(npc) {
+	if dmg > 0 && npcDamageBlockedBySkm0LikeJava(npc) {
 		dmg = 0
 	}
 	if dmg > 0 && !(skill.DamageValue == 0 && skill.DamageDice == 0) {
@@ -687,7 +725,7 @@ func (s *SkillSystem) executeAttackSkill(sess *net.Session, player *world.Player
 			if blockDmg || npcRejectsDamageWhileHiddenLikeJava(t.npc) {
 				dmg = 0
 			}
-			if dmg > 0 && npcHasAbsoluteBarrierDamageZeroLikeJava(t.npc) {
+			if dmg > 0 && npcDamageBlockedBySkm0LikeJava(t.npc) {
 				dmg = 0
 			}
 			if dmg > 0 && !isPhysicalSkill {

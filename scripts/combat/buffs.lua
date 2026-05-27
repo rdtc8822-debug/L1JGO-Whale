@@ -6,11 +6,14 @@
 --   ac, str, dex, con, wis, intel, cha
 --   max_hp, max_mp, hit_mod, dmg_mod, sp, mr, hpr, mpr
 --   bow_hit, bow_dmg, dodge
+--   weight_pct
 --   fire_res, water_res, wind_res, earth_res
 --   exclusions = {skill_ids to remove first}
 --   move_speed = 1(haste) / 2(slow)
 --   brave_speed = 4(brave/holy walk)
 --   invisible, paralyzed, sleeped = true
+
+local DRAGON_EYE_EXCLUSIONS = {6683, 6684, 6685, 6686, 6687, 6688, 6689}
 
 BUFF_DEFS = {
     -- ==================== Wizard Spells (1-80) ====================
@@ -179,15 +182,24 @@ BUFF_DEFS = {
 
     [219] = { dmg_mod = 10, bow_dmg = 10 },                                  -- Illusion Avatar（Java skillmode/ILLUSION_AVATAR.java:28-31 only addDmgup(+10)+addBowDmgup(+10)+setAvatar；無 REPEATEDSKILLS 互斥群——Java 允許四個 illusion buff 並存。setAvatar 用於 dmg-=(dmg*Avatar/100) 但 Java default ILLUSION_AVATAR_DAMAGE=1 → 整數除 1/100=0 等同 dead-code，Go 不實作）
 
+    -- ==================== ADLV80 龍副本祝福 (4009/4010/4018) ====================
+
+    [4009] = { hpr = 3, mpr = 3, max_hp = 100, max_mp = 50, earth_res = 30,
+               dmg_mod = 1, bow_dmg = 1, hit_mod = 5, bow_hit = 5, weight_pct = 4 }, -- 卡瑞的祝福（地龍副本）
+    [4010] = { hpr = 8, mpr = 1, max_hp = 80, max_mp = 10, bow_hit = 6,
+               bow_dmg = 3, water_res = 30, ac = -8 },                       -- 莎爾的祝福（水龍副本）
+    [4018] = { dex = 5, bow_hit = 7, bow_dmg = 5, hpr = 10, mpr = 3,
+               max_hp = 100, max_mp = 40, wind_res = 30, mr = 15 },          -- 甘特的祝福（風龍副本）
+
     -- ==================== Dragon Eye 龍之眼 (6683-6689) ====================
 
-    [6683] = { dmg_mod = 2, regist_stun = 3 },                               -- 火龍之眼（Valakas）
-    [6684] = { regist_stone = 3, dodge = 1 },                                 -- 地龍之眼（Antharas）
-    [6685] = { regist_freeze = 3 },                                           -- 水龍之眼（Fafurion）
-    [6686] = { regist_sleep = 3, magic_critical = 2 },                        -- 風龍之眼（Lindvior）
-    [6687] = { dmg_mod = 2, dodge = 1, magic_critical = 2 },                  -- 生命之眼（Life）
-    [6688] = { regist_blind = 3, dodge = 1 },                                 -- 誕生之眼（Birth）
-    [6689] = { regist_sustain = 3, magic_critical = 2, dodge = 1 },           -- 形象之眼（Figure）
+    [6683] = { dmg_mod = 2, regist_stun = 3, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 火龍之眼（Valakas）
+    [6684] = { regist_stone = 3, dodge = 1, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 地龍之眼（Antharas）
+    [6685] = { regist_freeze = 3, exclusions = DRAGON_EYE_EXCLUSIONS },       -- 水龍之眼（Fafurion）
+    [6686] = { regist_sleep = 3, magic_critical = 2, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 風龍之眼（Lindvior）
+    [6687] = { dmg_mod = 2, dodge = 1, magic_critical = 2, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 生命之眼（Life）
+    [6688] = { regist_blind = 3, dodge = 1, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 誕生之眼（Birth）
+    [6689] = { regist_sustain = 3, magic_critical = 2, dodge = 1, exclusions = DRAGON_EYE_EXCLUSIONS }, -- 形象之眼（Figure）
 }
 
 ---------------------------------------------------------------------

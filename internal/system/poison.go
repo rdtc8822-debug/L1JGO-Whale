@@ -7,6 +7,8 @@ import (
 	"github.com/l1jgo/server/internal/world"
 )
 
+const poisonTickMillis = 200
+
 // --- 毒系統（Java L1DamagePoison / L1SilencePoison / L1ParalysisPoison）---
 //
 // PoisonType 值：
@@ -49,9 +51,13 @@ func TickPlayerPoison(p *world.PlayerInfo, deps *handler.Deps) {
 			CurePoison(p, deps)
 			return
 		}
-		// 每 15 tick（3 秒）扣血（NPC攻擊:20, 毒咒:5）
+		// 每 15 tick（3 秒）扣血（NPC攻擊:20, 毒咒:5）；陷阱可帶自己的 damageSpan。
 		p.PoisonDmgTimer++
-		if p.PoisonDmgTimer >= 15 {
+		interval := p.PoisonDmgIntervalTicks
+		if interval <= 0 {
+			interval = 15
+		}
+		if p.PoisonDmgTimer >= interval {
 			p.PoisonDmgTimer = 0
 			dmg := int32(20)
 			if p.PoisonDmgAmount > 0 {
@@ -76,7 +82,12 @@ func TickPlayerPoison(p *world.PlayerInfo, deps *handler.Deps) {
 		if p.PoisonTicksLeft <= 0 {
 			// 進入階段二：真正麻痺
 			p.PoisonType = 4
-			p.PoisonTicksLeft = 80 // 16 秒 = 80 ticks
+			duration := p.PoisonParalysisTicks
+			if duration <= 0 {
+				duration = 80
+			}
+			p.PoisonTicksLeft = duration
+			p.PoisonParalysisTicks = 0
 			p.Paralyzed = true
 			// 視覺：綠色→灰色
 			broadcastPlayerPoison(p, 2, deps) // 灰色
@@ -138,7 +149,9 @@ func CurePoison(p *world.PlayerInfo, deps *handler.Deps) {
 	p.PoisonType = 0
 	p.PoisonTicksLeft = 0
 	p.PoisonDmgTimer = 0
+	p.PoisonDmgIntervalTicks = 0
 	p.PoisonDmgAmount = 0
+	p.PoisonParalysisTicks = 0
 	p.PoisonAttacker = 0
 
 	// 清除色調
@@ -224,8 +237,13 @@ func applySilencePoisonToPlayer(target *world.PlayerInfo, deps *handler.Deps) {
 // applyParalysisPoisonToPlayer 對玩家施加麻痺毒延遲階段（20 秒延遲後麻痺 16 秒）。
 // Java: L1ParalysisPoison.doInfection(target, 20000, 16000)。
 func applyParalysisPoisonToPlayer(target *world.PlayerInfo, deps *handler.Deps) {
+	applyParalysisPoisonToPlayerWithTiming(target, 20000, 16000, deps)
+}
+
+func applyParalysisPoisonToPlayerWithTiming(target *world.PlayerInfo, delayMillis, timeMillis int32, deps *handler.Deps) {
 	target.PoisonType = 3 // 階段一：延遲中
-	target.PoisonTicksLeft = 100
+	target.PoisonTicksLeft = poisonTicksFromMillis(delayMillis, 100)
+	target.PoisonParalysisTicks = poisonTicksFromMillis(timeMillis, 80)
 	broadcastPlayerPoison(target, 1, deps)
 	handler.SendServerMessage(target.Session, 212) // "你的身體漸漸麻痺。"
 }
@@ -253,16 +271,32 @@ func applyEnchantVenomPoisonToNpcWithRoll(attacker *world.PlayerInfo, npc *world
 }
 
 func applyDamagePoisonToPlayer(target *world.PlayerInfo, attackerSID uint64, amount int16, deps *handler.Deps) bool {
+	return applyDamagePoisonToPlayerWithInterval(target, attackerSID, amount, 3000, deps)
+}
+
+func applyDamagePoisonToPlayerWithInterval(target *world.PlayerInfo, attackerSID uint64, amount int16, damageSpanMillis int32, deps *handler.Deps) bool {
 	if !canApplyPoisonToPlayer(target) {
 		return false
 	}
 	target.PoisonType = 1
 	target.PoisonTicksLeft = 150
 	target.PoisonDmgTimer = 0
+	target.PoisonDmgIntervalTicks = poisonTicksFromMillis(damageSpanMillis, 15)
 	target.PoisonDmgAmount = amount
 	target.PoisonAttacker = attackerSID
 	broadcastPlayerPoison(target, 1, deps)
 	return true
+}
+
+func poisonTicksFromMillis(milliseconds int32, fallback int) int {
+	if milliseconds <= 0 {
+		return fallback
+	}
+	ticks := int(milliseconds) / poisonTickMillis
+	if ticks <= 0 {
+		return 1
+	}
+	return ticks
 }
 
 func applyDamagePoisonToNpc(npc *world.NpcInfo, attackerSID uint64, amount int32, deps *handler.Deps) bool {

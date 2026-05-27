@@ -378,6 +378,7 @@ type BuffEffect struct {
 	SP, MR                               int
 	HPR, MPR                             int
 	BowHit, BowDmg                       int
+	WeightPct                            int
 	Dodge                                int
 	FireRes, WaterRes, WindRes, EarthRes int
 	RegistSustain, RegistFreeze          int
@@ -439,6 +440,7 @@ func (e *Engine) GetBuffEffect(skillID, targetLevel int) *BuffEffect {
 		MPR:           lInt(rt, "mpr"),
 		BowHit:        lInt(rt, "bow_hit"),
 		BowDmg:        lInt(rt, "bow_dmg"),
+		WeightPct:     lInt(rt, "weight_pct"),
 		Dodge:         lInt(rt, "dodge"),
 		RegistSustain: lInt(rt, "regist_sustain"),
 		RegistFreeze:  lInt(rt, "regist_freeze"),

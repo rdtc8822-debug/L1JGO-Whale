@@ -24,6 +24,7 @@ type WarehouseItem struct {
 	InnNpcID         int32
 	InnHall          bool
 	InnDueTime       int64
+	LastUsedAt       int64
 }
 
 type WarehouseRepo struct {
@@ -39,7 +40,7 @@ func (r *WarehouseRepo) Load(ctx context.Context, accountName string, whType int
 	rows, err := r.db.Pool.Query(ctx,
 		`SELECT id, account_name, char_name, wh_type, item_id, count, enchant_lvl, bless, identified,
 			item_obj_id, charge_count, durability, attr_enchant_kind, attr_enchant_level,
-			inn_key_id, inn_npc_id, inn_hall, inn_due_time
+			inn_key_id, inn_npc_id, inn_hall, inn_due_time, last_used_at
 		 FROM warehouse_items WHERE account_name = $1 AND wh_type = $2`, accountName, whType,
 	)
 	if err != nil {
@@ -54,7 +55,7 @@ func (r *WarehouseRepo) Load(ctx context.Context, accountName string, whType int
 			&it.ID, &it.AccountName, &it.CharName, &it.WhType,
 			&it.ItemID, &it.Count, &it.EnchantLvl, &it.Bless, &it.Identified,
 			&it.ItemObjID, &it.ChargeCount, &it.Durability, &it.AttrEnchantKind, &it.AttrEnchantLevel,
-			&it.InnKeyID, &it.InnNpcID, &it.InnHall, &it.InnDueTime,
+			&it.InnKeyID, &it.InnNpcID, &it.InnHall, &it.InnDueTime, &it.LastUsedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -70,13 +71,13 @@ func (r *WarehouseRepo) Deposit(ctx context.Context, item WarehouseItem) (int32,
 		`INSERT INTO warehouse_items (
 			account_name, char_name, wh_type, item_id, count, enchant_lvl, bless, identified,
 			item_obj_id, charge_count, durability, attr_enchant_kind, attr_enchant_level,
-			inn_key_id, inn_npc_id, inn_hall, inn_due_time
+			inn_key_id, inn_npc_id, inn_hall, inn_due_time, last_used_at
 		)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING id`,
 		item.AccountName, item.CharName, item.WhType, item.ItemID, item.Count,
 		item.EnchantLvl, item.Bless, item.Identified,
 		item.ItemObjID, item.ChargeCount, item.Durability, item.AttrEnchantKind, item.AttrEnchantLevel,
-		item.InnKeyID, item.InnNpcID, item.InnHall, item.InnDueTime,
+		item.InnKeyID, item.InnNpcID, item.InnHall, item.InnDueTime, item.LastUsedAt,
 	).Scan(&id)
 	return id, err
 }
@@ -115,7 +116,7 @@ func (r *WarehouseRepo) LoadByCharName(ctx context.Context, charName string, whT
 	rows, err := r.db.Pool.Query(ctx,
 		`SELECT id, account_name, char_name, wh_type, item_id, count, enchant_lvl, bless, identified,
 			item_obj_id, charge_count, durability, attr_enchant_kind, attr_enchant_level,
-			inn_key_id, inn_npc_id, inn_hall, inn_due_time
+			inn_key_id, inn_npc_id, inn_hall, inn_due_time, last_used_at
 		 FROM warehouse_items WHERE char_name = $1 AND wh_type = $2`, charName, whType,
 	)
 	if err != nil {
@@ -130,7 +131,7 @@ func (r *WarehouseRepo) LoadByCharName(ctx context.Context, charName string, whT
 			&it.ID, &it.AccountName, &it.CharName, &it.WhType,
 			&it.ItemID, &it.Count, &it.EnchantLvl, &it.Bless, &it.Identified,
 			&it.ItemObjID, &it.ChargeCount, &it.Durability, &it.AttrEnchantKind, &it.AttrEnchantLevel,
-			&it.InnKeyID, &it.InnNpcID, &it.InnHall, &it.InnDueTime,
+			&it.InnKeyID, &it.InnNpcID, &it.InnHall, &it.InnDueTime, &it.LastUsedAt,
 		); err != nil {
 			return nil, err
 		}

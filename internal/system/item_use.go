@@ -25,6 +25,23 @@ func NewItemUseSystem(deps *handler.Deps) *ItemUseSystem {
 	return &ItemUseSystem{deps: deps}
 }
 
+const dragonEyeBuffDurationSec = 600
+
+type dragonEyeItemEffect struct {
+	skillID int32
+	gfxID   int32
+}
+
+var dragonEyeItems = map[int32]dragonEyeItemEffect{
+	47017: {skillID: 6684, gfxID: 7671}, // 地龍之魔眼
+	47018: {skillID: 6685, gfxID: 7672}, // 水龍之魔眼
+	47019: {skillID: 6686, gfxID: 7673}, // 風龍之魔眼
+	47020: {skillID: 6683, gfxID: 7674}, // 火龍之魔眼
+	47021: {skillID: 6688, gfxID: 7675}, // 誕生之魔眼
+	47022: {skillID: 6689, gfxID: 7676}, // 形象之魔眼
+	47023: {skillID: 6687, gfxID: 7678}, // 生命之魔眼
+}
+
 func applyPlayerPotionHealingModifiersLikeJava(player *world.PlayerInfo, heal int32) int32 {
 	if player == nil || heal == 0 {
 		return heal
@@ -56,6 +73,13 @@ func (s *ItemUseSystem) itemUseViewers(player *world.PlayerInfo, excludeSession 
 	return s.deps.World.GetNearbyPlayersInShow(player.X, player.Y, player.MapID, excludeSession, player.ShowID)
 }
 
+func (s *ItemUseSystem) itemUseLineOfSightBlockedLikeJava(player *world.PlayerInfo, x, y int32) bool {
+	if s == nil || s.deps == nil || s.deps.MapData == nil || player == nil {
+		return false
+	}
+	return !s.deps.MapData.HasLineOfSight(player.MapID, player.X, player.Y, x, y)
+}
+
 // ---------- 消耗品使用（藥水、食物） ----------
 
 // UseConsumable 處理消耗品使用。回傳 true 表示物品已被消耗。
@@ -63,6 +87,10 @@ func (s *ItemUseSystem) itemUseViewers(player *world.PlayerInfo, excludeSession 
 func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo) bool {
 	if isPlayerItemUseBlocked(sess, player) {
 		return false
+	}
+
+	if s.useDragonEye(sess, player, invItem, itemInfo) {
+		return true
 	}
 
 	consumed := false
@@ -232,6 +260,56 @@ func (s *ItemUseSystem) UseConsumable(sess *net.Session, player *world.PlayerInf
 		handler.SendWeightUpdate(sess, player)
 	}
 	return consumed
+}
+
+func (s *ItemUseSystem) useDragonEye(sess *net.Session, player *world.PlayerInfo, invItem *world.InvItem, itemInfo *data.ItemInfo) bool {
+	if player == nil || invItem == nil {
+		return false
+	}
+	eff, ok := dragonEyeItems[invItem.ItemID]
+	if !ok {
+		return false
+	}
+
+	now := time.Now()
+	if itemInfo != nil && itemInfo.DelayEffect > 0 && invItem.LastUsedAt > 0 {
+		waitSec := int64(itemInfo.DelayEffect) - (now.Unix() - invItem.LastUsedAt)
+		if waitSec > 0 {
+			sendItemDelayEffectMessage(sess, invItem.Name, waitSec)
+			return false
+		}
+	}
+
+	skill := data.SkillInfo{SkillID: eff.skillID, BuffDuration: dragonEyeBuffDurationSec}
+	if s.deps != nil && s.deps.Skills != nil {
+		if base := s.deps.Skills.Get(eff.skillID); base != nil {
+			skill = *base
+			if skill.BuffDuration <= 0 {
+				skill.BuffDuration = dragonEyeBuffDurationSec
+			}
+		}
+	}
+
+	skillSys := &SkillSystem{deps: s.deps}
+	skillSys.applyBuffEffect(player, &skill)
+	s.BroadcastEffect(sess, player, eff.gfxID)
+	invItem.LastUsedAt = now.Unix()
+	player.Dirty = true
+	return true
+}
+
+func sendItemDelayEffectMessage(sess *net.Session, itemName string, waitSec int64) {
+	if sess == nil {
+		return
+	}
+	if itemName == "" {
+		itemName = "item"
+	}
+	if waitSec > 60 {
+		handler.SendServerMessageArgs(sess, 1139, fmt.Sprintf("%s %d", itemName, waitSec/60))
+		return
+	}
+	handler.SendSystemMessage(sess, fmt.Sprintf("%s %d秒後可以使用。", itemName, waitSec))
 }
 
 // UseResurrectionScroll 處理復活卷軸。Java: Scroll_Resurrection / Reactivating_Reel。
@@ -1811,10 +1889,16 @@ func (s *ItemUseSystem) useLightningWand(sess *net.Session, player *world.Player
 
 	const lightningGfx = 6598 // 閃電動畫 GFX ID
 
-	// 廣播魔杖使用動作（Java: ACTION_Wand = 17）
 	nearby := s.itemUseViewers(player, 0)
-	actionData := handler.BuildActionGfx(player.CharID, 17)
-	handler.BroadcastToPlayers(nearby, actionData)
+	sendWandAction := func() {
+		actionData := handler.BuildActionGfx(player.CharID, 17)
+		handler.BroadcastToPlayers(nearby, actionData)
+	}
+	defer func() {
+		// Java execute 即使 doWandAction 因目標/LOS 早退，仍會扣一次 chargeCount。
+		invItem.ChargeCount--
+		player.Dirty = true
+	}()
 
 	// 傷害公式（Java: random.nextInt(11) - 5 + INT）
 	dmg := int32(rand.Intn(11)-5) + int32(player.Intel)
@@ -1825,43 +1909,56 @@ func (s *ItemUseSystem) useLightningWand(sess *net.Session, player *world.Player
 	// 查找目標 — NPC 或玩家
 	npc := s.deps.World.GetNpc(targetObjID)
 	if npc != nil && !npc.Dead {
+		if s.itemUseLineOfSightBlockedLikeJava(player, npc.X, npc.Y) {
+			return
+		}
 		// 對 NPC 施放閃電
+		sendWandAction()
 		effectData := handler.BuildSkillEffect(npc.ID, lightningGfx)
 		handler.BroadcastToPlayers(nearby, effectData)
 
-		npc.HP -= dmg
-		if npc.HP < 0 {
-			npc.HP = 0
-		}
+		damageBlocked := npcDamageBlockedBySkm0LikeJava(npc)
+		if !damageBlocked {
+			npc.HP -= dmg
+			if npc.HP < 0 {
+				npc.HP = 0
+			}
 
-		// 累加仇恨
-		AddPlayerHateLikeJava(s.deps.World, npc, player, dmg)
+			// 累加仇恨
+			AddPlayerHateLikeJava(s.deps.World, npc, player, dmg)
+		}
 
 		// 受傷動畫
 		dmgData := handler.BuildActionGfx(npc.ID, 2) // ACTION_Damage = 2
 		handler.BroadcastToPlayers(nearby, dmgData)
 
-		// 血量更新
-		hpRatio := int16(0)
-		if npc.MaxHP > 0 {
-			hpRatio = int16((npc.HP * 100) / npc.MaxHP)
-		}
-		for _, viewer := range nearby {
-			handler.SendHpMeter(viewer.Session, npc.ID, hpRatio)
-		}
+		if !damageBlocked {
+			// 血量更新
+			hpRatio := int16(0)
+			if npc.MaxHP > 0 {
+				hpRatio = int16((npc.HP * 100) / npc.MaxHP)
+			}
+			for _, viewer := range nearby {
+				handler.SendHpMeter(viewer.Session, npc.ID, hpRatio)
+			}
 
-		// 死亡檢查
-		if npc.HP <= 0 {
-			s.deps.Combat.HandleNpcDeath(npc, player, nearby)
+			// 死亡檢查
+			if npc.HP <= 0 {
+				s.deps.Combat.HandleNpcDeath(npc, player, nearby)
+			}
 		}
 	} else {
 		// 嘗試查找玩家目標（Java: findObject 通用查找 → L1PcInstance 分支）
 		targetPlayer := s.deps.World.GetByCharID(targetObjID)
 		if targetPlayer != nil && targetPlayer.CharID != player.CharID && !targetPlayer.Dead {
+			if s.itemUseLineOfSightBlockedLikeJava(player, targetPlayer.X, targetPlayer.Y) {
+				return
+			}
 			// 安全區檢查
 			if s.deps.MapData != nil && s.deps.MapData.IsSafetyZone(targetPlayer.MapID, targetPlayer.X, targetPlayer.Y) {
 				// 安全區內不可攻擊
 			} else {
+				sendWandAction()
 				// 閃電效果
 				effectData := handler.BuildSkillEffect(targetPlayer.CharID, lightningGfx)
 				handler.BroadcastToPlayers(nearby, effectData)
@@ -1883,11 +1980,6 @@ func (s *ItemUseSystem) useLightningWand(sess *net.Session, player *world.Player
 		}
 		// else: 目標不存在 → 3.80C 客戶端自行播放投射物動畫（無需伺服器處理）
 	}
-
-	// 扣減充能次數（Java: 只更新 chargeCount，不刪除物品）
-	// 注意：不發送 S_AddItem — 會在客戶端新增重複物品。充能數僅伺服器端追蹤。
-	invItem.ChargeCount--
-	player.Dirty = true
 }
 
 // ==================== 楓木魔杖（變身）====================

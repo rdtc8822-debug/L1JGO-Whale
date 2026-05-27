@@ -171,3 +171,93 @@ func TestMeleeAttackNpcKirtasBarrierThreeAbsoluteBarrierBlocksDamageLikeJava(t *
 		t.Fatalf("yiwei KIRTAS_BARRIER3(11058) 不是反擊屏障，玩家不應被反傷，HP=%d want=%d", player.HP, initialPlayerHP)
 	}
 }
+
+func TestMeleeAttackNpcIceLanceBlocksDamageLikeJava(t *testing.T) {
+	ws := world.NewState()
+	player := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 1,
+		Session:   newSkillTestSession(t, 1),
+		CharID:    1003,
+		Name:      "attacker_ice_lance",
+		X:         100,
+		Y:         100,
+		MapID:     900,
+		Level:     80,
+		Str:       35,
+		HP:        1000,
+		MaxHP:     1000,
+	})
+	npc := &world.NpcInfo{
+		ID:     2003,
+		NpcID:  45001,
+		Impl:   "L1Monster",
+		Name:   "ice_lance_npc",
+		X:      101,
+		Y:      100,
+		MapID:  900,
+		Level:  1,
+		STR:    18,
+		HP:     1000,
+		MaxHP:  1000,
+		ShowID: player.ShowID,
+		Size:   "small",
+		AC:     10,
+		MR:     0,
+	}
+	npc.AddDebuff(50, 120)
+	ws.AddNpc(npc)
+	s := newCombatLOSTestSystem(t, ws, &fakePvPManager{})
+
+	s.processMeleeAttack(player.SessionID, npc.ID)
+
+	if npc.HP != npc.MaxHP {
+		t.Fatalf("yiwei L1AttackPc.dmg0 會以 SKM0 擋下 ICE_LANCE NPC 物理傷害，HP=%d want=%d", npc.HP, npc.MaxHP)
+	}
+}
+
+func TestRangedAttackNpcIceLanceBlocksDamageLikeJava(t *testing.T) {
+	ws := world.NewState()
+	player := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID:     1,
+		Session:       newSkillTestSession(t, 1),
+		CharID:        1004,
+		Name:          "archer_ice_lance",
+		X:             100,
+		Y:             100,
+		MapID:         900,
+		Level:         80,
+		Dex:           35,
+		BowHitMod:     100,
+		HP:            1000,
+		MaxHP:         1000,
+		CurrentWeapon: 20,
+	})
+	player.Equip.Set(world.SlotWeapon, &world.InvItem{ItemID: 190, ObjectID: 5001, Equipped: true})
+	npc := &world.NpcInfo{
+		ID:     2004,
+		NpcID:  45001,
+		Impl:   "L1Monster",
+		Name:   "ranged_ice_lance_npc",
+		X:      101,
+		Y:      100,
+		MapID:  900,
+		Level:  1,
+		HP:     1000,
+		MaxHP:  1000,
+		ShowID: player.ShowID,
+		Size:   "small",
+		AC:     10,
+		MR:     0,
+	}
+	npc.AddDebuff(50, 120)
+	ws.AddNpc(npc)
+	s := newCombatLOSTestSystem(t, ws, &fakePvPManager{})
+
+	for i := 0; i < 10; i++ {
+		s.processRangedAttack(player.SessionID, npc.ID)
+	}
+
+	if npc.HP != npc.MaxHP {
+		t.Fatalf("yiwei L1AttackPc.dmg0 會以 SKM0 擋下 ICE_LANCE NPC 遠攻傷害，HP=%d want=%d", npc.HP, npc.MaxHP)
+	}
+}

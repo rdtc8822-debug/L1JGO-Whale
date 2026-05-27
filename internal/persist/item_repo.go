@@ -27,6 +27,7 @@ type ItemRow struct {
 	InnHall          bool  // 是否為會議室鑰匙
 	InnDueTime       int64 // 租約到期時間（Unix 秒）
 	ChargeCount      int16 // 魔杖充能次數
+	LastUsedAt       int64 // delay_effect 上次使用時間（Unix 秒）
 }
 
 type ItemRepo struct {
@@ -45,7 +46,7 @@ func (r *ItemRepo) LoadByCharID(ctx context.Context, charID int32) ([]ItemRow, e
 		        COALESCE(attr_enchant_kind, 0), COALESCE(attr_enchant_level, 0),
 		        COALESCE(inn_key_id, 0), COALESCE(inn_npc_id, 0),
 		        COALESCE(inn_hall, FALSE), COALESCE(EXTRACT(EPOCH FROM inn_due_time)::BIGINT, 0),
-		        COALESCE(charge_count, 0)
+		        COALESCE(charge_count, 0), COALESCE(EXTRACT(EPOCH FROM last_used_at)::BIGINT, 0)
 		 FROM character_items WHERE char_id = $1`, charID,
 	)
 	if err != nil {
@@ -62,7 +63,7 @@ func (r *ItemRepo) LoadByCharID(ctx context.Context, charID int32) ([]ItemRow, e
 			&it.ObjID, &it.Durability,
 			&it.AttrEnchantKind, &it.AttrEnchantLevel,
 			&it.InnKeyID, &it.InnNpcID, &it.InnHall, &it.InnDueTime,
-			&it.ChargeCount,
+			&it.ChargeCount, &it.LastUsedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -112,14 +113,18 @@ func (r *ItemRepo) SaveInventory(ctx context.Context, charID int32, inv *world.I
 		if item.InnDueTime != 0 {
 			innDueTime = time.Unix(item.InnDueTime, 0)
 		}
+		var lastUsedAt interface{}
+		if item.LastUsedAt != 0 {
+			lastUsedAt = time.Unix(item.LastUsedAt, 0)
+		}
 		if _, err := tx.Exec(ctx,
-			`INSERT INTO character_items (char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot, obj_id, durability, attr_enchant_kind, attr_enchant_level, inn_key_id, inn_npc_id, inn_hall, inn_due_time, charge_count)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+			`INSERT INTO character_items (char_id, item_id, count, enchant_lvl, bless, equipped, identified, equip_slot, obj_id, durability, attr_enchant_kind, attr_enchant_level, inn_key_id, inn_npc_id, inn_hall, inn_due_time, charge_count, last_used_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
 			charID, item.ItemID, item.Count, int16(item.EnchantLvl), int16(item.Bless),
 			item.Equipped, item.Identified, equipSlot, item.ObjectID, int16(item.Durability),
 			int16(item.AttrEnchantKind), int16(item.AttrEnchantLevel),
 			item.InnKeyID, item.InnNpcID, item.InnHall, innDueTime,
-			item.ChargeCount,
+			item.ChargeCount, lastUsedAt,
 		); err != nil {
 			return err
 		}

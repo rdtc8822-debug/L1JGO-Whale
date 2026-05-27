@@ -28,7 +28,7 @@ func (f *fakeSummonManager) ExecuteTamingMonster(_ *l1net.Session, _ *world.Play
 func (f *fakeSummonManager) ExecuteCreateZombie(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo, _ int32) {
 }
 
-func (f *fakeSummonManager) ExecuteReturnToNature(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo) {
+func (f *fakeSummonManager) ExecuteReturnToNature(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo, _ int32) {
 }
 
 func (f *fakeSummonManager) DismissSummon(_ *world.SummonInfo, _ *world.PlayerInfo) {

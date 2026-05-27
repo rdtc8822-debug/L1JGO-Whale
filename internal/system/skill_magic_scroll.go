@@ -61,7 +61,7 @@ func (s *SkillSystem) castMagicScrollSkill(sess *net.Session, player *world.Play
 			s.deps.Summon.ExecuteCreateZombie(sess, player, skill, targetID)
 			return
 		case 145:
-			s.deps.Summon.ExecuteReturnToNature(sess, player, skill)
+			s.deps.Summon.ExecuteReturnToNature(sess, player, skill, targetID)
 			return
 		}
 	}

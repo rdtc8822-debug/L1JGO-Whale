@@ -42,9 +42,12 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 
 	case 13, 72: // 無所遁形術 / 強力無所遁形術 — 揭示附近隱身玩家
 		// Java 參考: L1SkillUse.detection() — 移除 buff 60（隱身術）和 97（暗影閃避）
-		// 注意: GM 隱身免疫（isGmInvis），待 GM 系統實作後加入
+		// 注意: Java 會跳過 GM 隱身（isGmInvis）。
 		for _, tgt := range nearby {
 			if tgt.CharID == player.CharID {
+				continue
+			}
+			if isGMInvisible(tgt) {
 				continue
 			}
 			if tgt.HasBuff(60) || tgt.HasBuff(97) {
@@ -62,10 +65,13 @@ func (s *SkillSystem) executeSelfSkill(sess *net.Session, player *world.PlayerIn
 			}
 		}
 		// 施法者自己若在隱身中也會被揭示
-		if player.HasBuff(60) || player.HasBuff(97) {
+		if !isGMInvisible(player) && (player.HasBuff(60) || player.HasBuff(97)) {
 			s.removeBuffAndRevert(player, 60)
 			s.removeBuffAndRevert(player, 97)
 			handler.SendInvisible(sess, player.CharID, false)
+		}
+		if s.deps.Trap != nil {
+			s.deps.Trap.DetectTraps(sess, player)
 		}
 
 	case 44: // 魔法相消術（自身）

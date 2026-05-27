@@ -194,7 +194,7 @@ type SummonManager interface {
 	// ExecuteCreateZombie 處理技能 41 創造殭屍。
 	ExecuteCreateZombie(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32)
 	// ExecuteReturnToNature 處理技能 145 歸返自然。
-	ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo)
+	ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32)
 	// DismissSummon 自願解散召喚獸。
 	DismissSummon(sum *world.SummonInfo, player *world.PlayerInfo)
 }
@@ -718,119 +718,121 @@ type ActiveWar struct {
 type TrapTriggerer interface {
 	// TriggerTraps 處理玩家踩到陷阱的所有遊戲邏輯。
 	TriggerTraps(sess *net.Session, player *world.PlayerInfo, traps []*world.TrapInstance)
+	// DetectTraps 處理 DETECTION / COUNTER_DETECTION 的畫面內陷阱偵測。
+	DetectTraps(sess *net.Session, player *world.PlayerInfo)
 }
 
 // Deps holds shared dependencies injected into all packet handlers.
 type Deps struct {
-	AccountRepo   *persist.AccountRepo
-	CharRepo      *persist.CharacterRepo
-	ItemRepo      *persist.ItemRepo
-	Config        *config.Config
-	Log           *zap.Logger
-	World         *world.State
-	Scripting     *scripting.Engine
-	NpcActions    *data.NpcActionTable
-	Items         *data.ItemTable
-	Shops         *data.ShopTable
-	Drops         *data.DropTable
-	Teleports     *data.TeleportTable
-	TeleportHtml  *data.TeleportHtmlTable
-	Portals       *data.PortalTable
-	RandomPortals *data.RandomPortalTable
-	Skills        *data.SkillTable
-	Npcs          *data.NpcTable
-	MobSkills     *data.MobSkillTable
-	MapData       *data.MapDataTable
-	Polys         *data.PolymorphTable
-	ArmorSets     *data.ArmorSetTable
-	ItemPowers    *data.ItemPowerTable // 物品強化加成（MISS-P1-005，L1ItemPower）
-	SprTable      *data.SprTable
-	WarehouseRepo *persist.WarehouseRepo
-	WALRepo       *persist.WALRepo
-	ClanRepo      *persist.ClanRepo
-	BuffRepo      *persist.BuffRepo
-	Doors         *data.DoorTable
-	ItemMaking    *data.ItemMakingTable
-	SpellbookReqs *data.SpellbookReqTable
-	BuffIcons     *data.BuffIconTable
-	NpcServices   *data.NpcServiceTable
-	QuestRepo     *persist.QuestRepo
-	BuddyRepo     *persist.BuddyRepo
-	ExcludeRepo   *persist.ExcludeRepo
-	BoardRepo     *persist.BoardRepo
-	MailRepo      *persist.MailRepo
-	PetRepo       *persist.PetRepo
-	PetTypes      *data.PetTypeTable
-	PetItems      *data.PetItemTable
-	Dolls         *data.DollTable
-	TeleportPages *data.TeleportPageTable
-	Combat        CombatQueue         // filled after CombatSystem is created
-	Skill         SkillManager        // filled after SkillSystem is created
-	Death         DeathManager        // filled after DeathSystem is created
-	Trade         TradeManager        // filled after TradeSystem is created
-	Party         PartyManager        // filled after PartySystem is created
-	Clan          ClanManager         // filled after ClanSystem is created
-	Summon        SummonManager       // filled after SummonSystem is created
-	Polymorph     PolymorphManager    // filled after PolymorphSystem is created
-	Equip         EquipManager        // filled after EquipSystem is created
-	ItemUse       ItemUseManager      // filled after ItemUseSystem is created
-	Mail          MailManager         // filled after MailSystem is created
-	Warehouse     WarehouseManager    // filled after WarehouseSystem is created
-	PvP           PvPManager          // filled after PvPSystem is created
-	Shop          ShopManager         // filled after ShopSystem is created
-	Craft         CraftManager        // filled after CraftSystem is created
-	ItemGround    ItemGroundManager   // filled after ItemGroundSystem is created
-	PetLife       PetLifecycleManager // filled after PetSystem is created
-	DollMgr       DollManager         // filled after DollSystem is created
-	HierarchMgr   HierarchManager     // filled after HierarchSystem is created
-	HauntedHouse  HauntedHouseManager // filled after HauntedHouseSystem is created
-	DragonDoor    DragonDoorManager   // filled after DragonDoorSystem is created
-	QuestWorld    QuestWorldManager   // filled after QuestWorldSystem is created (MISS-P0-003)
-	PetMatch      PetMatchManager     // filled after PetMatchSystem is created
-	Bus           *event.Bus          // event bus for emitting game events (EntityKilled, etc.)
-	WeaponSkills  *data.WeaponSkillTable
-	FireCrystals  *data.FireCrystalTable
+	AccountRepo      *persist.AccountRepo
+	CharRepo         *persist.CharacterRepo
+	ItemRepo         *persist.ItemRepo
+	Config           *config.Config
+	Log              *zap.Logger
+	World            *world.State
+	Scripting        *scripting.Engine
+	NpcActions       *data.NpcActionTable
+	Items            *data.ItemTable
+	Shops            *data.ShopTable
+	Drops            *data.DropTable
+	Teleports        *data.TeleportTable
+	TeleportHtml     *data.TeleportHtmlTable
+	Portals          *data.PortalTable
+	RandomPortals    *data.RandomPortalTable
+	Skills           *data.SkillTable
+	Npcs             *data.NpcTable
+	MobSkills        *data.MobSkillTable
+	MapData          *data.MapDataTable
+	Polys            *data.PolymorphTable
+	ArmorSets        *data.ArmorSetTable
+	ItemPowers       *data.ItemPowerTable // 物品強化加成（MISS-P1-005，L1ItemPower）
+	SprTable         *data.SprTable
+	WarehouseRepo    *persist.WarehouseRepo
+	WALRepo          *persist.WALRepo
+	ClanRepo         *persist.ClanRepo
+	BuffRepo         *persist.BuffRepo
+	Doors            *data.DoorTable
+	ItemMaking       *data.ItemMakingTable
+	SpellbookReqs    *data.SpellbookReqTable
+	BuffIcons        *data.BuffIconTable
+	NpcServices      *data.NpcServiceTable
+	QuestRepo        *persist.QuestRepo
+	BuddyRepo        *persist.BuddyRepo
+	ExcludeRepo      *persist.ExcludeRepo
+	BoardRepo        *persist.BoardRepo
+	MailRepo         *persist.MailRepo
+	PetRepo          *persist.PetRepo
+	PetTypes         *data.PetTypeTable
+	PetItems         *data.PetItemTable
+	Dolls            *data.DollTable
+	TeleportPages    *data.TeleportPageTable
+	Combat           CombatQueue         // filled after CombatSystem is created
+	Skill            SkillManager        // filled after SkillSystem is created
+	Death            DeathManager        // filled after DeathSystem is created
+	Trade            TradeManager        // filled after TradeSystem is created
+	Party            PartyManager        // filled after PartySystem is created
+	Clan             ClanManager         // filled after ClanSystem is created
+	Summon           SummonManager       // filled after SummonSystem is created
+	Polymorph        PolymorphManager    // filled after PolymorphSystem is created
+	Equip            EquipManager        // filled after EquipSystem is created
+	ItemUse          ItemUseManager      // filled after ItemUseSystem is created
+	Mail             MailManager         // filled after MailSystem is created
+	Warehouse        WarehouseManager    // filled after WarehouseSystem is created
+	PvP              PvPManager          // filled after PvPSystem is created
+	Shop             ShopManager         // filled after ShopSystem is created
+	Craft            CraftManager        // filled after CraftSystem is created
+	ItemGround       ItemGroundManager   // filled after ItemGroundSystem is created
+	PetLife          PetLifecycleManager // filled after PetSystem is created
+	DollMgr          DollManager         // filled after DollSystem is created
+	HierarchMgr      HierarchManager     // filled after HierarchSystem is created
+	HauntedHouse     HauntedHouseManager // filled after HauntedHouseSystem is created
+	DragonDoor       DragonDoorManager   // filled after DragonDoorSystem is created
+	QuestWorld       QuestWorldManager   // filled after QuestWorldSystem is created (MISS-P0-003)
+	PetMatch         PetMatchManager     // filled after PetMatchSystem is created
+	Bus              *event.Bus          // event bus for emitting game events (EntityKilled, etc.)
+	WeaponSkills     *data.WeaponSkillTable
+	FireCrystals     *data.FireCrystalTable
 	FireSmithRecipes *data.FireSmithRecipeTable
-	Resolvents    *data.ResolventTable
-	Ranking       RankingChecker // filled after RankingSystem is created
-	ItemBoxes     *data.ItemBoxTable
-	ItemUpgrades  *data.ItemUpgradeTable
-	ItemVIPs      *data.ItemVIPTable
-	NpcChats      *data.NpcChatTable
-	MobGroups     *data.MobGroupTable
-	ShopCn        *data.ShopCnTable
-	PowerItems    *data.PowerItemTable
-	ItemCreate    ItemCreateManager // filled after ItemCreateSystem is created
-	Hierarchs     *data.HierarchTable
-	Auction       AuctionManager                       // filled after AuctionSystem is created
-	Houses        *data.HouseTable                     // 住宅靜態座標資料
-	HouseRepo     *persist.HouseRepo                   // 住宅動態狀態持久化
-	InnRepo       *persist.InnRepo                     // 旅館房間持久化
-	InnRooms      map[int32]map[int32]*persist.InnRoom // 旅館房間運行時狀態（npcID → roomNum → room）
-	Alliances     *AllianceManager                     // 聯盟管理器（啟動時從 DB 載入）
-	ClanMatching  *ClanMatchingManager                 // 血盟配對管理器
-	QuestData     *data.QuestTable                     // 任務範本 + NPC 對話定義（YAML 載入）
-	TrapMgr       *world.TrapManager                   // 陷阱管理器（座標觸發 + 重生）
-	Trap          TrapTriggerer                        // 陷阱觸發邏輯（filled after TrapSystem is created）
-	Quest         QuestActionHandler                   // 任務動作邏輯（filled after QuestSystem is created）
-	NpcSvc        NpcServiceManager                    // NPC 服務邏輯（filled after NpcServiceSystem is created）
-	CharReset     CharResetManager                     // 角色重置邏輯（filled after CharResetSystem is created）
-	StatAlloc     StatAllocManager                     // 屬性配點邏輯（filled after StatAllocSystem is created）
-	Marriage      MarriageManager                      // 結婚/離婚邏輯（filled after MarriageSystem is created）
-	Inn           InnManager                           // 旅館租房/退租邏輯（filled after InnSystem is created）
-	ShopCnMgr     ShopCnManager                        // 天寶幣商城（filled after ShopCnSystem is created）
-	PowerItemMgr  PowerItemManager                     // 強化物品購買（filled after PowerItemSystem is created）
-	SpellShopMgr  SpellShopManager                     // 魔法商店（filled after SpellShopSystem is created）
-	GMCmd         GMCommandManager                     // GM 命令（filled after GMCommandSystem is created）
-	PrivShop      PrivateShopManager                   // 個人商店交易（filled after PrivateShopSystem is created）
-	Fishing       FishingManager                       // 釣魚邏輯（filled after FishingSystem is created）
-	MapTimer      MapTimerManager                      // 限時地圖計時（filled after MapTimerSystem is created）
-	Castles       *data.CastleTable                    // 城堡靜態地理資料
-	WarGifts      *data.WarGiftTable                   // 攻城戰禮物資料
-	CastleRepo    *persist.CastleRepo                  // 城堡動態狀態持久化
-	Castle        CastleManager                        // 城堡管理邏輯（filled after CastleSystem is created）
-	War           WarManager                           // 戰爭管理邏輯（filled after WarSystem is created）
-	Dialogs       *dialog.Manager                      // 動態 HTML 對話註冊表（YAML+HTM 載入）
+	Resolvents       *data.ResolventTable
+	Ranking          RankingChecker // filled after RankingSystem is created
+	ItemBoxes        *data.ItemBoxTable
+	ItemUpgrades     *data.ItemUpgradeTable
+	ItemVIPs         *data.ItemVIPTable
+	NpcChats         *data.NpcChatTable
+	MobGroups        *data.MobGroupTable
+	ShopCn           *data.ShopCnTable
+	PowerItems       *data.PowerItemTable
+	ItemCreate       ItemCreateManager // filled after ItemCreateSystem is created
+	Hierarchs        *data.HierarchTable
+	Auction          AuctionManager                       // filled after AuctionSystem is created
+	Houses           *data.HouseTable                     // 住宅靜態座標資料
+	HouseRepo        *persist.HouseRepo                   // 住宅動態狀態持久化
+	InnRepo          *persist.InnRepo                     // 旅館房間持久化
+	InnRooms         map[int32]map[int32]*persist.InnRoom // 旅館房間運行時狀態（npcID → roomNum → room）
+	Alliances        *AllianceManager                     // 聯盟管理器（啟動時從 DB 載入）
+	ClanMatching     *ClanMatchingManager                 // 血盟配對管理器
+	QuestData        *data.QuestTable                     // 任務範本 + NPC 對話定義（YAML 載入）
+	TrapMgr          *world.TrapManager                   // 陷阱管理器（座標觸發 + 重生）
+	Trap             TrapTriggerer                        // 陷阱觸發邏輯（filled after TrapSystem is created）
+	Quest            QuestActionHandler                   // 任務動作邏輯（filled after QuestSystem is created）
+	NpcSvc           NpcServiceManager                    // NPC 服務邏輯（filled after NpcServiceSystem is created）
+	CharReset        CharResetManager                     // 角色重置邏輯（filled after CharResetSystem is created）
+	StatAlloc        StatAllocManager                     // 屬性配點邏輯（filled after StatAllocSystem is created）
+	Marriage         MarriageManager                      // 結婚/離婚邏輯（filled after MarriageSystem is created）
+	Inn              InnManager                           // 旅館租房/退租邏輯（filled after InnSystem is created）
+	ShopCnMgr        ShopCnManager                        // 天寶幣商城（filled after ShopCnSystem is created）
+	PowerItemMgr     PowerItemManager                     // 強化物品購買（filled after PowerItemSystem is created）
+	SpellShopMgr     SpellShopManager                     // 魔法商店（filled after SpellShopSystem is created）
+	GMCmd            GMCommandManager                     // GM 命令（filled after GMCommandSystem is created）
+	PrivShop         PrivateShopManager                   // 個人商店交易（filled after PrivateShopSystem is created）
+	Fishing          FishingManager                       // 釣魚邏輯（filled after FishingSystem is created）
+	MapTimer         MapTimerManager                      // 限時地圖計時（filled after MapTimerSystem is created）
+	Castles          *data.CastleTable                    // 城堡靜態地理資料
+	WarGifts         *data.WarGiftTable                   // 攻城戰禮物資料
+	CastleRepo       *persist.CastleRepo                  // 城堡動態狀態持久化
+	Castle           CastleManager                        // 城堡管理邏輯（filled after CastleSystem is created）
+	War              WarManager                           // 戰爭管理邏輯（filled after WarSystem is created）
+	Dialogs          *dialog.Manager                      // 動態 HTML 對話註冊表（YAML+HTM 載入）
 }
 
 // RegisterAll registers all packet handlers into the registry.
