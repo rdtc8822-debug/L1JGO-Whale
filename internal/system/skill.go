@@ -545,7 +545,7 @@ func (s *SkillSystem) processSkill(req handler.SkillRequest) {
 			s.deps.Summon.ExecuteCreateZombie(sess, player, skill, targetID)
 			return
 		case 145:
-			s.deps.Summon.ExecuteReturnToNature(sess, player, skill)
+			s.deps.Summon.ExecuteReturnToNature(sess, player, skill, targetID)
 			return
 		}
 	}

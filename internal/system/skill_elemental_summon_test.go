@@ -71,6 +71,68 @@ func TestSkillElementalSummonElementalSummonUsesElfAttr(t *testing.T) {
 	}
 }
 
+func TestSkillElementalSummonBroadcastsCastVisualLikeJava(t *testing.T) {
+	ws := world.NewState()
+	caster := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 1,
+		Session:   newSkillTestSession(t, 1),
+		CharID:    1001,
+		Name:      "elf",
+		X:         100,
+		Y:         100,
+		MapID:     4,
+		ShowID:    10,
+		MP:        100,
+		MaxMP:     100,
+		Cha:       12,
+		ElfAttr:   2,
+		KnownSpells: []int32{
+			154,
+		},
+		Inv: world.NewInventory(),
+	})
+	sameShow := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 2,
+		Session:   newSkillTestSession(t, 2),
+		CharID:    1002,
+		Name:      "same_show",
+		X:         101,
+		Y:         100,
+		MapID:     4,
+		ShowID:    10,
+	})
+	otherShow := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 3,
+		Session:   newSkillTestSession(t, 3),
+		CharID:    1003,
+		Name:      "other_show",
+		X:         102,
+		Y:         100,
+		MapID:     4,
+		ShowID:    99,
+	})
+	caster.Inv.AddItem(40319, 10, "spirit gem", 0, 0, true, 1)
+	s := newElementalSummonTestSystem(t, ws)
+
+	s.processSkill(handler.SkillRequest{SessionID: caster.SessionID, SkillID: 154})
+
+	casterPackets := drainSkillTestPackets(caster.Session)
+	if !hasActionGfxPacket(casterPackets, caster.CharID, 19) {
+		t.Fatal("義維 sendGrfx 成功路徑會讓施法者看到元素召喚施法動作")
+	}
+	if !hasSkillEffectPacket(casterPackets, caster.CharID, 2510) {
+		t.Fatal("義維 sendGrfx 成功路徑會讓施法者看到元素召喚 cast_gfx")
+	}
+	samePackets := drainSkillTestPackets(sameShow.Session)
+	if !hasActionGfxPacket(samePackets, caster.CharID, 19) || !hasSkillEffectPacket(samePackets, caster.CharID, 2510) {
+		t.Fatal("同 ShowID 觀眾應看到元素召喚施法動作與 cast_gfx")
+	}
+	otherPackets := drainSkillTestPackets(otherShow.Session)
+	if hasActionGfxPacket(otherPackets, caster.CharID, 19) || hasSkillEffectPacket(otherPackets, caster.CharID, 2510) {
+		t.Fatal("不同 ShowID 觀眾不應看到元素召喚施法動作或 cast_gfx")
+	}
+}
+
 func TestSkillElementalSummonGreaterElementalUsesElfAttr(t *testing.T) {
 	ws := world.NewState()
 	caster := addSkillTestPlayer(ws, &world.PlayerInfo{

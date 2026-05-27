@@ -218,6 +218,7 @@ func warehouseItemFromInvItem(accountName, charName string, whType int16, invIte
 		InnNpcID:         invItem.InnNpcID,
 		InnHall:          invItem.InnHall,
 		InnDueTime:       invItem.InnDueTime,
+		LastUsedAt:       invItem.LastUsedAt,
 	}
 }
 
@@ -258,6 +259,7 @@ func warehouseCacheFromPersistItem(it persist.WarehouseItem, itemInfo *data.Item
 		InnNpcID:         it.InnNpcID,
 		InnHall:          it.InnHall,
 		InnDueTime:       it.InnDueTime,
+		LastUsedAt:       it.LastUsedAt,
 		Name:             name,
 		InvGfx:           invGfx,
 		Weight:           weight,
@@ -280,6 +282,7 @@ func copyWarehouseCacheState(dst *world.InvItem, wc *world.WarehouseCache) {
 	dst.InnNpcID = wc.InnNpcID
 	dst.InnHall = wc.InnHall
 	dst.InnDueTime = wc.InnDueTime
+	dst.LastUsedAt = wc.LastUsedAt
 }
 
 // handleWarehouseDeposit 將物品從玩家背包移至倉庫。

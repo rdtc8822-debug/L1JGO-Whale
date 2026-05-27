@@ -23,34 +23,38 @@ type DollInfo struct {
 
 	// Stat bonuses applied to master on summon (reversed on dismiss).
 	// Follows the delta pattern used by ActiveBuff.
-	BonusAC        int16
-	BonusDmg       int16
-	BonusHit       int16
-	BonusBowDmg    int16
-	BonusBowHit    int16
-	BonusSP        int16
-	BonusMR        int16
-	BonusHP        int16
-	BonusMP        int16
-	BonusHPR       int16
-	BonusMPR       int16
-	BonusFireRes   int16
-	BonusWaterRes  int16
-	BonusWindRes   int16
-	BonusEarthRes  int16
-	BonusDodge     int16
-	BonusSTR       int16
-	BonusDEX       int16
-	BonusCON       int16
-	BonusWIS       int16
-	BonusINT       int16
-	BonusCHA       int16
-	BonusStunRes   int16
-	BonusFreezeRes int16
+	BonusAC              int16
+	BonusDmg             int16
+	BonusDmgRandom       int16
+	BonusDmgRandomChance int
+	BonusHit             int16
+	BonusBowDmg          int16
+	BonusBowHit          int16
+	BonusSP              int16
+	BonusMR              int16
+	BonusHP              int16
+	BonusMP              int16
+	BonusHPR             int16
+	BonusMPR             int16
+	BonusFireRes         int16
+	BonusWaterRes        int16
+	BonusWindRes         int16
+	BonusEarthRes        int16
+	BonusDodge           int16
+	BonusSTR             int16
+	BonusDEX             int16
+	BonusCON             int16
+	BonusWIS             int16
+	BonusINT             int16
+	BonusCHA             int16
+	BonusStunRes         int16
+	BonusFreezeRes       int16
 
 	// MISS-P1-006：YAML 已用但原本被 switch 默默忽略的 4 個 power 類型。
-	BonusDmgReduce int16 // 對應 Java Doll_DmgDown — 每次受傷減免（目前僅追蹤，combat hook 待補）
-	BonusWeight    int16 // 對應 Java Doll_Weight — 額外負重上限
+	BonusDmgReduce             int16 // 對應 Java Doll_DmgDown — 每次受傷減免
+	BonusDmgReduceRandom       int16 // 對應 Java Doll_DmgDownR — 機率受傷減免
+	BonusDmgReduceRandomChance int   // Doll_DmgDownR 觸發機率百分比
+	BonusWeight                int16 // 對應 Java Doll_Weight — 額外負重上限
 
 	// 週期性回復狀態（hp_regen_tick / mp_regen_tick）。
 	// 對應 Java DollHprTimer / DollMprTimer：每 IntervalTicks 個 tick 回復 Amount 點。

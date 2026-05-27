@@ -320,11 +320,7 @@ func (s *InputSystem) handleDisconnect(sess *net.Session) {
 		s.cleanupCompanions(player)
 
 		// 廣播移除 + 解鎖格子給附近玩家
-		nearby := s.worldState.GetNearbyPlayers(player.X, player.Y, player.MapID, sess.ID)
-		removePacket := buildRemoveObjectPacket(player.CharID)
-		for _, other := range nearby {
-			other.Session.Send(removePacket)
-		}
+		broadcastDisconnectRemoveObject(player, s.worldState, sess.ID)
 
 		// Save full character state to DB
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -458,6 +454,17 @@ func buildRemoveObjectPacket(charID int32) []byte {
 	w := packet.NewWriterWithOpcode(packet.S_OPCODE_REMOVE_OBJECT)
 	w.WriteD(charID)
 	return w.Bytes()
+}
+
+func broadcastDisconnectRemoveObject(player *world.PlayerInfo, ws *world.State, excludeSession uint64) {
+	if player == nil || ws == nil {
+		return
+	}
+	nearby := ws.GetNearbyPlayersInShow(player.X, player.Y, player.MapID, excludeSession, player.ShowID)
+	removePacket := buildRemoveObjectPacket(player.CharID)
+	for _, other := range nearby {
+		other.Session.Send(removePacket)
+	}
 }
 
 // SessionCount returns the current number of active sessions.

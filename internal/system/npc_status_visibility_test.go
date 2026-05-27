@@ -66,6 +66,22 @@ func TestNpcPoisonDamageHpMeterBroadcastsOnlySameShowLikeJava(t *testing.T) {
 	}
 }
 
+func TestNpcPoisonDamageNpcAbsoluteBarrierBlocksDamageLikeJava(t *testing.T) {
+	ws, npc, _, _ := newNpcStatusVisibilityFixture(t)
+	npc.ActiveDebuffs = map[int32]int{11: 5, 78: 5}
+	npc.PoisonDmgAmt = 5
+	npc.PoisonDmgTimer = 14
+
+	tickNpcPoison(npc, ws, nil)
+
+	if npc.HP != npc.MaxHP {
+		t.Fatalf("yiwei L1DamagePoison 對 NPC 會走 mob.receiveDamage，ABSOLUTE_BARRIER NPC 不應扣毒傷，HP=%d want=%d", npc.HP, npc.MaxHP)
+	}
+	if npc.PoisonDmgTimer != 0 {
+		t.Fatalf("毒傷 tick 仍應消耗本輪計時，PoisonDmgTimer=%d want=0", npc.PoisonDmgTimer)
+	}
+}
+
 func newNpcStatusVisibilityFixture(t *testing.T) (*world.State, *world.NpcInfo, *world.PlayerInfo, *world.PlayerInfo) {
 	t.Helper()
 	ws := world.NewState()

@@ -46,6 +46,7 @@ const (
 	mobSkillKirtasBarrier3          int32 = 11058
 	mobSkillKirtasBarrier2          int32 = 11059
 	mobSkillKirtasBarrier1          int32 = 11060
+	mobSkillLindviorSkySpiked       int32 = 11061
 	mobSkillKirtasBarrierTicks            = 1 << 30
 )
 
@@ -688,29 +689,31 @@ func (s *NpcAISystem) npcMeleeAttack(npc *world.NpcInfo, target *world.PlayerInf
 			// 套用設定倍率（Java: ConfigSkill.COUNTER_BARRIER_DMG = 1.5）
 			cbDmg = cbDmg * 3 / 2
 			if cbDmg > 0 {
-				// 反彈傷害施加在 NPC 身上
-				npc.HP -= cbDmg
-				if npc.HP < 0 {
-					npc.HP = 0
-				}
 				// 播放反擊屏障觸發特效（GFX 10710）
 				handler.BroadcastToPlayers(nearby, handler.BuildSkillEffect(target.CharID, 10710))
 				// 原始攻擊傷害歸零
 				damage = 0
-				// 如果 NPC 被反彈殺死
-				if npc.HP <= 0 {
-					hpData := handler.BuildHpMeter(npc.ID, 0)
-					handler.BroadcastToPlayers(nearby, hpData)
-					handleNpcDeath(npc, target, nearby, s.deps)
-					npc.AggroTarget = 0
-					return
+				if !npcDamageBlockedBySkm0LikeJava(npc) {
+					// 反彈傷害施加在 NPC 身上
+					npc.HP -= cbDmg
+					if npc.HP < 0 {
+						npc.HP = 0
+					}
+					// 如果 NPC 被反彈殺死
+					if npc.HP <= 0 {
+						hpData := handler.BuildHpMeter(npc.ID, 0)
+						handler.BroadcastToPlayers(nearby, hpData)
+						handleNpcDeath(npc, target, nearby, s.deps)
+						npc.AggroTarget = 0
+						return
+					}
+					// 廣播 NPC HP 條
+					hpRatio := int16(0)
+					if npc.MaxHP > 0 {
+						hpRatio = int16((npc.HP * 100) / npc.MaxHP)
+					}
+					handler.BroadcastToPlayers(nearby, handler.BuildHpMeter(npc.ID, hpRatio))
 				}
-				// 廣播 NPC HP 條
-				hpRatio := int16(0)
-				if npc.MaxHP > 0 {
-					hpRatio = int16((npc.HP * 100) / npc.MaxHP)
-				}
-				handler.BroadcastToPlayers(nearby, handler.BuildHpMeter(npc.ID, hpRatio))
 			}
 		}
 	}
@@ -922,6 +925,9 @@ func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerIn
 				if chebyshev32(areaCenterX, areaCenterY, p.X, p.Y) > area {
 					continue
 				}
+				if skill.SkillID == mobSkillLindviorSkySpiked {
+					broadcastNpcLindviorSkySpikedEffectLikeJava(npc, p.X, p.Y, nearby)
+				}
 				sctx := scripting.SkillDamageContext{
 					SkillID:         int(skill.SkillID),
 					DamageValue:     skill.DamageValue,
@@ -942,6 +948,7 @@ func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerIn
 					dmg = 1
 				}
 				dmg = applyNpcMagicLeverageLikeJava(dmg, leverage)
+				dmg = applyDragonEyeMagicDamageReductionLikeYiwei(p, dmg, world.RandInt(100), nearby)
 				p.HP -= int32(dmg)
 				p.Dirty = true
 				if p.HP <= 0 {
@@ -978,6 +985,10 @@ func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerIn
 			damage = applyNpcMagicLeverageLikeJava(damage, leverage)
 			damage = applyImmuneToHarmDamage(target, damage)
 			damage = applyReductionArmorDamage(target, damage, false)
+			damage = applyDragonEyeMagicDamageReductionLikeYiwei(target, damage, world.RandInt(100), nearby)
+			if skill.SkillID == mobSkillLindviorSkySpiked {
+				broadcastNpcLindviorSkySpikedEffectLikeJava(npc, target.X, target.Y, nearby)
+			}
 
 			skillAtkData := buildNpcUseAttackSkill(npc.ID, target.CharID,
 				int16(damage), npc.Heading, gfx, 6,
@@ -1026,6 +1037,27 @@ func (s *NpcAISystem) executeNpcSkill(npc *world.NpcInfo, target *world.PlayerIn
 		}
 	}
 	return true
+}
+
+func broadcastNpcLindviorSkySpikedEffectLikeJava(npc *world.NpcInfo, targetX, targetY int32, nearby []*world.PlayerInfo) {
+	gfx := npcLindviorSkySpikedEffectGfxLikeJava(calcNpcHeading(npc.X, npc.Y, targetX, targetY))
+	if gfx == 0 {
+		return
+	}
+	handler.BroadcastToPlayers(nearby, buildEffectLocation(targetX, targetY, gfx))
+}
+
+func npcLindviorSkySpikedEffectGfxLikeJava(dir int16) int32 {
+	switch dir {
+	case 3, 4:
+		return 7987
+	case 5:
+		return 8050
+	case 6, 7:
+		return 8051
+	default:
+		return 0
+	}
 }
 
 func (s *NpcAISystem) executeNpcKirtasBarrierLikeJava(npc *world.NpcInfo, skillID int32, nearby []*world.PlayerInfo) bool {
@@ -2100,73 +2132,7 @@ func (s *NpcAISystem) executeNpcSummon(npc *world.NpcInfo, summonID int32, summo
 			}
 		}
 
-		// 解析速度（與 main.go 相同邏輯）
-		atkSpeed := tmpl.AtkSpeed
-		moveSpeed := tmpl.PassiveSpeed
-		if s.deps.SprTable != nil {
-			gfx := int(tmpl.GfxID)
-			if tmpl.AtkSpeed != 0 {
-				if v := s.deps.SprTable.GetAttackSpeed(gfx, data.ActAttack); v > 0 {
-					atkSpeed = int16(v)
-				}
-			}
-			if tmpl.PassiveSpeed != 0 {
-				if v := s.deps.SprTable.GetMoveSpeed(gfx, data.ActWalk); v > 0 {
-					moveSpeed = int16(v)
-				}
-			}
-		}
-
-		summonNpc := &world.NpcInfo{
-			ID:                world.NextNpcID(),
-			NpcID:             tmpl.NpcID,
-			Impl:              tmpl.Impl,
-			GfxID:             tmpl.GfxID,
-			Name:              tmpl.Name,
-			NameID:            tmpl.NameID,
-			Level:             tmpl.Level,
-			X:                 sx,
-			Y:                 sy,
-			MapID:             npc.MapID,
-			ShowID:            npc.ShowID,
-			HP:                tmpl.HP,
-			MaxHP:             tmpl.HP,
-			MP:                tmpl.MP,
-			MaxMP:             tmpl.MP,
-			AC:                tmpl.AC,
-			STR:               tmpl.STR,
-			DEX:               tmpl.DEX,
-			Intel:             tmpl.INT,
-			Exp:               tmpl.Exp,
-			Lawful:            tmpl.Lawful,
-			Size:              tmpl.Size,
-			MR:                tmpl.MR,
-			Undead:            tmpl.Undead,
-			UndeadType:        tmpl.UndeadType,
-			TurnUndeadable:    tmpl.EffectiveTurnUndeadable(),
-			TurnUndeadableSet: true,
-			Hard:              tmpl.Hard,
-			Agro:              tmpl.Agro,
-			Family:            tmpl.Family,
-			AgroFamily:        tmpl.AgroFamily,
-			AtkDmg:            int32(tmpl.Level) + int32(tmpl.STR)/3,
-			Ranged:            tmpl.Ranged,
-			AtkSpeed:          atkSpeed,
-			AtkMagicSpeed:     tmpl.AtkMagicSpeed,
-			SubMagicSpeed:     tmpl.SubMagicSpeed,
-			MoveSpeed:         moveSpeed,
-			PoisonAtk:         tmpl.PoisonAtk,
-			FireRes:           tmpl.FireRes,
-			WaterRes:          tmpl.WaterRes,
-			WindRes:           tmpl.WindRes,
-			EarthRes:          tmpl.EarthRes,
-			WeakAttr:          tmpl.WeakAttr,
-			WeaponRequired:    tmpl.WeaponRequired,
-			SpawnX:            sx,
-			SpawnY:            sy,
-			SpawnMapID:        npc.MapID,
-			RespawnDelay:      0, // 召喚怪物不重生
-		}
+		summonNpc := newRuntimeNpcFromTemplate(tmpl, sx, sy, npc.MapID, 0, npc.ShowID, 0, s.deps.SprTable)
 
 		s.world.AddNpc(summonNpc)
 		summoned++
@@ -2760,6 +2726,9 @@ func tickNpcPoison(npc *world.NpcInfo, ws *world.State, deps *handler.Deps) {
 	npc.PoisonDmgTimer++
 	if npc.PoisonDmgTimer >= 15 {
 		npc.PoisonDmgTimer = 0
+		if npcDamageBlockedBySkm0LikeJava(npc) {
+			return
+		}
 		npc.HP -= npc.PoisonDmgAmt
 		// 毒傷害不可殺死 NPC — HP 最低 1
 		if npc.HP <= 1 {

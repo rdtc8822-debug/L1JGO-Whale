@@ -1,6 +1,6 @@
 dolls:
   - item_id: 41248
-    gfx_id: 80106
+    gfx_id: 6100
     name_id: 魔法娃娃：肥肥
     name: 魔法娃娃：肥肥
     duration: 1800
@@ -9,7 +9,7 @@ dolls:
       - type: weight
         value: 20
   - item_id: 41249
-    gfx_id: 80107
+    gfx_id: 5919
     name_id: 魔法娃娃：小思克巴
     name: 魔法娃娃：小思克巴
     duration: 1800
@@ -19,7 +19,7 @@ dolls:
         value: 15
         param: 1
   - item_id: 41250
-    gfx_id: 80108
+    gfx_id: 6096
     name_id: 魔法娃娃：野狼寶寶
     name: 魔法娃娃：野狼寶寶
     duration: 1800
@@ -29,7 +29,7 @@ dolls:
         value: 15
         chance: 3
   - item_id: 47105
-    gfx_id: 92109
+    gfx_id: 6477
     name_id: 魔法娃娃：希爾黛斯
     name: 魔法娃娃：希爾黛斯
     duration: 1800
@@ -39,7 +39,7 @@ dolls:
         value: 40
         param: 1
   - item_id: 47106
-    gfx_id: 92103
+    gfx_id: 6483
     name_id: 魔法娃娃：蛇女
     name: 魔法娃娃：蛇女
     duration: 1800
@@ -51,7 +51,7 @@ dolls:
         value: 77
         chance: 5
   - item_id: 47107
-    gfx_id: 92102
+    gfx_id: 6480
     name_id: 魔法娃娃：雪怪
     name: 魔法娃娃：雪怪
     duration: 1800
@@ -62,7 +62,7 @@ dolls:
       - type: freeze_resist
         value: 7
   - item_id: 47108
-    gfx_id: 92104
+    gfx_id: 7047
     name_id: 魔法娃娃：亞力安
     name: 魔法娃娃：亞力安
     duration: 1800
@@ -73,7 +73,7 @@ dolls:
       - type: bow_dmg
         value: 1
   - item_id: 47109
-    gfx_id: 92106
+    gfx_id: 7257
     name_id: 魔法娃娃：史巴托
     name: 魔法娃娃：史巴托
     duration: 1800
@@ -84,7 +84,7 @@ dolls:
       - type: stun_resist
         value: 10
   - item_id: 47110
-    gfx_id: 92110
+    gfx_id: 7662
     name_id: 神秘稜鏡：淘氣幼龍
     name: 神秘稜鏡：淘氣幼龍
     duration: 1800
@@ -95,7 +95,7 @@ dolls:
       - type: weight
         value: 20
   - item_id: 47111
-    gfx_id: 92111
+    gfx_id: 7661
     name_id: 神秘稜鏡：頑皮幼龍
     name: 神秘稜鏡：頑皮幼龍
     duration: 1800
@@ -106,7 +106,7 @@ dolls:
       - type: weight
         value: 20
   - item_id: 47112
-    gfx_id: 92112
+    gfx_id: 7659
     name_id: 神秘稜鏡：高等淘氣幼龍
     name: 神秘稜鏡：高等淘氣幼龍
     duration: 1800
@@ -117,7 +117,7 @@ dolls:
       - type: weight
         value: 20
   - item_id: 47113
-    gfx_id: 92113
+    gfx_id: 7660
     name_id: 神秘稜鏡：高等頑皮幼龍
     name: 神秘稜鏡：高等頑皮幼龍
     duration: 1800
@@ -128,7 +128,7 @@ dolls:
       - type: weight
         value: 20
   - item_id: 49037
-    gfx_id: 80129
+    gfx_id: 6443
     name_id: 魔法娃娃：長老
     name: 魔法娃娃：長老
     duration: 1800
@@ -138,7 +138,7 @@ dolls:
         value: 15
         param: 1
   - item_id: 49038
-    gfx_id: 80130
+    gfx_id: 6449
     name_id: 魔法娃娃：奎斯坦修
     name: 魔法娃娃：奎斯坦修
     duration: 1800
@@ -148,7 +148,7 @@ dolls:
         value: 15
         chance: 3
   - item_id: 49039
-    gfx_id: 80131
+    gfx_id: 6452
     name_id: 魔法娃娃：石頭高崙
     name: 魔法娃娃：石頭高崙
     duration: 1800

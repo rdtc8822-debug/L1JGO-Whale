@@ -254,7 +254,7 @@ func (s *GroundEffectSystem) applyCubeEnemyNpc(effect *world.GroundEffect, npc *
 				npc.MP = npc.MaxMP
 			}
 		}
-		if effect.DamageTickAcc%cubeBalanceDamageIntervalTicks == 0 {
+		if effect.DamageTickAcc%cubeBalanceDamageIntervalTicks == 0 && !npcDamageBlockedBySkm0LikeJava(npc) {
 			npc.HP -= 25
 			s.finishNpcCubeDamage(effect, npc, nearby)
 		}
@@ -418,6 +418,9 @@ func (s *GroundEffectSystem) applyFireWallDamage(effect *world.GroundEffect) {
 			continue
 		}
 		damage := calcFireWallDamage(effect.OwnerIntel, npc.FireRes)
+		if npcDamageBlockedBySkm0LikeJava(npc) {
+			damage = 0
+		}
 		if damage <= 0 {
 			continue
 		}

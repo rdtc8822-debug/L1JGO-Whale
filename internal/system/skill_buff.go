@@ -25,22 +25,25 @@ func applyImmuneToHarmDamage(target *world.PlayerInfo, damage int32) int32 {
 // 其他三條路徑（L1AttackNpc NPC→PC physical、L1MagicPc/L1MagicNpc magic）公式為
 // `dmg -= (max(targetLvl,50)-50)/5 + 1`。pvpPhysical=true 套用 +10，否則 +1。
 func applyReductionArmorDamage(target *world.PlayerInfo, damage int32, pvpPhysical bool) int32 {
-	if target == nil || damage <= 0 || !target.HasBuff(reductionArmorSkillID) {
+	if target == nil || damage <= 0 {
 		return damage
 	}
-	lvl := int32(target.Level)
-	if lvl < 50 {
-		lvl = 50
-	}
-	reduction := (lvl-50)/5 + 1
-	if pvpPhysical {
-		reduction = (lvl-50)/5 + 10
+	reduction := int32(target.EquipBonuses.DmgReduction)
+	if target.HasBuff(reductionArmorSkillID) {
+		lvl := int32(target.Level)
+		if lvl < 50 {
+			lvl = 50
+		}
+		reduction += (lvl-50)/5 + 1
+		if pvpPhysical {
+			reduction += 9
+		}
 	}
 	damage -= reduction
 	if damage < 0 {
 		damage = 0
 	}
-	return damage
+	return applyDollRandomDamageReduction(target, damage)
 }
 
 func (s *SkillSystem) validateSolidCarriage(player *world.PlayerInfo) bool {
@@ -166,6 +169,7 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 		buff.DeltaMPR = int16(eff.MPR)
 		buff.DeltaBowHit = int16(eff.BowHit)
 		buff.DeltaBowDmg = int16(eff.BowDmg)
+		buff.DeltaWeightPct = int16(eff.WeightPct)
 		buff.DeltaDodge = int16(eff.Dodge)
 		buff.DeltaRegistSustain = int16(eff.RegistSustain)
 		buff.DeltaRegistFreeze = int16(eff.RegistFreeze)
@@ -200,6 +204,7 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 		target.MPR += buff.DeltaMPR
 		target.BowHitMod += buff.DeltaBowHit
 		target.BowDmgMod += buff.DeltaBowDmg
+		target.WeightBonusPct += buff.DeltaWeightPct
 		target.Dodge += buff.DeltaDodge
 		target.RegistSustain += buff.DeltaRegistSustain
 		target.RegistFreeze += buff.DeltaRegistFreeze
@@ -309,12 +314,28 @@ func (s *SkillSystem) applyBuffEffect(target *world.PlayerInfo, skill *data.Skil
 	if target.Session != nil && (buff.DeltaFireRes != 0 || buff.DeltaWaterRes != 0 || buff.DeltaWindRes != 0 || buff.DeltaEarthRes != 0) {
 		handler.SendAbilityScores(target.Session, target)
 	}
+	s.sendBuffStatUpdatePackets(target, buff)
 
 	s.sendBuffIcon(target, skill.SkillID, uint16(skill.BuffDuration))
 
 	// 日光術（技能 2）：上 buff 後更新光源
 	if skill.SkillID == 2 {
 		handler.UpdatePlayerLight(target, s.deps.World)
+	}
+}
+
+func (s *SkillSystem) sendBuffStatUpdatePackets(target *world.PlayerInfo, buff *world.ActiveBuff) {
+	if target.Session == nil {
+		return
+	}
+	if buff.DeltaMaxHP != 0 {
+		sendHPUpdatePacket(target.Session, target.HP, target.MaxHP)
+	}
+	if buff.DeltaMaxMP != 0 {
+		sendMPUpdatePacket(target.Session, target.MP, target.MaxMP)
+	}
+	if buff.DeltaWeightPct != 0 {
+		handler.SendWeightUpdate(target.Session, target)
 	}
 }
 
@@ -393,6 +414,30 @@ func (s *SkillSystem) ApplyGMBuff(player *world.PlayerInfo, skillID int32) bool 
 	}
 	s.applyBuffEffect(player, skill)
 	dur := uint16(skill.BuffDuration)
+	if dur == 0 {
+		dur = 300 // 預設 5 分鐘
+	}
+	s.sendBuffIcon(player, skillID, dur)
+	handler.SendPlayerStatus(player.Session, player)
+	// 負重強化：套用時更新負重
+	if skillID == 14 || skillID == 218 {
+		handler.SendWeightUpdate(player.Session, player)
+	}
+	return true
+}
+
+// ApplyGMBuffWithDuration 以指定秒數套用 GM buff，用於 yiwei type 5 陷阱的 skillTimeSeconds。
+func (s *SkillSystem) ApplyGMBuffWithDuration(player *world.PlayerInfo, skillID int32, durationSec int32) bool {
+	skill := s.deps.Skills.Get(skillID)
+	if skill == nil {
+		return false
+	}
+	effectiveSkill := *skill
+	if durationSec > 0 {
+		effectiveSkill.BuffDuration = int(durationSec)
+	}
+	s.applyBuffEffect(player, &effectiveSkill)
+	dur := uint16(effectiveSkill.BuffDuration)
 	if dur == 0 {
 		dur = 300 // 預設 5 分鐘
 	}
@@ -521,6 +566,7 @@ func (s *SkillSystem) revertBuffStats(target *world.PlayerInfo, buff *world.Acti
 	target.MPR -= buff.DeltaMPR
 	target.BowHitMod -= buff.DeltaBowHit
 	target.BowDmgMod -= buff.DeltaBowDmg
+	target.WeightBonusPct -= buff.DeltaWeightPct
 	target.FireRes -= buff.DeltaFireRes
 	target.WaterRes -= buff.DeltaWaterRes
 	target.WindRes -= buff.DeltaWindRes
@@ -581,6 +627,7 @@ func (s *SkillSystem) revertBuffStats(target *world.PlayerInfo, buff *world.Acti
 	if target.Session != nil && (buff.DeltaFireRes != 0 || buff.DeltaWaterRes != 0 || buff.DeltaWindRes != 0 || buff.DeltaEarthRes != 0) {
 		handler.SendAbilityScores(target.Session, target)
 	}
+	s.sendBuffStatUpdatePackets(target, buff)
 }
 
 // RevertBuffStats implements handler.SkillManager — 還原 buff 的所有屬性修改（Exported）。
@@ -612,6 +659,7 @@ func (s *SkillSystem) ApplyBuffStats(player *world.PlayerInfo, buff *world.Activ
 	player.MPR += buff.DeltaMPR
 	player.BowHitMod += buff.DeltaBowHit
 	player.BowDmgMod += buff.DeltaBowDmg
+	player.WeightBonusPct += buff.DeltaWeightPct
 	player.Dodge += buff.DeltaDodge
 	player.FireRes += buff.DeltaFireRes
 	player.WaterRes += buff.DeltaWaterRes

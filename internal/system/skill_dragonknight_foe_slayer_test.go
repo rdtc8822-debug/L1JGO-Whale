@@ -107,3 +107,50 @@ func TestSkillDragonKnightFoeSlayerFoeSlayerHitsNpcThreeTimesAndCanCopyShockStun
 		t.Fatalf("屠宰者應可對 NPC 套用 COPY_SHOCK_STUN，Paralyzed=%v debuff=%v", npc.Paralyzed, npc.HasDebuff(testSkillCopyShockStun))
 	}
 }
+
+func TestSkillDragonKnightFoeSlayerNpcAbsoluteBarrierBlocksDamageLikeJava(t *testing.T) {
+	ws := world.NewState()
+	caster := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 1,
+		Session:   newSkillTestSession(t, 1),
+		CharID:    1002,
+		Name:      "caster_barrier",
+		X:         100,
+		Y:         100,
+		MapID:     4,
+		Level:     70,
+		Str:       35,
+		DmgMod:    100,
+		HP:        100,
+		MaxHP:     100,
+	})
+	npc := &world.NpcInfo{
+		ID:    2002,
+		NpcID: 45001,
+		Name:  "barrier_target",
+		X:     101,
+		Y:     100,
+		MapID: 4,
+		Level: 1,
+		HP:    1000,
+		MaxHP: 1000,
+		Impl:  "L1Monster",
+	}
+	npc.AddDebuff(78, 100)
+	ws.AddNpc(npc)
+	s := newSkillTestSystem(t, ws)
+	skill := &data.SkillInfo{
+		SkillID:    187,
+		Target:     "attack",
+		Type:       64,
+		Ranged:     2,
+		DamageDice: 1,
+		ActionID:   18,
+	}
+
+	s.executeAttackSkill(caster.Session, caster, skill, npc.ID)
+
+	if npc.HP != npc.MaxHP {
+		t.Fatalf("yiwei FOE_SLAYER 三段 cha.onAction 會進入 L1AttackPc.dmg0，ABSOLUTE_BARRIER NPC 不應扣血，HP=%d want=%d", npc.HP, npc.MaxHP)
+	}
+}

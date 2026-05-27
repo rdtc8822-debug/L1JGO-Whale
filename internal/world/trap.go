@@ -174,6 +174,43 @@ func (mgr *TrapManager) GetTrapsAt(x, y int32, mapID int16) []*TrapInstance {
 	return alive
 }
 
+// GetTrapsInScreen 取得指定座標畫面內的所有存活陷阱。
+// Java: WorldTrap.onDetection() 使用 L1Location.isInScreen()。
+func (mgr *TrapManager) GetTrapsInScreen(x, y int32, mapID int16) []*TrapInstance {
+	if mgr == nil {
+		return nil
+	}
+	var traps []*TrapInstance
+	for _, t := range mgr.allTraps {
+		if t == nil || !t.Alive || t.MapID != mapID {
+			continue
+		}
+		if trapInScreenLikeJava(x, y, t.X, t.Y) {
+			traps = append(traps, t)
+		}
+	}
+	return traps
+}
+
+func trapInScreenLikeJava(x, y, targetX, targetY int32) bool {
+	dist := absTrap32(targetX-x) + absTrap32(targetY-y)
+	if dist > 19 {
+		return false
+	}
+	if dist <= 18 {
+		return true
+	}
+	dist2 := absTrap32(targetX-(x-18)) + absTrap32(targetY-(y-18))
+	return dist2 >= 19 && dist2 <= 52
+}
+
+func absTrap32(v int32) int32 {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
 // DisableTrap 觸發後停用陷阱 + 排入重生佇列。
 func (mgr *TrapManager) DisableTrap(inst *TrapInstance) {
 	inst.Alive = false

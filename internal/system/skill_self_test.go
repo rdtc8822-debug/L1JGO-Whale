@@ -7,6 +7,7 @@ import (
 	"github.com/l1jgo/server/internal/handler"
 	"github.com/l1jgo/server/internal/net/packet"
 	"github.com/l1jgo/server/internal/world"
+	"go.uber.org/zap"
 )
 
 func TestSkillStormWalkUsesJavaBraveConflictsWithoutRemovingStrengthBuff(t *testing.T) {
@@ -236,6 +237,159 @@ func TestSkillDetectionAffectsOnlySameShowLikeJava(t *testing.T) {
 	}
 	if hasPutObjectPacket(drainSkillTestPackets(otherViewer.Session), sameHidden.CharID) {
 		t.Fatal("不同 ShowID 觀眾不應收到被揭示玩家 put object")
+	}
+}
+
+func TestSkillDetectionSkipsGmInvisiblePlayerLikeJava(t *testing.T) {
+	ws := world.NewState()
+	caster := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 11,
+		Session:   newSkillTestSession(t, 11),
+		CharID:    1101,
+		Name:      "caster",
+		X:         100,
+		Y:         100,
+		MapID:     4,
+		ShowID:    21,
+	})
+	gmHidden := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID:   12,
+		Session:     newSkillTestSession(t, 12),
+		CharID:      1102,
+		Name:        "gm-hidden",
+		X:           101,
+		Y:           100,
+		MapID:       4,
+		ShowID:      21,
+		AccessLevel: 200,
+		Invisible:   true,
+	})
+	viewer := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 13,
+		Session:   newSkillTestSession(t, 13),
+		CharID:    1103,
+		Name:      "viewer",
+		X:         102,
+		Y:         100,
+		MapID:     4,
+		ShowID:    21,
+	})
+	gmHidden.AddBuff(&world.ActiveBuff{SkillID: 60, TicksLeft: 100, SetInvisible: true})
+
+	newSkillTestSystem(t, ws).executeSelfSkill(caster.Session, caster, &data.SkillInfo{
+		SkillID:  13,
+		ActionID: 19,
+	})
+
+	if !gmHidden.HasBuff(60) || !gmHidden.Invisible {
+		t.Fatalf("yiwei detection() 會跳過 isGmInvis 目標，buff60=%v Invisible=%v", gmHidden.HasBuff(60), gmHidden.Invisible)
+	}
+	if hasPutObjectPacket(drainSkillTestPackets(viewer.Session), gmHidden.CharID) {
+		t.Fatal("GM 隱身目標未被揭露時，同 ShowID 觀眾不應收到 put object")
+	}
+}
+
+func TestSkillDetectionSkipsGmInvisibleCasterLikeJava(t *testing.T) {
+	ws := world.NewState()
+	caster := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID:   21,
+		Session:     newSkillTestSession(t, 21),
+		CharID:      2101,
+		Name:        "gm-caster",
+		X:           100,
+		Y:           100,
+		MapID:       4,
+		ShowID:      31,
+		AccessLevel: 200,
+		Invisible:   true,
+	})
+	caster.AddBuff(&world.ActiveBuff{SkillID: 60, TicksLeft: 100, SetInvisible: true})
+
+	newSkillTestSystem(t, ws).executeSelfSkill(caster.Session, caster, &data.SkillInfo{
+		SkillID:  13,
+		ActionID: 19,
+	})
+
+	if !caster.HasBuff(60) || !caster.Invisible {
+		t.Fatalf("yiwei detection() 會跳過 isGmInvis 的施法者自身，buff60=%v Invisible=%v", caster.HasBuff(60), caster.Invisible)
+	}
+}
+
+func TestSkillDetectionDetectsScreenTrapsLikeJava(t *testing.T) {
+	ws := world.NewState()
+	caster := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 31,
+		Session:   newSkillTestSession(t, 31),
+		CharID:    3101,
+		Name:      "caster",
+		X:         100,
+		Y:         100,
+		MapID:     4,
+		ShowID:    41,
+	})
+	viewer := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 32,
+		Session:   newSkillTestSession(t, 32),
+		CharID:    3102,
+		Name:      "viewer",
+		X:         101,
+		Y:         100,
+		MapID:     4,
+		ShowID:    41,
+	})
+	otherShow := addSkillTestPlayer(ws, &world.PlayerInfo{
+		SessionID: 33,
+		Session:   newSkillTestSession(t, 33),
+		CharID:    3103,
+		Name:      "other-show",
+		X:         101,
+		Y:         101,
+		MapID:     4,
+		ShowID:    42,
+	})
+	trapData := &data.TrapData{
+		Templates: map[int32]*data.TrapTemplate{
+			1: {TrapID: 1, Type: 1, GfxID: 2231, Detectionable: true},
+			2: {TrapID: 2, Type: 1, GfxID: 2232, Detectionable: false},
+			3: {TrapID: 3, Type: 1, GfxID: 2233, Detectionable: true},
+		},
+		Spawns: []data.TrapSpawn{
+			{TrapID: 1, MapID: 4, X: 101, Y: 100, Count: 1},
+			{TrapID: 2, MapID: 4, X: 102, Y: 100, Count: 1},
+			{TrapID: 3, MapID: 4, X: 130, Y: 100, Count: 1},
+		},
+	}
+	trapMgr := world.NewTrapManager(trapData, nil)
+	detectableTrap := trapMgr.GetTrapsAt(101, 100, 4)[0]
+	undetectableTrap := trapMgr.GetTrapsAt(102, 100, 4)[0]
+	outsideTrap := trapMgr.GetTrapsAt(130, 100, 4)[0]
+	deps := &handler.Deps{World: ws, Log: zap.NewNop(), TrapMgr: trapMgr}
+	deps.Trap = NewTrapSystem(deps)
+	sys := &SkillSystem{deps: deps}
+
+	sys.executeSelfSkill(caster.Session, caster, &data.SkillInfo{
+		SkillID:  13,
+		ActionID: 19,
+	})
+
+	if detectableTrap.Alive {
+		t.Fatal("yiwei WorldTrap.onDetection 應停用畫面內陷阱")
+	}
+	if undetectableTrap.Alive {
+		t.Fatal("yiwei WorldTrap.onDetection 即使不可探查也會停用畫面內陷阱")
+	}
+	if !outsideTrap.Alive {
+		t.Fatal("畫面外陷阱不應被 DETECTION 偵測或停用")
+	}
+	viewerPackets := drainSkillTestPackets(viewer.Session)
+	if !hasEffectLocationPacket(viewerPackets, detectableTrap.X, detectableTrap.Y, detectableTrap.Template.GfxID) {
+		t.Fatal("可探查陷阱應對同 ShowID 觀眾送出 S_EffectLocation")
+	}
+	if hasEffectLocationPacket(viewerPackets, undetectableTrap.X, undetectableTrap.Y, undetectableTrap.Template.GfxID) {
+		t.Fatal("不可探查陷阱不應送出陷阱特效")
+	}
+	if hasEffectLocationPacket(drainSkillTestPackets(otherShow.Session), detectableTrap.X, detectableTrap.Y, detectableTrap.Template.GfxID) {
+		t.Fatal("陷阱偵測特效不應跨 ShowID 廣播")
 	}
 }
 

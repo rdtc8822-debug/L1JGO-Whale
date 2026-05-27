@@ -50,7 +50,7 @@ func (m *captureSummonManager) ExecuteTamingMonster(_ *l1net.Session, _ *world.P
 func (m *captureSummonManager) ExecuteCreateZombie(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo, _ int32) {
 }
 
-func (m *captureSummonManager) ExecuteReturnToNature(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo) {
+func (m *captureSummonManager) ExecuteReturnToNature(_ *l1net.Session, _ *world.PlayerInfo, _ *data.SkillInfo, _ int32) {
 }
 
 func (m *captureSummonManager) DismissSummon(_ *world.SummonInfo, _ *world.PlayerInfo) {}

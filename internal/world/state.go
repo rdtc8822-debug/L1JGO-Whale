@@ -10,78 +10,82 @@ import (
 // PlayerInfo holds in-memory data for a player currently in-world.
 // Accessed only from the game loop goroutine — no locks needed.
 type PlayerInfo struct {
-	SessionID         uint64
-	Session           *net.Session
-	CharID            int32 // DB ID, used as object ID in packets
-	Name              string
-	X                 int32
-	Y                 int32
-	MapID             int16
-	Heading           int16
-	ClassID           int32 // GFX
-	Sex               int16 // 0=male, 1=female
-	Level             int16
-	Lawful            int32
-	Title             string
-	ClanID            int32
-	ClanName          string
-	ClanRank          int16
-	ClassType         int16 // 0=Prince, 1=Knight, 2=Elf, 3=Wizard, 4=DarkElf, 5=DragonKnight, 6=Illusionist
-	ElfAttr           int16 // Java getElfAttr(): 0=無, 1=地, 2=火, 4=水, 8=風
-	HP                int32
-	MaxHP             int32
-	MP                int32
-	MaxMP             int32
-	Str               int16
-	Dex               int16
-	Con               int16
-	Wis               int16
-	Intel             int16
-	Cha               int16
-	Exp               int32 // cumulative total exp
-	BonusStats        int16 // number of bonus stat points already allocated (level 51+)
-	ElixirStats       int16 // 萬能藥使用次數（洗點時用於計算可分配點數）
-	Speed             byte  // 0=normal, 1=fast, etc.
-	MoveSpeed         byte  // 0=normal, 1=hasted (green potion), 2=slowed
-	BraveSpeed        byte  // 0=none, 1=brave (attack speed), 3=elf brave
-	HasteItemEquipped int   // Java getHasteItemEquipped(): equipped item-based haste counter
-	HasteTicks        int   // remaining ticks for haste buff (0 = expired)
-	BraveTicks        int   // remaining ticks for brave buff (0 = expired)
-	WisdomTicks       int   // remaining ticks for wisdom buff (0 = expired)
-	WisdomSP          int16 // SP bonus from wisdom potion (removed when buff expires)
-	AC                int16 // current AC (base 10 - equipment bonus; lower = better)
-	MR                int16 // magic resistance
-	HitMod            int16 // melee hit bonus from buffs
-	DmgMod            int16 // melee damage bonus from buffs
-	BowHitMod         int16 // bow hit bonus from buffs
-	BowDmgMod         int16 // bow damage bonus from buffs
-	SP                int16 // spell power bonus from buffs
-	HPR               int16 // HP regen bonus from buffs (per regen tick)
-	MPR               int16 // MP regen bonus from buffs (per regen tick)
-	FireRes           int16 // fire resistance
-	WaterRes          int16 // water resistance
-	WindRes           int16 // wind resistance
-	EarthRes          int16 // earth resistance
-	Dodge             int16 // dodge bonus
-	RegistSustain     int16 // 持續傷害抗性
-	RegistFreeze      int16 // 凍結抗性
-	RegistStun        int16 // 暈眩抗性
-	RegistStone       int16 // 石化抗性
-	RegistBlind       int16 // 失明抗性
-	RegistSleep       int16 // 睡眠抗性
-	StunLevel         int16 // 昏迷等級（Java: getStunLevel，用於衝擊之暈成功率）
-	MagicCritical     int16 // 魔法爆擊加成
-	OriginalMagicHit  int16 // 額外魔法命中（Java: getOriginalMagicHit，用於有害魔法成功率）
-	Food              int16 // satiety 0-225 (225=full); sent in S_STATUS
-	FoodFullTime      int64 // 飽食度達 225 的時刻（Unix 秒）；-1=未滿（Java: _h_time，生存吶喊用）
-	CookingID         int32 // 當前料理 buff 的 skill ID（0=無）；同時只能有一個
-	AccessLevel       int16 // GM 等級（0=一般玩家, ≥200=GM）
-	PKCount           int32 // PK kill count
-	KillCount         int32 // PvP 擊殺累計（排名用）
-	DeathCount        int32 // PvP 死亡累計（排名用）
-	PartnerID         int32 // 配偶角色 ID（0=未婚；結婚系統用）
-	MarriageRingID    int32 // 結婚時使用的戒指物品 ID（Java: QUEST_MARRY step）
-	TempID            int32 // 暫存目標 ID（Java: pc.setTempID）— 寵物改名等用途
+	SessionID                 uint64
+	Session                   *net.Session
+	CharID                    int32 // DB ID, used as object ID in packets
+	Name                      string
+	X                         int32
+	Y                         int32
+	MapID                     int16
+	Heading                   int16
+	ClassID                   int32 // GFX
+	Sex                       int16 // 0=male, 1=female
+	Level                     int16
+	Lawful                    int32
+	Title                     string
+	ClanID                    int32
+	ClanName                  string
+	ClanRank                  int16
+	ClassType                 int16 // 0=Prince, 1=Knight, 2=Elf, 3=Wizard, 4=DarkElf, 5=DragonKnight, 6=Illusionist
+	ElfAttr                   int16 // Java getElfAttr(): 0=無, 1=地, 2=火, 4=水, 8=風
+	HP                        int32
+	MaxHP                     int32
+	MP                        int32
+	MaxMP                     int32
+	Str                       int16
+	Dex                       int16
+	Con                       int16
+	Wis                       int16
+	Intel                     int16
+	Cha                       int16
+	Exp                       int32 // cumulative total exp
+	BonusStats                int16 // number of bonus stat points already allocated (level 51+)
+	ElixirStats               int16 // 萬能藥使用次數（洗點時用於計算可分配點數）
+	Speed                     byte  // 0=normal, 1=fast, etc.
+	MoveSpeed                 byte  // 0=normal, 1=hasted (green potion), 2=slowed
+	BraveSpeed                byte  // 0=none, 1=brave (attack speed), 3=elf brave
+	HasteItemEquipped         int   // Java getHasteItemEquipped(): equipped item-based haste counter
+	HasteTicks                int   // remaining ticks for haste buff (0 = expired)
+	BraveTicks                int   // remaining ticks for brave buff (0 = expired)
+	WisdomTicks               int   // remaining ticks for wisdom buff (0 = expired)
+	WisdomSP                  int16 // SP bonus from wisdom potion (removed when buff expires)
+	AC                        int16 // current AC (base 10 - equipment bonus; lower = better)
+	MR                        int16 // magic resistance
+	HitMod                    int16 // melee hit bonus from buffs
+	DmgMod                    int16 // melee damage bonus from buffs
+	BowHitMod                 int16 // bow hit bonus from buffs
+	BowDmgMod                 int16 // bow damage bonus from buffs
+	DollDmgAdd                int16 // 魔法娃娃機率增傷量（Yiwei: dmgAdd）
+	DollDmgAddChance          int   // 魔法娃娃機率增傷機率百分比
+	SP                        int16 // spell power bonus from buffs
+	HPR                       int16 // HP regen bonus from buffs (per regen tick)
+	MPR                       int16 // MP regen bonus from buffs (per regen tick)
+	FireRes                   int16 // fire resistance
+	WaterRes                  int16 // water resistance
+	WindRes                   int16 // wind resistance
+	EarthRes                  int16 // earth resistance
+	Dodge                     int16 // dodge bonus
+	RegistSustain             int16 // 持續傷害抗性
+	RegistFreeze              int16 // 凍結抗性
+	RegistStun                int16 // 暈眩抗性
+	RegistStone               int16 // 石化抗性
+	RegistBlind               int16 // 失明抗性
+	RegistSleep               int16 // 睡眠抗性
+	StunLevel                 int16 // 昏迷等級（Java: getStunLevel，用於衝擊之暈成功率）
+	MagicCritical             int16 // 魔法爆擊加成
+	OriginalMagicHit          int16 // 額外魔法命中（Java: getOriginalMagicHit，用於有害魔法成功率）
+	DollDmgReduceRandom       int16 // 魔法娃娃機率減傷量（Yiwei: dmgDowe）
+	DollDmgReduceRandomChance int   // 魔法娃娃機率減傷機率百分比
+	Food                      int16 // satiety 0-225 (225=full); sent in S_STATUS
+	FoodFullTime              int64 // 飽食度達 225 的時刻（Unix 秒）；-1=未滿（Java: _h_time，生存吶喊用）
+	CookingID                 int32 // 當前料理 buff 的 skill ID（0=無）；同時只能有一個
+	AccessLevel               int16 // GM 等級（0=一般玩家, ≥200=GM）
+	PKCount                   int32 // PK kill count
+	KillCount                 int32 // PvP 擊殺累計（排名用）
+	DeathCount                int32 // PvP 死亡累計（排名用）
+	PartnerID                 int32 // 配偶角色 ID（0=未婚；結婚系統用）
+	MarriageRingID            int32 // 結婚時使用的戒指物品 ID（Java: QUEST_MARRY step）
+	TempID                    int32 // 暫存目標 ID（Java: pc.setTempID）— 寵物改名等用途
 
 	// 武器吸血/吸魔累計值（Java: L1PcInstance dice_hp/sucking_hp/dice_mp/sucking_mp）
 	DrainDiceHP       int   // 所有裝備累計的 HP 吸取機率
@@ -158,6 +162,8 @@ type PlayerInfo struct {
 	// 額外負重加成（MISS-P1-006）— 來自魔法娃娃等系統，獨立於 buff 14/218。
 	// 對應 Java Doll_Weight 系列。PlayerMaxWeight 會疊加此值。
 	WeightBonus int32
+	// 額外負重百分比（Java add_weightUP）。值 4 代表最大負重 +4%。
+	WeightBonusPct int16
 
 	// Cached current weapon visual byte (for S_PUT_OBJECT / S_CHANGE_DESC)
 	CurrentWeapon byte
@@ -216,11 +222,13 @@ type PlayerInfo struct {
 
 	// --- 中毒系統（Java L1Poison）---
 	// PoisonType: 0=無, 1=傷害毒, 2=沉默毒, 3=麻痺毒延遲中, 4=麻痺毒已麻痺
-	PoisonType      byte
-	PoisonTicksLeft int    // 毒剩餘 ticks（傷害毒:150, 麻痺延遲:100, 麻痺:80）
-	PoisonDmgTimer  int    // 傷害毒：距下次扣血的 tick 計數（每 15 tick 扣一次）
-	PoisonDmgAmount int16  // 傷害毒每次扣血量（NPC攻擊:20, 毒咒:5）
-	PoisonAttacker  uint64 // 施毒者 SessionID（傷害毒歸屬用）
+	PoisonType             byte
+	PoisonTicksLeft        int    // 毒剩餘 ticks（傷害毒:150, 麻痺延遲:100, 麻痺:80）
+	PoisonDmgTimer         int    // 傷害毒：距下次扣血的 tick 計數（每 15 tick 扣一次）
+	PoisonDmgIntervalTicks int    // 傷害毒扣血間隔；0 表示使用 Java 一般預設 15 ticks
+	PoisonDmgAmount        int16  // 傷害毒每次扣血量（NPC攻擊:20, 毒咒:5）
+	PoisonParalysisTicks   int    // 麻痺毒延遲後的麻痺持續 ticks；0 表示使用 Java 一般預設 80 ticks
+	PoisonAttacker         uint64 // 施毒者 SessionID（傷害毒歸屬用）
 
 	// 投石車沉默砲彈到期時間（Unix 秒，0=無效）
 	CatapultSilenceEnd int64
@@ -329,6 +337,7 @@ type WarehouseCache struct {
 	Identified       bool
 	UseType          byte // 0=etcitem, 1=weapon, 2=armor
 	ChargeCount      int16
+	LastUsedAt       int64
 	Durability       int8
 	AttrEnchantKind  int8
 	AttrEnchantLevel int8
@@ -381,6 +390,7 @@ type ActiveBuff struct {
 	DeltaMPR           int16
 	DeltaBowHit        int16
 	DeltaBowDmg        int16
+	DeltaWeightPct     int16
 	DeltaFireRes       int16
 	DeltaWaterRes      int16
 	DeltaWindRes       int16

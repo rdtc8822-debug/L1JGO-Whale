@@ -209,6 +209,7 @@ type ItemInfo struct {
 	FoodVolume     int
 	DelayID        int
 	DelayTime      int
+	DelayEffect    int
 
 	// Client use_type byte (integer mapping of UseType string).
 	// Sent in S_ADD_INVENTORY_BATCH / S_ADD_ITEM packets.
@@ -578,6 +579,7 @@ type etcItemEntry struct {
 	Tradeable      bool   `yaml:"tradeable"`
 	DelayID        int    `yaml:"delay_id"`
 	DelayTime      int    `yaml:"delay_time"`
+	DelayEffect    int    `yaml:"delay_effect"`
 	FoodVolume     int    `yaml:"food_volume"`
 }
 
@@ -620,6 +622,7 @@ func loadEtcItems(t *ItemTable, path string) error {
 			FoodVolume:     e.FoodVolume,
 			DelayID:        e.DelayID,
 			DelayTime:      e.DelayTime,
+			DelayEffect:    e.DelayEffect,
 			LocX:           e.LocX,
 			LocY:           e.LocY,
 			LocMapID:       e.MapID,

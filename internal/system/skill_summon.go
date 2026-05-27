@@ -17,6 +17,22 @@ func NewSummonSystem(deps *handler.Deps) *SummonSystem {
 	return &SummonSystem{deps: deps}
 }
 
+func (s *SummonSystem) broadcastSummonCastVisual(player *world.PlayerInfo, skill *data.SkillInfo, effectObjectID int32) {
+	if s == nil || s.deps == nil || s.deps.World == nil || player == nil || skill == nil {
+		return
+	}
+	if effectObjectID == 0 {
+		effectObjectID = player.CharID
+	}
+	viewers := companionViewersAt(s.deps.World, player.X, player.Y, player.MapID, player.ShowID)
+	if skill.ActionID > 0 {
+		handler.BroadcastToPlayers(viewers, handler.BuildActionGfx(player.CharID, byte(skill.ActionID)))
+	}
+	if skill.CastGfx > 0 {
+		handler.BroadcastToPlayers(viewers, handler.BuildSkillEffect(effectObjectID, skill.CastGfx))
+	}
+}
+
 // calcUsedPetCost 委派到 PetLifecycleManager 計算已使用的 CHA 消耗。
 func (s *SummonSystem) calcUsedPetCost(charID int32) int {
 	if s.deps.PetLife != nil {
@@ -219,6 +235,7 @@ func (s *SummonSystem) ExecuteSummonMonster(sess *net.Session, player *world.Pla
 
 	// 所有驗證通過 — 消耗資源
 	s.deps.Skill.ConsumeSkillResources(sess, player, skill)
+	s.broadcastSummonCastVisual(player, skill, player.CharID)
 
 	// 清除召喚選擇模式
 	player.SummonSelectionMode = false
@@ -320,6 +337,7 @@ func (s *SummonSystem) ExecuteElementalSummon(sess *net.Session, player *world.P
 		petCost = 7
 	}
 	s.deps.Skill.ConsumeSkillResources(sess, player, skill)
+	s.broadcastSummonCastVisual(player, skill, player.CharID)
 
 	sum := &world.SummonInfo{
 		ID:          world.NextNpcID(),
@@ -410,6 +428,7 @@ func (s *SummonSystem) ExecuteTamingMonster(sess *net.Session, player *world.Pla
 
 	// 所有驗證通過 — 消耗資源
 	s.deps.Skill.ConsumeSkillResources(sess, player, skill)
+	s.broadcastSummonCastVisual(player, skill, npc.ID)
 
 	// 從 NPC 建立召喚獸
 	sum := &world.SummonInfo{
@@ -533,6 +552,7 @@ func (s *SummonSystem) ExecuteCreateZombie(sess *net.Session, player *world.Play
 
 	// 所有驗證通過 — 消耗資源
 	s.deps.Skill.ConsumeSkillResources(sess, player, skill)
+	s.broadcastSummonCastVisual(player, skill, npc.ID)
 
 	sum := &world.SummonInfo{
 		ID:          world.NextNpcID(),
@@ -592,23 +612,52 @@ func (s *SummonSystem) ExecuteCreateZombie(sess *net.Session, player *world.Play
 
 // ExecuteReturnToNature 處理技能 145（歸返自然）。
 // 非馴服的召喚獸銷毀；馴服的釋放回 NPC 型態。
-func (s *SummonSystem) ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo) {
+func (s *SummonSystem) ExecuteReturnToNature(sess *net.Session, player *world.PlayerInfo, skill *data.SkillInfo, targetID int32) {
 	ws := s.deps.World
-	summons := ws.GetSummonsByOwner(player.CharID)
-	if len(summons) == 0 {
+	sum := ws.GetSummon(targetID)
+	if sum == nil {
+		handler.SendServerMessage(sess, msgInvalidTarget)
 		return
 	}
 
-	// 驗證通過（有召喚獸） — 消耗資源
+	// 驗證通過（目標為召喚獸） — 消耗資源
 	s.deps.Skill.ConsumeSkillResources(sess, player, skill)
+	s.broadcastSummonCastVisual(player, skill, sum.ID)
 
-	for _, sum := range summons {
-		if sum.Tamed {
-			s.liberateSummon(sum)
-		} else {
-			s.killSummon(sum)
+	if !s.returnToNatureSucceeds(player, skill, sum) {
+		return
+	}
+
+	if sum.Tamed {
+		s.liberateSummon(sum)
+	} else {
+		s.killSummon(sum)
+	}
+}
+
+func (s *SummonSystem) returnToNatureSucceeds(player *world.PlayerInfo, skill *data.SkillInfo, sum *world.SummonInfo) bool {
+	if player == nil || skill == nil || sum == nil {
+		return false
+	}
+	defenseLevel := int(sum.Level)
+	if s != nil && s.deps != nil && s.deps.World != nil {
+		if master := s.deps.World.GetByCharID(sum.OwnerCharID); master != nil {
+			defenseLevel = int(master.Level)
 		}
 	}
+	prob := int(float64(skill.ProbabilityDice)/10.0*float64(int(player.Level)-defenseLevel)) +
+		skill.ProbabilityValue -
+		int(sum.MR)/10 +
+		int(player.OriginalMagicHit) +
+		shockStunIntMagicHit(player.Intel) +
+		shockStunBaseIntMagicHit(player)
+	if prob > 100 {
+		prob = 100
+	}
+	if prob < 0 {
+		prob = 0
+	}
+	return world.RandInt(100)+1 <= prob
 }
 
 // DismissSummon 自願解散召喚獸（從 NPC 選單觸發）。

@@ -29,8 +29,8 @@ func (s *SkillSystem) executeSelfAreaAttackSkill(sess *net.Session, player *worl
 		}
 		res := s.deps.Scripting.CalcSkillDamage(s.buildPlayerSkillDamageContext(player, target, skill))
 		dmg := int32(res.Damage)
-		targets = append(targets, handler.RangeSkillTarget{ObjectID: target.CharID, Hit: dmg > 0, Damage: dmg})
-		s.applySelfAreaSkillDamageToPlayerNoVisual(sess, player, target, skill, dmg, nearby)
+		applied := s.applySelfAreaSkillDamageToPlayerNoVisual(sess, player, target, skill, dmg, nearby)
+		targets = append(targets, handler.RangeSkillTarget{ObjectID: target.CharID, Hit: applied > 0, Damage: applied})
 	}
 
 	nearbyNpcs := s.deps.World.GetNearbyNpcs(player.X, player.Y, player.MapID)
@@ -64,7 +64,7 @@ func (s *SkillSystem) executeSelfAreaAttackSkill(sess *net.Session, player *worl
 	}
 }
 
-func (s *SkillSystem) applySelfAreaSkillDamageToPlayerNoVisual(sess *net.Session, player, target *world.PlayerInfo, skill *data.SkillInfo, dmg int32, nearby []*world.PlayerInfo) {
+func (s *SkillSystem) applySelfAreaSkillDamageToPlayerNoVisual(sess *net.Session, player, target *world.PlayerInfo, skill *data.SkillInfo, dmg int32, nearby []*world.PlayerInfo) int32 {
 	if dmg < 0 {
 		dmg = 0
 	}
@@ -72,13 +72,14 @@ func (s *SkillSystem) applySelfAreaSkillDamageToPlayerNoVisual(sess *net.Session
 		dmg = 0
 	}
 	dmg = applyImmuneToHarmDamage(target, dmg)
+	dmg = applyDragonEyeMagicDamageReductionLikeYiwei(target, dmg, world.RandInt(100), nearby)
 	dmg = s.applyCounterMirrorMagicDamage(player, target, dmg, world.RandInt(100), nearby)
 
 	if player.AttackView {
 		handler.SendDamageNumbers(sess, target.CharID, dmg)
 	}
 	if dmg <= 0 {
-		return
+		return 0
 	}
 
 	if target.Sleeped {
@@ -94,9 +95,10 @@ func (s *SkillSystem) applySelfAreaSkillDamageToPlayerNoVisual(sess *net.Session
 		if s.deps.Death != nil {
 			s.deps.Death.KillPlayer(target)
 		}
-		return
+		return dmg
 	}
 	sendHpUpdate(target.Session, target)
+	return dmg
 }
 
 func (s *SkillSystem) calcSelfAreaSkillNpcDamage(player *world.PlayerInfo, npc *world.NpcInfo, skill *data.SkillInfo) int32 {
@@ -139,7 +141,7 @@ func (s *SkillSystem) applySelfAreaSkillDamageToNpcNoVisual(sess *net.Session, p
 	if dmg < 0 {
 		dmg = 0
 	}
-	if dmg > 0 && npcHasAbsoluteBarrierDamageZeroLikeJava(npc) {
+	if dmg > 0 && npcDamageBlockedBySkm0LikeJava(npc) {
 		dmg = 0
 	}
 	if dmg > 0 && !(skill.DamageValue == 0 && skill.DamageDice == 0) {
